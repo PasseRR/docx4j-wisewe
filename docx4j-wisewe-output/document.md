@@ -3,23 +3,23 @@
 <details>
 <summary><b>1.标题正文</b></summary>
 
-<h5>效果</h5>
+##### 效果
 
-<blockquote>
-<h1>标题一</h1>
-<h2>标题二</h2>
-<h3>标题三</h3>
-<h4>标题五</h4>
-<h5>标题七</h5>
-<h6>标题九</h6>
-<p>这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文</p>
-</blockquote>
+> # 标题一
+> ## 标题二
+> ### 标题三
+> #### 标题五
+> ##### 标题七
+> ###### 标题九
+> 这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文</p>
 
-<blockquote>
-说明：支持以上标题样式直接设定，其他标题样式可通过style方法自定义样式设定。
-</blockquote>
 
-<pre><code lang="java"> public void simple() throws IOException {
+> 说明：支持以上标题样式直接设定，其他标题样式可通过style方法自定义样式设定。
+
+##### 代码
+
+```java
+public void simple() throws IOException {
     DocumentBuilder.create()
         .headingParagraph("标题一", ParagraphStyle.HEADING_1)
         .headingParagraph("标题二", ParagraphStyle.HEADING_2)
@@ -30,12 +30,14 @@
         .textParagraph("这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文")
         .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "simple.docx")));
 }
-</code></pre>
+```
+
 </details>
 
 <details>
 <summary><b>2.动态分页</b></summary>
-<h5>效果</h5>
+
+##### 效果
 
 <blockquote>
  在本段落后面手动添加个分页符
@@ -91,25 +93,27 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void breakPage() throws FileNotFoundException {
-        List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
-            .textParagraph("在本段落后面手动添加个分页符")
-            // 手动添加分页符
-            .pageBreak()
-            .textParagraph("多个文档之间自动添加分页符")
-            // 多个文档之间 自动添加分页符
-            .documents(people, (it, d) ->
-                // 分页文档
-                d.headingParagraph(it.getName() + "个人信息", ParagraphStyle.SUB_HEADING)
-                    .table(2, 3, t ->
-                        t.row(r -> r.headCells("姓名", "年龄", "性别"))
-                            .row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
-                    )
-            )
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "break-page.docx")));
-    }
-</code></pre>
+```java
+public void breakPage() throws FileNotFoundException {
+	List<Person> people = SpecDataFactory.tableData();
+	DocumentBuilder.create()
+		.textParagraph("在本段落后面手动添加个分页符")
+		// 手动添加分页符
+		.pageBreak()
+		.textParagraph("多个文档之间自动添加分页符")
+		// 多个文档之间 自动添加分页符
+		.documents(people, (it, d) ->
+			// 分页文档
+			d.headingParagraph(it.getName() + "个人信息", ParagraphStyle.SUB_HEADING)
+				.table(2, 3, t ->
+					t.row(r -> r.headCells("姓名", "年龄", "性别"))
+						.row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
+				)
+		)
+		.writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "break-page.docx")));
+}
+```
+
 </details>
 
 <details>
@@ -158,7 +162,8 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void table() throws FileNotFoundException {
+```java
+public void table() throws FileNotFoundException {
     List<Person> people = SpecDataFactory.tableData();
     DocumentBuilder.create()
          // 添加副标题
@@ -172,7 +177,7 @@
               )
         .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "table.docx")));
 }
-</code></pre>
+```
 
 </details>
 
@@ -220,7 +225,8 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void mergeTable() throws FileNotFoundException {
+```java
+public void mergeTable() throws FileNotFoundException {
     List<Person> people = SpecDataFactory.tableData();
     // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
     Map<String, List<Person>> groupBySex = people.stream().collect(Collectors.groupingBy(Person::getSex));
@@ -250,7 +256,7 @@
         })
         .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "merge-table.docx")));
 }
-</code></pre>
+```
 
 </details>
 
@@ -269,7 +275,8 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void simpleHeaderAndFooter() throws FileNotFoundException {
+```java
+public void simpleHeaderAndFooter() throws FileNotFoundException {
     DocumentBuilder.create()
         .headingParagraph("标题一", ParagraphStyle.HEADING_1)
         .textParagraph("这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文")
@@ -279,7 +286,7 @@
         new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "simple-header-foote1r.docx"))
     );
 }
-</code></pre>
+```
 
 </details>
 
@@ -333,23 +340,24 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void complexHeaderAndFooter() throws FileNotFoundException {
-        List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
-            // 多个文档 自动添加分页符
-            .documents(people, (it, d) ->
-                // 分页文档
-                d.headingParagraph(it.getName() + "个人信息", ParagraphStyle.SUB_HEADING)
-                    .table(2, 3, t ->
-                        t.row(r -> r.headCells("姓名", "年龄", "性别"))
-                            .row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
-                    )
-            )
-            .header(HeaderFooterType.DEFAULT, h -> h.text("某公司职工信息"))
-            .footer(HeaderFooterType.DEFAULT, f -> f.page("第", "页/共", "页"))
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "complex-header-footer.docx")));
-    }
-</code></pre>
+```java
+public void complexHeaderAndFooter() throws FileNotFoundException {
+	List<Person> people = SpecDataFactory.tableData();
+	DocumentBuilder.create()
+		// 多个文档 自动添加分页符
+		.documents(people, (it, d) ->
+			// 分页文档
+			d.headingParagraph(it.getName() + "个人信息", ParagraphStyle.SUB_HEADING)
+				.table(2, 3, t ->
+					t.row(r -> r.headCells("姓名", "年龄", "性别"))
+						.row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
+				)
+		)
+		.header(HeaderFooterType.DEFAULT, h -> h.text("某公司职工信息"))
+		.footer(HeaderFooterType.DEFAULT, f -> f.page("第", "页/共", "页"))
+		.writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "complex-header-footer.docx")));
+}
+```
 
 </details>
 
@@ -421,7 +429,8 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void picture() throws FileNotFoundException {
+```java
+public void picture() throws FileNotFoundException {
     List<Person> people = SpecDataFactory.tableData();
     DocumentBuilder.create()
         .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
@@ -459,6 +468,6 @@
                )
         .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "picture.docx")));
 }
-</code></pre>
+```
 
 </details>
