@@ -2,7 +2,7 @@
 
 <details>
 <summary><b>1.目录导出</b></summary>
-<h5>效果</h5>
+##### 效果
 
 <blockquote>
 . folders.zip       <br/>
@@ -24,26 +24,29 @@
 |                   <br/>
 </blockquote>
 
-<h5>代码</h5>
-<pre><code lang="java">public void folders() throws FileNotFoundException {
-        CompressionBuilder.create()
-            // 文件目录
-            .folder(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
-            // 自定义目录
-            .folder("abc", (fn, b) ->
-                b.folders(IntStream.range(1, 6).boxed().collect(Collectors.toList()), t -> fn + t, (n, nfn, t) -> {})
-            )
-            .folder("cde", (fn, b) ->
-                b.folders(IntStream.range(6, 10).boxed().collect(Collectors.toList()), t -> fn + t, (n, nfn, t) -> {})
-            )
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "folders.zip")));
-    }
-</code></pre>
+##### 代码
+
+```java
+public void folders() throws FileNotFoundException {
+    CompressionBuilder.create()
+        // 文件目录
+        .folder(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
+        // 自定义目录
+        .folder("abc", (fn, b) ->
+            b.folders(IntStream.range(1, 6).boxed().collect(Collectors.toList()), t -> fn + t, (n, nfn, t) -> {})
+        )
+        .folder("cde", (fn, b) ->
+            b.folders(IntStream.range(6, 10).boxed().collect(Collectors.toList()), t -> fn + t, (n, nfn, t) -> {})
+        )
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "folders.zip")));
+}
+```
+
 </details>
 
 <details>
 <summary><b>2.文件导出</b></summary>
-<h5>效果</h5>
+##### 效果
 
 <blockquote>    <br/> 
 . files.zip     <br/>               
@@ -58,25 +61,28 @@
 |               <br/> 
 </blockquote>
 
-<h5>代码</h5>
-<pre><code lang="java">public void files() throws FileNotFoundException {
-        CompressionBuilder.create()
-            // 已有文件
-            .file(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
-            // 空的word文件
-            .file(DocumentFileType.DOCX.fullName("a"), os -> DocumentBuilder.create().writeTo(os, false))
-            // 空的excel文件
-            .file(SpreadSheetFileType.XLSX.fullName("b"), os -> SpreadSheetBuilder.create().writeTo(os, false))
-            // 空的pdf文件
-            .file(PortableFileType.PDF.fullName("c"), os -> PortableBuilder.fastCreate().writeTo(os, false))
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "files.zip")));
-    }
-</code></pre>
+##### 代码
+
+```java
+public void files() throws FileNotFoundException {
+    CompressionBuilder.create()
+        // 已有文件
+        .file(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
+        // 空的word文件
+        .file(DocumentFileType.DOCX.fullName("a"), os -> DocumentBuilder.create().writeTo(os, false))
+        // 空的excel文件
+        .file(SpreadSheetFileType.XLSX.fullName("b"), os -> SpreadSheetBuilder.create().writeTo(os, false))
+        // 空的pdf文件
+        .file(PortableFileType.PDF.fullName("c"), os -> PortableBuilder.fastCreate().writeTo(os, false))
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "files.zip")));
+}
+```
+
 </details>
 
 <details>
 <summary><b>3.复杂目录导出</b></summary>
-<h5>效果</h5>
+### 效果
 
 <blockquote>    <br/> 
 . complex.zip     <br/>               
@@ -151,8 +157,10 @@
 | <br>
 </blockquote>
 
-<h5>代码</h5>
-<pre><code lang="java">public void complex() throws FileNotFoundException {
+##### 代码
+
+```java
+public void complex() throws FileNotFoundException {
         // 文件类型示例
         // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
         List<String> sexList =
@@ -219,5 +227,6 @@
             })
             .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "complex.zip")));
     }
-</code></pre>
+```
+
 </details>
