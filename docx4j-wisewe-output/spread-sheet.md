@@ -42,7 +42,8 @@
 
 <h5> 代码 </h5>
 
-<pre><code lang="java">public void simple() throws FileNotFoundException {
+```java
+public void simple() throws FileNotFoundException {
     SpreadSheetBuilder.create()
         .workbook(wb ->
             wb.sheet(s ->
@@ -59,7 +60,8 @@
         )
         .writeTo(new FileOutputStream(prefix + "simple.xlsx"));
 }
-</code></pre>
+```
+
 </details>
 
 <details>
@@ -105,7 +107,8 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void mergeHead() throws FileNotFoundException {
+```java
+public void mergeHead() throws FileNotFoundException {
     SpreadSheetBuilder.create()
         .workbook(wb ->
             wb.sheet(s ->
@@ -122,7 +125,7 @@
         )
         .writeTo(new FileOutputStream(prefix + "merge-head.xlsx"));
 }
-</code></pre>
+```
 
 </details>
 
@@ -165,7 +168,8 @@
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void mergeData() throws FileNotFoundException {
+```java
+public void mergeData() throws FileNotFoundException {
     // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
     Map<String, List<code>> groupBySex =
         SpecDataFactory.excelData().stream().collect(Collectors.groupingBy(Person::getSex));
@@ -194,7 +198,7 @@
         })
     ).writeTo(new FileOutputStream(prefix + "merge-data.xlsx"));
 }
-</code></pre>
+```
 
 </details>
 
@@ -239,7 +243,8 @@ Sheet 名称：王五的Sheet
 
 <h5>代码</h5>
 
-<pre><code lang="java">public void dynamicSheet() throws FileNotFoundException {
+```java
+public void dynamicSheet() throws FileNotFoundException {
     SpreadSheetBuilder.create()
         .workbook(wb ->
             // 动态sheet
@@ -251,6 +256,6 @@ Sheet 名称：王五的Sheet
         )
         .writeTo(new FileOutputStream(prefix + "dynamic-sheet.xlsx"));
 }
-</code></pre>
+```java
 
 </details>
