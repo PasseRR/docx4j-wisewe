@@ -61,7 +61,7 @@ public class DslRun {
                 Units.toEMU(height)
             );
         } catch (InvalidFormatException | IOException e) {
-            throw new DocumentException(e.getMessage(), e);
+            throw new DocumentExportException(e);
         }
 
         return this;

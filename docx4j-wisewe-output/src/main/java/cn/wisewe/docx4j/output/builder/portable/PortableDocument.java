@@ -84,7 +84,7 @@ abstract class PortableDocument<T extends PortableDocument> {
         try {
             image = Image.getInstance(file.toURI().toURL());
         } catch (BadElementException | IOException e) {
-            throw new PortableException(e.getMessage(), e);
+            throw new PortableExportException(e);
         }
         consumer.accept(image);
         this.addImage(image);

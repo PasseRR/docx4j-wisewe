@@ -1,0 +1,37 @@
+package cn.wisewe.docx4j.input.builder.sheet;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * excel单元格导入注解
+ * @author xiehai
+ * @date 2021/01/11 09:18
+ * @Copyright(c) tellyes tech. inc. co.,ltd
+ */
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CellMeta {
+    /**
+     * 单元格名称
+     * @return 列名称
+     */
+    String name();
+    /**
+     * 单元格索引 从0开始
+     * @return 列索引
+     */
+    int index();
+    /**
+     * 非法格式提示信息 会自动拼接{@link #name()}为前缀
+     * @return 非法格式提示信息
+     */
+    String message() default "";
+    /**
+     * 日期时间格式化
+     * @return 格式化模式
+     */
+    String dateTimeFormat() default "";
+}

@@ -2,6 +2,7 @@ package cn.wisewe.docx4j.output.builder.sheet;
 
 import cn.wisewe.docx4j.output.utils.FileUtil;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Getter
 public enum SpreadSheetPictureType {
     /**
      * emf
@@ -56,9 +58,9 @@ public enum SpreadSheetPictureType {
                     Stream.of(SpreadSheetPictureType.values())
                         .filter(type -> Objects.equals(type.suffix, it))
                         .findFirst()
-                        .map(type -> type.format)
+                        .map(SpreadSheetPictureType::getFormat)
                 )
-                .orElseThrow(() -> new SpreadSheetException("spread sheet not support picture file:" + fileName));
+                .orElseThrow(() -> new SpreadSheetExportException("spread sheet not support picture file:" + fileName));
     }
 
     /**

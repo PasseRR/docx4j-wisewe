@@ -1,10 +1,13 @@
 package cn.wisewe.docx4j.output.builder.sheet;
 
+import cn.wisewe.docx4j.output.OutputConstants;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,10 +33,16 @@ public class DslSheet {
      * 行数据缓存
      */
     Map<Integer, DslRow> rows;
+    /**
+     * 缓存最大列数
+     */
+    @NonFinal
+    int maxCells = 0;
 
     DslSheet(Sheet sheet) {
         this.sheet = sheet;
-        this.rowNumber = new AtomicInteger();
+        // 若是空sheet 则从0开始 否则从已有sheet的下一行开始
+        this.rowNumber = new AtomicInteger(this.sheet.getLastRowNum() + 1);
         this.rows = new HashedMap<>(16);
     }
 
@@ -45,7 +54,6 @@ public class DslSheet {
      */
     public DslSheet freeze(int column, int row) {
         this.sheet.createFreezePane(column, row);
-
         return this;
     }
 
@@ -63,7 +71,11 @@ public class DslSheet {
      * @return {@link DslSheet}
      */
     public DslSheet row(Consumer<DslRow> consumer) {
-        consumer.accept(this.getOrCreateRow(this.rowNumber.getAndIncrement()));
+        DslRow row = this.getOrCreateRow(this.rowNumber.getAndIncrement());
+        consumer.accept(row);
+        // 更新最大列数
+        this.maxCells = Integer.max(this.maxCells, row.getRow().getLastCellNum());
+
         return this;
     }
 
@@ -83,19 +95,16 @@ public class DslSheet {
     }
 
     /**
-     * 自动列宽
+     * 单元格自适应
      */
-    protected void doAutoColumnWidth() {
+    protected void doAutoColumnFit() {
         try {
-            int lastRowNum = this.sheet.getLastRowNum();
-            if (lastRowNum <= 0) {
+            // 没有数据行或列
+            if (this.rows.isEmpty() || this.maxCells <= 0) {
                 return;
             }
-            int lastCellNum = this.sheet.getRow(0).getLastCellNum();
-            if (lastCellNum <= 0) {
-                return;
-            }
-            IntStream.range(0, lastCellNum)
+
+            IntStream.range(0, this.maxCells)
                 .forEach(it -> {
                     // 列宽至少宽5个字符
                     int width =
@@ -104,9 +113,34 @@ public class DslSheet {
                             .map(m -> m.get(it))
                             .filter(w -> w >= 5)
                             .orElse(5);
-
                     // 使一列最大宽度为100个字符 并多出2个字符保持美观
-                    this.sheet.setColumnWidth(it, (Integer.min(width, 100) + 2) * 256);
+                    int fitWidth = Integer.min(width, 100) + 2;
+                    this.sheet.setColumnWidth(it, fitWidth * 256);
+
+                    // 设置斜线单元格 自动补全空格
+                    Optional.ofNullable(DslCell.DIAGONAL_COLUMNS.get())
+                        .map(m -> m.get(it))
+                        .ifPresent(s ->
+                            s.forEach(c -> {
+                                String text = c.cell.getStringCellValue();
+                                int index = text.indexOf(OutputConstants.BREAK_LINE);
+                                if (index < 0) {
+                                    return;
+                                }
+
+                                String left = text.substring(0, index), right = text.substring(index + 1);
+                                // 自动补齐空格
+                                if (c.diagonalUp) {
+                                    int len = fitWidth - DslCell.width(right);
+                                    // 右上至左下斜线
+                                    c.cell.setCellValue(left + OutputConstants.BREAK_LINE + padding(len) + right);
+                                } else {
+                                    int len = fitWidth - DslCell.width(left);
+                                    // 左上至右下斜线
+                                    c.cell.setCellValue(padding(len) + left + OutputConstants.BREAK_LINE + right);
+                                }
+                            })
+                        );
                 });
         } finally {
             DslCell.removeThreadLocal();
@@ -127,5 +161,26 @@ public class DslSheet {
 
                     return row;
                 });
+    }
+
+    /**
+     * 空格填充
+     * @param len 填充字节数
+     * @return
+     */
+    protected static String padding(int len) {
+        // 预留一个字节长度
+        len -= 1;
+        // 多余2个字节使用双字节空格填充
+        String padding = String.join(
+            OutputConstants.EMPTY,
+            Collections.nCopies(len / 2, OutputConstants.DOUBLE_BYTE_SPACE)
+        );
+        // 剩余字节使用单字节空格填充
+        if ((len & 1) > 0) {
+            padding += OutputConstants.SPACE;
+        }
+
+        return padding;
     }
 }

@@ -8,16 +8,16 @@ import cn.wisewe.docx4j.output.OutputException;
  * @date 2020/12/24 10:11
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-public class SpreadSheetException extends OutputException {
-    public SpreadSheetException() {
-        super();
-    }
-
-    public SpreadSheetException(String message) {
+public class SpreadSheetExportException extends OutputException {
+    public SpreadSheetExportException(String message) {
         super(message);
     }
 
-    public SpreadSheetException(String message, Throwable t) {
+    public SpreadSheetExportException(String message, Throwable t) {
         super(message, t);
+    }
+
+    public SpreadSheetExportException(Throwable t) {
+        this(t.getMessage(), t);
     }
 }

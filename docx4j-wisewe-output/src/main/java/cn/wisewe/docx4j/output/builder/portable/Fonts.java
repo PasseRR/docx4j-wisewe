@@ -81,7 +81,7 @@ public enum Fonts {
             // 基础中文字体
             BASE_CN_FONT = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
         } catch (DocumentException | IOException e) {
-            throw new PortableException(e.getMessage(), e);
+            throw new PortableExportException(e);
         }
     }
 

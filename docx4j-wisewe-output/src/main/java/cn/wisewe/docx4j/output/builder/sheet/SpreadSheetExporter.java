@@ -4,6 +4,7 @@ import cn.wisewe.docx4j.output.utils.HttpResponseUtil;
 import cn.wisewe.docx4j.output.utils.HttpServletUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -12,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -23,52 +26,57 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SpreadSheetBuilder {
+public class SpreadSheetExporter {
     Workbook workbook;
+    /**
+     * 自定义样式
+     */
+    private static final ThreadLocal<Map<CustomStyleType, CellStyle>> CUSTOM_STYLES =
+        ThreadLocal.withInitial(HashMap::new);
 
-    private SpreadSheetBuilder(Workbook workbook) {
+    private SpreadSheetExporter(Workbook workbook) {
         this.workbook = workbook;
     }
 
     /**
      * 自定义{@link Workbook}构造
      * @param supplier 电子表格构造器
-     * @return {@link SpreadSheetBuilder}
+     * @return {@link SpreadSheetExporter}
      */
-    public static SpreadSheetBuilder create(Supplier<Workbook> supplier) {
-        return new SpreadSheetBuilder(supplier.get());
+    public static SpreadSheetExporter create(Supplier<Workbook> supplier) {
+        return new SpreadSheetExporter(supplier.get());
     }
 
     /**
      * 创建电子表格
-     * @return {@link SpreadSheetBuilder}
+     * @return {@link SpreadSheetExporter}
      */
-    public static SpreadSheetBuilder create() {
-        return SpreadSheetBuilder.create(XSSFWorkbook::new);
+    public static SpreadSheetExporter create() {
+        return SpreadSheetExporter.create(XSSFWorkbook::new);
     }
 
     /**
      * 通过给定输入流及给定{@link Workbook}构造器
      * @param inputStream 输入流
      * @param function    根据输入流创建电子表格方法
-     * @return {@link SpreadSheetBuilder}
+     * @return {@link SpreadSheetExporter}
      */
-    public static SpreadSheetBuilder create(InputStream inputStream, Function<InputStream, Workbook> function) {
-        return SpreadSheetBuilder.create(() -> function.apply(inputStream));
+    public static SpreadSheetExporter create(InputStream inputStream, Function<InputStream, Workbook> function) {
+        return SpreadSheetExporter.create(() -> function.apply(inputStream));
     }
 
     /**
      * 通过给定输入流
      * @param inputStream 给定输入流
-     * @return {@link SpreadSheetBuilder}
+     * @return {@link SpreadSheetExporter}
      */
-    public static SpreadSheetBuilder create(InputStream inputStream) {
+    public static SpreadSheetExporter create(InputStream inputStream) {
         return
-            SpreadSheetBuilder.create(inputStream, is -> {
+            SpreadSheetExporter.create(inputStream, is -> {
                 try {
                     return new XSSFWorkbook(is);
                 } catch (IOException e) {
-                    throw new SpreadSheetException(e.getMessage(), e);
+                    throw new SpreadSheetExportException(e);
                 }
             });
     }
@@ -76,47 +84,51 @@ public class SpreadSheetBuilder {
     /**
      * 快速构建
      * @param consumer 电子表格消费者
-     * @return {@link SpreadSheetBuilder}
+     * @return {@link SpreadSheetExporter}
      */
-    public static SpreadSheetBuilder fastCreate(Consumer<DslWorkbook> consumer) {
-        return SpreadSheetBuilder.create().workbook(consumer);
+    public static SpreadSheetExporter fastCreate(Consumer<DslWorkbook> consumer) {
+        return SpreadSheetExporter.create().workbook(consumer);
     }
 
     /**
      * workbook操作
      * @param consumer workbook消费
-     * @return {@link SpreadSheetBuilder}
+     * @return {@link SpreadSheetExporter}
      */
-    public SpreadSheetBuilder workbook(Consumer<DslWorkbook> consumer) {
+    public SpreadSheetExporter workbook(Consumer<DslWorkbook> consumer) {
         consumer.accept(new DslWorkbook(this.workbook));
 
         return this;
     }
 
     /**
-     * 将电子表格写到servlet输出流并指定文件后缀
-     * @param fileName      文件名
-     * @param spreadSheetFileType 后缀名
+     * 自定义样式
+     * @param styleType 自定义样式类型
+     * @param function  生成样式方法
+     * @return {@link SpreadSheetExporter}
      */
-    public void writeToServletResponse(String fileName, SpreadSheetFileType spreadSheetFileType) {
-        HttpServletResponse response = HttpServletUtil.getCurrentResponse();
-        try {
-            // http文件名处理
-            HttpResponseUtil.handleOutputFileName(spreadSheetFileType.fullName(fileName), response);
-
-            this.writeTo(response.getOutputStream(), false);
-        } catch (IOException e) {
-            throw new SpreadSheetException(e.getMessage(), e);
-        }
+    public SpreadSheetExporter customStyle(CustomStyleType styleType, Function<Workbook, CellStyle> function) {
+        CUSTOM_STYLES.get().put(styleType, function.apply(this.workbook));
+        return this;
     }
 
     /**
-     * 将电子表格写到servlet输出流
-     * @param fileName 电子表格下载文件名名称
+     * 将电子表格写到servlet输出流并指定文件后缀
+     * @param fileName            文件名
      */
     public void writeToServletResponse(String fileName) {
-        // 默认后缀xlsx
-        this.writeToServletResponse(fileName, SpreadSheetFileType.XLSX);
+        HttpServletResponse response = HttpServletUtil.getCurrentResponse();
+        try {
+            // http文件名处理
+            HttpResponseUtil.handleOutputFileName(
+                SpreadSheetFileType.getTypeByWorkbook(this.workbook).fullName(fileName),
+                response
+            );
+
+            this.writeTo(response.getOutputStream(), false);
+        } catch (IOException e) {
+            throw new SpreadSheetExportException(e);
+        }
     }
 
     /**
@@ -137,6 +149,15 @@ public class SpreadSheetBuilder {
     }
 
     /**
+     * 获得自定义样式
+     * @param styleType 自定义样式类型
+     * @return {@link CellStyle}
+     */
+    protected static CellStyle getCustomStyle(CustomStyleType styleType) {
+        return CUSTOM_STYLES.get().get(styleType);
+    }
+
+    /**
      * 将电子表格写到输出流
      * @param outputStream 输出流
      * @param closeable    是否需要关闭输出流
@@ -150,7 +171,7 @@ public class SpreadSheetBuilder {
 
             this.workbook.write(outputStream);
         } catch (IOException e) {
-            throw new SpreadSheetException(e.getMessage(), e);
+            throw new SpreadSheetExportException(e);
         } finally {
             // 电子表格流关闭
             IOUtils.closeQuietly(this.workbook);
@@ -158,6 +179,8 @@ public class SpreadSheetBuilder {
             if (closeable) {
                 IOUtils.closeQuietly(outputStream);
             }
+            // 清空自定义样式
+            CUSTOM_STYLES.remove();
         }
     }
 }

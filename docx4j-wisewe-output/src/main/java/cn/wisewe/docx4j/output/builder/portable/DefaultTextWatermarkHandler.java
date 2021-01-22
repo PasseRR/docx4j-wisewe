@@ -26,7 +26,7 @@ public class DefaultTextWatermarkHandler extends PdfPageEventHelper {
      */
     String text;
     /**
-     * 旋转度数
+     * 文本旋转度数
      */
     float rotate;
     /**

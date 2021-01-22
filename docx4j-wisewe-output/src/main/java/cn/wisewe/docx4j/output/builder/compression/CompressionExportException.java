@@ -8,16 +8,16 @@ import cn.wisewe.docx4j.output.OutputException;
  * @date 2020/12/24 10:11
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-public class CompressionException extends OutputException {
-    public CompressionException() {
-        super();
-    }
-
-    public CompressionException(String message) {
+public class CompressionExportException extends OutputException {
+    public CompressionExportException(String message) {
         super(message);
     }
 
-    public CompressionException(String message, Throwable t) {
+    public CompressionExportException(String message, Throwable t) {
         super(message, t);
+    }
+
+    public CompressionExportException(Throwable t) {
+        this(t.getMessage(), t);
     }
 }

@@ -1,4 +1,4 @@
-[excel导出测试用例](./src/test/java/cn/wisewe/docx4j/output/builder/sheet/SpreadSheetBuilderSpec.java)
+[excel导出测试用例](./src/test/java/cn/wisewe/docx4j/output/builder/sheet/SpreadSheetExporterSpec.java)
 
 <details>
 <summary><b>1.简单表格导出</b></summary>
@@ -44,7 +44,7 @@
 
 ```java
 public void simple() throws FileNotFoundException {
-    SpreadSheetBuilder.create()
+    SpreadSheetExporter.create()
         .workbook(wb ->
             wb.sheet(s ->
                 // 表头行：填充顺序与列表顺序一致
@@ -109,7 +109,7 @@ public void simple() throws FileNotFoundException {
 
 ```java
 public void mergeHead() throws FileNotFoundException {
-    SpreadSheetBuilder.create()
+    SpreadSheetExporter.create()
         .workbook(wb ->
             wb.sheet(s ->
                 // 表头行，首行：设置“姓名”跨2行、“其他信息”跨2列（动态填充时跨n行需在下行对应列填充n-1个占位符）
@@ -173,7 +173,7 @@ public void mergeData() throws FileNotFoundException {
     // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
     Map<String, List<code>> groupBySex =
         SpecDataFactory.excelData().stream().collect(Collectors.groupingBy(Person::getSex));
-    SpreadSheetBuilder.fastCreate(wb ->
+    SpreadSheetExporter.fastCreate(wb ->
         wb.sheet(s -> {
             // 表头行
             s.row(r -> r.headCells(Arrays.asList("姓名", "年龄", "性别")));
@@ -245,7 +245,7 @@ Sheet 名称：王五的Sheet
 
 ```java
 public void dynamicSheet() throws FileNotFoundException {
-    SpreadSheetBuilder.create()
+    SpreadSheetExporter.create()
         .workbook(wb ->
             // 动态sheet
             wb.sheets(SpecDataFactory.excelData(), it -> it.getName() + "的Sheet", (it, s) ->

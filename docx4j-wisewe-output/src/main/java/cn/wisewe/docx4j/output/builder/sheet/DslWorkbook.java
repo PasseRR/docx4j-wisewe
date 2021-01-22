@@ -53,7 +53,7 @@ public class DslWorkbook {
     public DslWorkbook sheet(String name, Consumer<DslSheet> consumer) {
         DslSheet sheet = this.getOrCreateSheet(name);
         consumer.accept(sheet);
-        sheet.doAutoColumnWidth();
+        sheet.doAutoColumnFit();
 
         return this;
     }

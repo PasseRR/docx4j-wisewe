@@ -15,21 +15,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * {@link PortableBuilder}单元测试
+ * {@link PortableExporter}单元测试
  * @author xiehai
  * @date 2020/12/31 11:59
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-public class PortableBuilderSpec {
+public class PortableExporterSpec {
     @Test
     public void empty() throws FileNotFoundException {
-        PortableBuilder.fastCreate()
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableBuilderSpec.class, "empty.pdf")));
+        PortableExporter.fastCreate()
+            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "empty.pdf")));
     }
 
     @Test
     public void simple() throws FileNotFoundException {
-        PortableBuilder.fastCreate()
+        PortableExporter.fastCreate()
             .headingParagraph("标题一", Fonts.HEADING_1)
             .headingParagraph("标题二", Fonts.HEADING_2)
             .headingParagraph("标题三", Fonts.HEADING_3)
@@ -38,17 +38,17 @@ public class PortableBuilderSpec {
             .headingParagraph("标题九", Fonts.HEADING_9)
             .textParagraph("这是正文这是正文这是正文这是正文这是正文这是正文这是正第一行")
             .paragraph(p -> p.chunk("这是正文这是正文这是正文这是正文这是正文这是正文这是第二行", Fonts.HEADER_FOOTER.font()))
-            .pictureParagraph(new File(FileUtil.rootPath(PortableBuilderSpec.class, "/a.jpeg")), 200)
-            .pictureParagraph(new File(FileUtil.rootPath(PortableBuilderSpec.class, "/a.jpg")), 100)
-            .pictureParagraph(new File(FileUtil.rootPath(PortableBuilderSpec.class, "/b.png")))
-            .pictureParagraph(new File(FileUtil.rootPath(PortableBuilderSpec.class, "/c.gif")))
-            .pictureParagraph(new File(FileUtil.rootPath(PortableBuilderSpec.class, "/d.bmp")))
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableBuilderSpec.class, "simple.pdf")));
+            .pictureParagraph(new File(FileUtil.rootPath(PortableExporterSpec.class, "/a.jpeg")), 200)
+            .pictureParagraph(new File(FileUtil.rootPath(PortableExporterSpec.class, "/a.jpg")), 100)
+            .pictureParagraph(new File(FileUtil.rootPath(PortableExporterSpec.class, "/b.png")))
+            .pictureParagraph(new File(FileUtil.rootPath(PortableExporterSpec.class, "/c.gif")))
+            .pictureParagraph(new File(FileUtil.rootPath(PortableExporterSpec.class, "/d.bmp")))
+            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "simple.pdf")));
     }
 
     @Test
     public void breakPage() throws FileNotFoundException {
-        PortableBuilder.fastCreate()
+        PortableExporter.fastCreate()
             // 多个文档 自动添加分页符
             .documents(SpecDataFactory.tableData(), (it, d) ->
                 // 分页文档
@@ -57,12 +57,12 @@ public class PortableBuilderSpec {
                     .textParagraph(String.format("年龄:%s", it.getAge()))
                     .textParagraph(String.format("性别:%s", it.getSex()))
             )
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableBuilderSpec.class, "break-page.pdf")));
+            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "break-page.pdf")));
     }
 
     @Test
     public void table() throws FileNotFoundException {
-        PortableBuilder.fastCreate()
+        PortableExporter.fastCreate()
             .paragraph(p ->
                 p.chunk("教职工列表", Fonts.HEADING_1.font()).more(pp -> pp.setAlignment(Element.ALIGN_CENTER))
             )
@@ -73,7 +73,7 @@ public class PortableBuilderSpec {
                     // 数据单元格
                     .rows(SpecDataFactory.tableData(), (u, r) -> r.dataCells(u::getName, u::getAge, u::getSex))
             )
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableBuilderSpec.class, "table.pdf")));
+            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "table.pdf")));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class PortableBuilderSpec {
         List<Person> people = SpecDataFactory.tableData();
         // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
         Map<String, List<Person>> groupBySex = people.stream().collect(Collectors.groupingBy(Person::getSex));
-        PortableBuilder.fastCreate()
+        PortableExporter.fastCreate()
             .paragraph(p ->
                 p.chunk("教职工列表", Fonts.HEADING_1.font()).more(pp -> pp.setAlignment(Element.ALIGN_CENTER))
             )
@@ -106,12 +106,12 @@ public class PortableBuilderSpec {
                     });
                 });
             })
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableBuilderSpec.class, "merge-table.pdf")));
+            .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "merge-table.pdf")));
     }
 
     @Test
     public void headerAndFooter() throws FileNotFoundException {
-        PortableBuilder.create()
+        PortableExporter.create()
             // 页眉事件
             .event(new DefaultTextHeaderHandler("成都中教智汇"))
             // 页脚事件
@@ -132,7 +132,7 @@ public class PortableBuilderSpec {
 
     @Test
     public void watermark() throws FileNotFoundException {
-        PortableBuilder.create()
+        PortableExporter.create()
             // 页眉事件
             .event(new DefaultTextHeaderHandler("成都中教智汇"))
             // 页脚事件
@@ -154,7 +154,7 @@ public class PortableBuilderSpec {
 
     @Test
     public void picture() throws FileNotFoundException {
-        PortableBuilder.create()
+        PortableExporter.create()
             // 水印图片
             .event(new DefaultPictureWatermarkHandler(new File(FileUtil.rootPath(this.getClass(), "/b.png")), 50))
             // 事件必须在open之前设置

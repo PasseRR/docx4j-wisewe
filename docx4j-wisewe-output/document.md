@@ -1,4 +1,4 @@
-[word导出测试用例](./src/test/java/cn/wisewe/docx4j/output/builder/document/DocumentBuilderSpec.java)
+[word导出测试用例](./src/test/java/cn/wisewe/docx4j/output/builder/document/DocumentExporterSpec.java)
 
 <details>
 <summary><b>1.标题正文</b></summary>
@@ -20,7 +20,7 @@
 
 ```java
 public void simple() throws IOException {
-    DocumentBuilder.create()
+    DocumentExporter.create()
         .headingParagraph("标题一", ParagraphStyle.HEADING_1)
         .headingParagraph("标题二", ParagraphStyle.HEADING_2)
         .headingParagraph("标题三", ParagraphStyle.HEADING_3)
@@ -28,7 +28,7 @@ public void simple() throws IOException {
         .headingParagraph("标题七", ParagraphStyle.HEADING_7)
         .headingParagraph("标题九", ParagraphStyle.HEADING_9)
         .textParagraph("这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文")
-        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "simple.docx")));
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "simple.docx")));
 }
 ```
 
@@ -96,7 +96,7 @@ public void simple() throws IOException {
 ```java
 public void breakPage() throws FileNotFoundException {
 	List<Person> people = SpecDataFactory.tableData();
-	DocumentBuilder.create()
+	DocumentExporter.create()
 		.textParagraph("在本段落后面手动添加个分页符")
 		// 手动添加分页符
 		.pageBreak()
@@ -110,7 +110,7 @@ public void breakPage() throws FileNotFoundException {
 						.row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
 				)
 		)
-		.writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "break-page.docx")));
+		.writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "break-page.docx")));
 }
 ```
 
@@ -165,7 +165,7 @@ public void breakPage() throws FileNotFoundException {
 ```java
 public void table() throws FileNotFoundException {
     List<Person> people = SpecDataFactory.tableData();
-    DocumentBuilder.create()
+    DocumentExporter.create()
          // 添加副标题
         .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
         // 添加表格，需要指定表格行数及列数
@@ -175,7 +175,7 @@ public void table() throws FileNotFoundException {
                // 数据行正常
                .rows(people, (p, r) -> r.dataCells(p::getName, p::getAge, p::getSex))
               )
-        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "table.docx")));
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "table.docx")));
 }
 ```
 
@@ -230,7 +230,7 @@ public void mergeTable() throws FileNotFoundException {
     List<Person> people = SpecDataFactory.tableData();
     // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
     Map<String, List<Person>> groupBySex = people.stream().collect(Collectors.groupingBy(Person::getSex));
-    DocumentBuilder.create()
+    DocumentExporter.create()
         .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
         // 需要指定表格行数及列数
         .table(people.size() + 2, 3, t -> {
@@ -254,7 +254,7 @@ public void mergeTable() throws FileNotFoundException {
                       );
             });
         })
-        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "merge-table.docx")));
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "merge-table.docx")));
 }
 ```
 
@@ -277,13 +277,13 @@ public void mergeTable() throws FileNotFoundException {
 
 ```java
 public void simpleHeaderAndFooter() throws FileNotFoundException {
-    DocumentBuilder.create()
+    DocumentExporter.create()
         .headingParagraph("标题一", ParagraphStyle.HEADING_1)
         .textParagraph("这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文")
         .header("我是页眉")
         .footer("我是页脚")
         .writeTo(
-        new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "simple-header-foote1r.docx"))
+        new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "simple-header-foote1r.docx"))
     );
 }
 ```
@@ -343,7 +343,7 @@ public void simpleHeaderAndFooter() throws FileNotFoundException {
 ```java
 public void complexHeaderAndFooter() throws FileNotFoundException {
 	List<Person> people = SpecDataFactory.tableData();
-	DocumentBuilder.create()
+	DocumentExporter.create()
 		// 多个文档 自动添加分页符
 		.documents(people, (it, d) ->
 			// 分页文档
@@ -432,7 +432,7 @@ public void complexHeaderAndFooter() throws FileNotFoundException {
 ```java
 public void picture() throws FileNotFoundException {
     List<Person> people = SpecDataFactory.tableData();
-    DocumentBuilder.create()
+    DocumentExporter.create()
         .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
         // 需要指定表格行数及列数
         .table(people.size() + 1, 5, t ->
@@ -442,11 +442,11 @@ public void picture() throws FileNotFoundException {
                .rows(people, (p, r) ->
                      r.dataCells(p::getName, p::getAge, p::getSex)
                      // 表格单元格内添加图片
-                     .pictureCell(new File(FileUtil.brotherPath(DocumentBuilderSpec.class, "c.gif")), 20, 20)
+                     .pictureCell(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")), 20, 20)
                      .cell(c ->
                            c.text("我是单元格图片")
                            .pictureParagraph(
-                               new File(FileUtil.brotherPath(DocumentBuilderSpec.class, "c.gif")),
+                               new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")),
                                20,
                                20
                            )
@@ -455,18 +455,18 @@ public void picture() throws FileNotFoundException {
               )
         // 段落图片
         .textParagraph("我是正文图片")
-        .pictureParagraph(new File(FileUtil.brotherPath(DocumentBuilderSpec.class, "c.gif")), 400, 150)
+        .pictureParagraph(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")), 400, 150)
         // 页眉图片
         .header(HeaderFooterType.DEFAULT, h ->
                 h.textParagraph("我是页眉图片")
-                .pictureParagraph(new File(FileUtil.brotherPath(DocumentBuilderSpec.class, "b.png")), 20, 20)
+                .pictureParagraph(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "b.png")), 20, 20)
                )
         // 页脚图片
         .footer(HeaderFooterType.DEFAULT, f ->
                 f.textParagraph("我是页脚图片")
-                .pictureParagraph(new File(FileUtil.brotherPath(DocumentBuilderSpec.class, "b.png")), 20, 20)
+                .pictureParagraph(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "b.png")), 20, 20)
                )
-        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentBuilderSpec.class, "picture.docx")));
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "picture.docx")));
 }
 ```
 

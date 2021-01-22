@@ -63,7 +63,7 @@ public enum DocumentPictureType {
                         .findFirst()
                         .map(type -> type.format)
                 )
-                .orElseThrow(() -> new DocumentException("document not support picture file:" + fileName));
+                .orElseThrow(() -> new DocumentExportException("document not support picture file:" + fileName));
     }
 
     /**

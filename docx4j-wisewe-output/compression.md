@@ -1,4 +1,4 @@
-[zip导出测试用例](./src/test/java/cn/wisewe/docx4j/output/builder/compression/CompressionBuilderSpec.java)
+[zip导出测试用例](./src/test/java/cn/wisewe/docx4j/output/builder/compression/CompressionExporterSpec.java)
 
 <details>
 <summary><b>1.目录导出</b></summary>
@@ -29,7 +29,7 @@
 
 ```java
 public void folders() throws FileNotFoundException {
-    CompressionBuilder.create()
+    CompressionExporter.create()
         // 文件目录
         .folder(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
         // 自定义目录
@@ -67,7 +67,7 @@ public void folders() throws FileNotFoundException {
 
 ```java
 public void files() throws FileNotFoundException {
-    CompressionBuilder.create()
+    CompressionExporter.create()
         // 已有文件
         .file(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
         // 空的word文件
@@ -170,7 +170,7 @@ public void complex() throws FileNotFoundException {
             SpecDataFactory.tableData().stream().map(Person::getSex).distinct().collect(Collectors.toList());
         Map<String, List<Person>> groupBySex =
             SpecDataFactory.tableData().stream().collect(Collectors.groupingBy(Person::getSex));
-        CompressionBuilder.create()
+        CompressionExporter.create()
             // 直接添加文件
             .any(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
             .file(new File(FileUtil.rootPath(this.getClass(), "/b.png")))
@@ -224,7 +224,7 @@ public void complex() throws FileNotFoundException {
                 // 空压缩包
                 b.folder(fn + CompressionFileType.ZIP.name(), (sfn, nb) ->
                     nb.files(groupBySex.get(u), p -> CompressionFileType.ZIP.fullName(sfn + p.getName()), (p, os) ->
-                        CompressionBuilder.create().writeTo(os, false)
+                        CompressionExporter.create().writeTo(os, false)
                     )
                 );
             })

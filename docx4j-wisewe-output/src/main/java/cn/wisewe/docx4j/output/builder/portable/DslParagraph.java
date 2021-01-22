@@ -124,7 +124,7 @@ public class DslParagraph {
                 consumer.accept(image);
                 return image;
             } catch (BadElementException | IOException e) {
-                throw new PortableException(e.getMessage(), e);
+                throw new PortableExportException(e);
             }
         });
     }

@@ -2,7 +2,7 @@ package cn.wisewe.docx4j.output.builder.document;
 
 import cn.wisewe.docx4j.output.builder.Person;
 import cn.wisewe.docx4j.output.builder.SpecDataFactory;
-import cn.wisewe.docx4j.output.builder.sheet.SpreadSheetBuilderSpec;
+import cn.wisewe.docx4j.output.builder.sheet.SpreadSheetExporterSpec;
 import cn.wisewe.docx4j.output.utils.FileUtil;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.junit.Test;
@@ -17,21 +17,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * {@link DocumentBuilder}单元测试
+ * {@link DocumentExporter}单元测试
  * @author xiehai
  * @date 2020/12/25 10:46
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-public class DocumentBuilderSpec {
+public class DocumentExporterSpec {
     @Test
     public void empty() throws FileNotFoundException {
-        DocumentBuilder.create()
+        DocumentExporter.create()
             .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "empty.docx")));
     }
 
     @Test
     public void simple() throws IOException {
-        DocumentBuilder.create()
+        DocumentExporter.create()
             .headingParagraph("标题一", ParagraphStyle.HEADING_1)
             .headingParagraph("标题二", ParagraphStyle.HEADING_2)
             .headingParagraph("标题三", ParagraphStyle.HEADING_3)
@@ -45,7 +45,7 @@ public class DocumentBuilderSpec {
     @Test
     public void breakPage() throws FileNotFoundException {
         List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
+        DocumentExporter.create()
             // 多个文档 自动添加分页符
             .documents(people, (it, d) ->
                 // 分页文档
@@ -61,7 +61,7 @@ public class DocumentBuilderSpec {
     @Test
     public void table() throws FileNotFoundException {
         List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
+        DocumentExporter.create()
             .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
             // 需要指定表格行数及列数
             .table(people.size() + 1, 3, t ->
@@ -76,20 +76,25 @@ public class DocumentBuilderSpec {
     /**
      * 合并表格
      * @throws FileNotFoundException FileNotFoundException
-     * @see SpreadSheetBuilderSpec#mergeHead()
-     * @see SpreadSheetBuilderSpec#mergeData()
+     * @see SpreadSheetExporterSpec#mergeHead()
+     * @see SpreadSheetExporterSpec#mergeData()
      */
     @Test
     public void mergeTable() throws FileNotFoundException {
         List<Person> people = SpecDataFactory.tableData();
         // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
         Map<String, List<Person>> groupBySex = people.stream().collect(Collectors.groupingBy(Person::getSex));
-        DocumentBuilder.create()
+        DocumentExporter.create()
             .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
             // 需要指定表格行数及列数
             .table(people.size() + 2, 3, t -> {
                 // 表头行列合并
-                t.row(r -> r.cell(c -> c.boldText("姓名").rowspan(2)).cell(c -> c.boldText("其他信息").colspan(2)))
+                t.row(r ->
+                    r.cell(c -> c.boldText("姓名").rowspan(2))
+                        .cell(c -> c.boldText("其他信息").colspan(2))
+                        // 合并列数据补全
+                        .headCell("")
+                )
                     // 合并行的数据需要补全
                     .row(r -> r.headCells("姓名", "年龄", "性别"));
                 groupBySex.forEach((key, value) -> {
@@ -114,7 +119,7 @@ public class DocumentBuilderSpec {
     @Test
     public void simpleHeaderAndFooter() throws FileNotFoundException {
         List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
+        DocumentExporter.create()
             // 多个文档 自动添加分页符
             .documents(people, (it, d) ->
                 // 分页文档
@@ -132,7 +137,7 @@ public class DocumentBuilderSpec {
     @Test
     public void complexHeaderAndFooter() throws FileNotFoundException {
         List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
+        DocumentExporter.create()
             // 多个文档 自动添加分页符
             .documents(people, (it, d) ->
                 // 分页文档
@@ -150,7 +155,7 @@ public class DocumentBuilderSpec {
     @Test
     public void picture() throws FileNotFoundException {
         List<Person> people = SpecDataFactory.tableData();
-        DocumentBuilder.create()
+        DocumentExporter.create()
             .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
             // 需要指定表格行数及列数
             .table(people.size() + 1, 5, t ->

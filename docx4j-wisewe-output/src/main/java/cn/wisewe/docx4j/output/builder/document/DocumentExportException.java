@@ -8,16 +8,16 @@ import cn.wisewe.docx4j.output.OutputException;
  * @date 2020/12/24 10:11
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-public class DocumentException extends OutputException {
-    public DocumentException() {
-        super();
-    }
-
-    public DocumentException(String message) {
+public class DocumentExportException extends OutputException {
+    public DocumentExportException(String message) {
         super(message);
     }
 
-    public DocumentException(String message, Throwable t) {
+    public DocumentExportException(String message, Throwable t) {
         super(message, t);
+    }
+
+    public DocumentExportException(Throwable t) {
+        this(t.getMessage(), t);
     }
 }

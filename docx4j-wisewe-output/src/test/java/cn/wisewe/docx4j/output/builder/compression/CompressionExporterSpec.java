@@ -3,15 +3,15 @@ package cn.wisewe.docx4j.output.builder.compression;
 import cn.wisewe.docx4j.output.OutputConstants;
 import cn.wisewe.docx4j.output.builder.Person;
 import cn.wisewe.docx4j.output.builder.SpecDataFactory;
-import cn.wisewe.docx4j.output.builder.document.DocumentBuilder;
+import cn.wisewe.docx4j.output.builder.document.DocumentExporter;
 import cn.wisewe.docx4j.output.builder.document.DocumentFileType;
 import cn.wisewe.docx4j.output.builder.document.ParagraphStyle;
 import cn.wisewe.docx4j.output.builder.portable.DefaultTextWatermarkHandler;
 import cn.wisewe.docx4j.output.builder.portable.Fonts;
-import cn.wisewe.docx4j.output.builder.portable.PortableBuilder;
+import cn.wisewe.docx4j.output.builder.portable.PortableExporter;
 import cn.wisewe.docx4j.output.builder.portable.PortableFileType;
+import cn.wisewe.docx4j.output.builder.sheet.SpreadSheetExporter;
 import cn.wisewe.docx4j.output.builder.sheet.SpreadSheetFileType;
-import cn.wisewe.docx4j.output.builder.sheet.SpreadSheetBuilder;
 import cn.wisewe.docx4j.output.utils.FileUtil;
 import org.junit.Test;
 
@@ -24,21 +24,21 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * {@link CompressionBuilder}测试用例
+ * {@link CompressionExporter}测试用例
  * @author xiehai
  * @date 2021/01/05 20:03
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-public class CompressionBuilderSpec {
+public class CompressionExporterSpec {
     @Test
     public void empty() throws FileNotFoundException {
-        CompressionBuilder.create()
+        CompressionExporter.create()
             .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "empty.zip")));
     }
 
     @Test
     public void folders() throws FileNotFoundException {
-        CompressionBuilder.create()
+        CompressionExporter.create()
             // 文件目录
             .folder(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
             // 自定义目录
@@ -53,15 +53,15 @@ public class CompressionBuilderSpec {
 
     @Test
     public void files() throws FileNotFoundException {
-        CompressionBuilder.create()
+        CompressionExporter.create()
             // 已有文件
             .file(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
             // 空的word文件
-            .file(DocumentFileType.DOCX.fullName("a"), os -> DocumentBuilder.create().writeTo(os, false))
+            .file(DocumentFileType.DOCX.fullName("a"), os -> DocumentExporter.create().writeTo(os, false))
             // 空的excel文件
-            .file(SpreadSheetFileType.XLSX.fullName("b"), os -> SpreadSheetBuilder.create().writeTo(os, false))
+            .file(SpreadSheetFileType.XLSX.fullName("b"), os -> SpreadSheetExporter.create().writeTo(os, false))
             // 空的pdf文件
-            .file(PortableFileType.PDF.fullName("c"), os -> PortableBuilder.fastCreate().writeTo(os, false))
+            .file(PortableFileType.PDF.fullName("c"), os -> PortableExporter.fastCreate().writeTo(os, false))
             .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "files.zip")));
     }
 
@@ -73,7 +73,7 @@ public class CompressionBuilderSpec {
             SpecDataFactory.tableData().stream().map(Person::getSex).distinct().collect(Collectors.toList());
         Map<String, List<Person>> groupBySex =
             SpecDataFactory.tableData().stream().collect(Collectors.groupingBy(Person::getSex));
-        CompressionBuilder.create()
+        CompressionExporter.create()
             // 直接添加文件
             .any(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
             .file(new File(FileUtil.rootPath(this.getClass(), "/b.png")))
@@ -85,7 +85,7 @@ public class CompressionBuilderSpec {
                 // 对应性别的docx文档
                 b.folder(fn + DocumentFileType.DOCX.name(), (sfn, nb) ->
                     nb.files(groupBySex.get(u), p -> DocumentFileType.DOCX.fullName(sfn + p.getName()), (p, os) ->
-                        DocumentBuilder.create()
+                        DocumentExporter.create()
                             .header("我是页眉")
                             .footer("我是页脚")
                             .headingParagraph(p.getName() + "个人信息", ParagraphStyle.SUB_HEADING)
@@ -99,7 +99,7 @@ public class CompressionBuilderSpec {
                 // 对应性别的xlsx文档
                 b.folder(fn + SpreadSheetFileType.XLSX.name(), (sfn, nb) ->
                     nb.files(groupBySex.get(u), p -> SpreadSheetFileType.XLSX.fullName(sfn + p.getName()), (p, os) ->
-                        SpreadSheetBuilder.create()
+                        SpreadSheetExporter.create()
                             .workbook(wb ->
                                 wb.sheet(s ->
                                     // 表头行
@@ -114,7 +114,7 @@ public class CompressionBuilderSpec {
                 // 对应性别的pdf文档
                 b.folder(fn + PortableFileType.PDF.name(), (sfn, nb) ->
                     nb.files(groupBySex.get(u), p -> PortableFileType.PDF.fullName(sfn + p.getName()), (p, os) ->
-                        PortableBuilder.create()
+                        PortableExporter.create()
                             .event(new DefaultTextWatermarkHandler(p.getName()))
                             .open()
                             .headingParagraph(p.getName() + "个人信息", Fonts.HEADING_1)
@@ -127,7 +127,7 @@ public class CompressionBuilderSpec {
                 // 空压缩包
                 b.folder(fn + CompressionFileType.ZIP.name(), (sfn, nb) ->
                     nb.files(groupBySex.get(u), p -> CompressionFileType.ZIP.fullName(sfn + p.getName()), (p, os) ->
-                        CompressionBuilder.create().writeTo(os, false)
+                        CompressionExporter.create().writeTo(os, false)
                     )
                 );
             })

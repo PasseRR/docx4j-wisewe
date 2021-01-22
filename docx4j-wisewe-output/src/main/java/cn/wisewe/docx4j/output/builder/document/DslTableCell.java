@@ -5,9 +5,11 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.experimental.PackagePrivate;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -100,6 +102,11 @@ public class DslTableCell extends ParagraphableDocument<DslTableCell> {
 
     @Override
     protected XWPFParagraph createParagraph() {
-        return this.cell.addParagraph();
+        // 修复第一个单元格自动添加段落问题
+        return
+            Optional.ofNullable(this.cell.getParagraphs())
+                .filter(CollectionUtils::isNotEmpty)
+                .map(it -> it.get(0))
+                .orElseGet(this.cell::addParagraph);
     }
 }

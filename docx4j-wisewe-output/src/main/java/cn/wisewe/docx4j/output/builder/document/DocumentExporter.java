@@ -32,10 +32,10 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
+public class DocumentExporter extends RichableDocument<DocumentExporter> {
     XWPFDocument document;
 
-    private DocumentBuilder(XWPFDocument document) {
+    private DocumentExporter(XWPFDocument document) {
         // 若文档样式为空则创建样式集
         if (Objects.isNull(document.getStyles())) {
             document.createStyles();
@@ -45,39 +45,39 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
         // 添加默认样式
         try {
             StylesDocument stylesDocument =
-                StylesDocument.Factory.parse(new File(FileUtil.brotherPath(DocumentBuilder.class, "styles.xml")));
+                StylesDocument.Factory.parse(new File(FileUtil.brotherPath(DocumentExporter.class, "styles.xml")));
             this.document.getStyles().setStyles(stylesDocument.getStyles());
         } catch (XmlException | IOException e) {
-            throw new DocumentException(e.getMessage(), e);
+            throw new DocumentExportException(e);
         }
     }
 
     /**
      * 创建word文档
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public static DocumentBuilder create() {
-        return new DocumentBuilder(new XWPFDocument());
+    public static DocumentExporter create() {
+        return new DocumentExporter(new XWPFDocument());
     }
 
     /**
      * 通过输入流创建word文档
      * @param is {@link InputStream}
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public static DocumentBuilder create(InputStream is) {
+    public static DocumentExporter create(InputStream is) {
         try {
-            return new DocumentBuilder(new XWPFDocument(is));
+            return new DocumentExporter(new XWPFDocument(is));
         } catch (IOException e) {
-            throw new DocumentException(e.getMessage(), e);
+            throw new DocumentExportException(e);
         }
     }
 
     /**
      * 自定义样式
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public DocumentBuilder style(Supplier<XWPFStyle> supplier) {
+    public DocumentExporter style(Supplier<XWPFStyle> supplier) {
         this.addStyle(supplier);
         return this;
     }
@@ -86,9 +86,9 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
      * 添加页眉
      * @param type     页眉类型
      * @param consumer 页眉消费
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public DocumentBuilder header(HeaderFooterType type, Consumer<DslHeader> consumer) {
+    public DocumentExporter header(HeaderFooterType type, Consumer<DslHeader> consumer) {
         consumer.accept(new DslHeader(this.document.createHeader(type)));
         return this;
     }
@@ -96,9 +96,9 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
     /**
      * 添加默认所有页的页眉文本
      * @param text 文本内容
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public DocumentBuilder header(String text) {
+    public DocumentExporter header(String text) {
         return this.header(HeaderFooterType.DEFAULT, header -> header.textParagraph(text));
     }
 
@@ -107,9 +107,9 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
      * @param iterable 迭代器
      * @param consumer builder消费
      * @param <U>      迭代元素类型
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public <U> DocumentBuilder documents(Iterable<U> iterable, BiConsumer<U, DocumentBuilder> consumer) {
+    public <U> DocumentExporter documents(Iterable<U> iterable, BiConsumer<U, DocumentExporter> consumer) {
         if (Objects.nonNull(iterable)) {
             Iterator<U> iterator = iterable.iterator();
             while (iterator.hasNext()) {
@@ -130,9 +130,9 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
      * 添加页脚
      * @param type     页脚类型
      * @param consumer 页脚消费
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public DocumentBuilder footer(HeaderFooterType type, Consumer<DslFooter> consumer) {
+    public DocumentExporter footer(HeaderFooterType type, Consumer<DslFooter> consumer) {
         consumer.accept(new DslFooter(this.document.createFooter(type)));
         return this;
     }
@@ -140,9 +140,9 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
     /**
      * 添加默认所有的页脚文本
      * @param text 文本内容
-     * @return {@link DocumentBuilder}
+     * @return {@link DocumentExporter}
      */
-    public DocumentBuilder footer(String text) {
+    public DocumentExporter footer(String text) {
         return this.footer(HeaderFooterType.DEFAULT, footer -> footer.textParagraph(text));
     }
 
@@ -157,7 +157,7 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
             HttpResponseUtil.handleOutputFileName(DocumentFileType.DOCX.fullName(fileName), response);
             this.writeTo(response.getOutputStream(), false);
         } catch (IOException e) {
-            throw new DocumentException(e.getMessage(), e);
+            throw new DocumentExportException(e);
         }
     }
 
@@ -203,7 +203,7 @@ public class DocumentBuilder extends RichableDocument<DocumentBuilder> {
         try {
             this.document.write(outputStream);
         } catch (IOException e) {
-            throw new DocumentException(e.getMessage(), e);
+            throw new DocumentExportException(e);
         } finally {
             // 文档流关闭
             IOUtils.closeQuietly(this.document);

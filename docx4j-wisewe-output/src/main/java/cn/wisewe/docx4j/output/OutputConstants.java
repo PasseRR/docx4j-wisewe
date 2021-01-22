@@ -12,6 +12,14 @@ public interface OutputConstants {
      */
     String EMPTY = "";
     /**
+     * 空格字符串{@value}
+     */
+    String SPACE = " ";
+    /**
+     * 全角空格
+     */
+    String DOUBLE_BYTE_SPACE = "　";
+    /**
      * 点字符串{@value}
      */
     String POINT = ".";
@@ -23,7 +31,6 @@ public interface OutputConstants {
      * 换行符{@value}
      */
     String BREAK_LINE = "\n";
-
     /**
      * word页眉页脚当前页码{@value}
      */

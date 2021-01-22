@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PortableBuilder extends PortableDocument<PortableBuilder> {
+public class PortableExporter extends PortableDocument<PortableExporter> {
     /**
      * pdf文档
      */
@@ -38,7 +38,7 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
     ByteArrayOutputStream byteArrayOutputStream;
     PdfWriter writer;
 
-    PortableBuilder(Document document) throws DocumentException {
+    PortableExporter(Document document) throws DocumentException {
         this.document = document;
         this.byteArrayOutputStream = new ByteArrayOutputStream(1024);
         this.writer = PdfWriter.getInstance(this.document, this.byteArrayOutputStream);
@@ -47,37 +47,37 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
     /**
      * 使用指定{@link Document}创建
      * @param supplier {@link Document}提供器
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public static PortableBuilder create(Supplier<Document> supplier) {
+    public static PortableExporter create(Supplier<Document> supplier) {
         try {
-            return new PortableBuilder(supplier.get());
+            return new PortableExporter(supplier.get());
         } catch (DocumentException e) {
-            throw new PortableException(e.getMessage(), e);
+            throw new PortableExportException(e);
         }
     }
 
     /**
      * 创建builder
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public static PortableBuilder create() {
-        return PortableBuilder.create(Document::new);
+    public static PortableExporter create() {
+        return PortableExporter.create(Document::new);
     }
 
     /**
      * 快速构建文档并开启
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public static PortableBuilder fastCreate() {
-        return PortableBuilder.create().open();
+    public static PortableExporter fastCreate() {
+        return PortableExporter.create().open();
     }
 
     /**
      * 文档开启
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public PortableBuilder open() {
+    public PortableExporter open() {
         this.document.open();
         return this;
     }
@@ -86,18 +86,18 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
      * 添加事件
      * @param event 任意{@link PdfPageEvent}事件
      * @param <T>   事件类型
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public <T extends PdfPageEvent> PortableBuilder event(T event) {
+    public <T extends PdfPageEvent> PortableExporter event(T event) {
         this.writer.setPageEvent(event);
         return this;
     }
 
     /**
      * 插入分页符
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public PortableBuilder pageBreak() {
+    public PortableExporter pageBreak() {
         this.writer.setPageEmpty(false);
         this.document.newPage();
         return this;
@@ -108,9 +108,9 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
      * @param iterable 迭代器
      * @param consumer builder消费
      * @param <U>      迭代元素类型
-     * @return {@link PortableBuilder}
+     * @return {@link PortableExporter}
      */
-    public <U> PortableBuilder documents(Iterable<U> iterable, BiConsumer<U, PortableBuilder> consumer) {
+    public <U> PortableExporter documents(Iterable<U> iterable, BiConsumer<U, PortableExporter> consumer) {
         if (Objects.nonNull(iterable)) {
             Iterator<U> iterator = iterable.iterator();
             while (iterator.hasNext()) {
@@ -137,7 +137,7 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
 
             this.writeTo(response.getOutputStream(), false);
         } catch (IOException e) {
-            throw new PortableException(e.getMessage(), e);
+            throw new PortableExportException(e);
         }
     }
 
@@ -178,7 +178,7 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
 
             this.byteArrayOutputStream.writeTo(outputStream);
         } catch (IOException e) {
-            throw new PortableException(e.getMessage(), e);
+            throw new PortableExportException(e);
         } finally {
             IOUtils.closeQuietly(this.byteArrayOutputStream);
             // 若需要关闭输入流则关闭 如ServletOutputStream则不能关闭
@@ -193,7 +193,7 @@ public class PortableBuilder extends PortableDocument<PortableBuilder> {
         try {
             this.document.add(element);
         } catch (DocumentException e) {
-            throw new PortableException(e.getMessage(), e);
+            throw new PortableExportException(e);
         }
     }
 }
