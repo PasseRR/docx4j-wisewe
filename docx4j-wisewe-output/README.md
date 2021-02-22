@@ -1,6 +1,6 @@
 
 # 前言
-所有导出Builder支持写到**给定输出流**writeTo() 、写到**servlet输出流**writeToServletResponse() 两种方式，以下所有测试用例均输出到给定输出流。   
+所有导出Exporter支持写到**给定输出流**writeTo() 、写到**servlet输出流**writeToServletResponse() 两种方式，以下所有测试用例均输出到给定输出流。   
 所有测试用例数据：[对象](./src/test/java/cn/wisewe/docx4j/output/builder/Person.java)、[数据](./src/test/java/cn/wisewe/docx4j/output/builder/SpecDataFactory.java)   
 
 # Excel导出
