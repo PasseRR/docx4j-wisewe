@@ -8,6 +8,10 @@ package cn.wisewe.docx4j.input;
  */
 public interface InputConstants {
     /**
+     * 空字符串{@value}
+     */
+    String EMPTY = "";
+    /**
      * 分号{@value}
      */
     String SEMICOLON = ";";

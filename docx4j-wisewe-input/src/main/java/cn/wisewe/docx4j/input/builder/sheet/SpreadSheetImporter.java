@@ -2,6 +2,7 @@ package cn.wisewe.docx4j.input.builder.sheet;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.util.IOUtils;
@@ -37,6 +38,7 @@ public class SpreadSheetImporter {
 
     SpreadSheetImporter(InputStream is, boolean closeable) {
         try {
+            ZipSecureFile.setMinInflateRatio(0D);
             this.workbook = WorkbookFactory.create(is);
         } catch (IOException e) {
             throw new SpreadSheetImportException(e);

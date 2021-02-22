@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
+import cn.wisewe.docx4j.input.utils.TrConsumer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +17,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * excel sheet解析结果
@@ -86,17 +88,33 @@ public class ImportResult<T> {
     }
 
     /**
+     * 遍历有效数据满足添加做删除
+     * @param supplier 判断有效基准数据
+     * @param consumer 移除元素消费
+     * @param <U>      有效数据类型
+     * @return {@link ImportResult}
+     */
+    public <U> ImportResult<T> remove(Supplier<U> supplier, TrConsumer<T, List<String>, U> consumer) {
+        if (this.hasValid()) {
+            // 当且仅当存在有效数据时 才做数据初始化
+            U u = supplier.get();
+            this.remove((t, m) -> consumer.accept(t, m, u));
+        }
+
+        return this;
+    }
+
+    /**
      * 移除重复数据
      * @param function 重复标识
      * @param <R>      重复标识类型
      * @return {@link ImportResult <T>}
      */
     public <R> ImportResult<T> removeIfRepeated(Function<T, R> function, String message) {
-        Set<R> set = new HashSet<>();
         return
-            this.remove((t, messages) -> {
-                if (!set.add(function.apply(t))) {
-                    messages.add(message);
+            this.remove((Supplier<Set<R>>) HashSet::new, (t, m, s) -> {
+                if (!s.contains(function.apply(t))) {
+                    m.add(message);
                 }
             });
     }

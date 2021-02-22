@@ -1,5 +1,7 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
+import cn.wisewe.docx4j.input.InputConstants;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -28,10 +30,10 @@ public @interface CellMeta {
      * 非法格式提示信息 会自动拼接{@link #name()}为前缀
      * @return 非法格式提示信息
      */
-    String message() default "";
+    String message() default InputConstants.EMPTY;
     /**
      * 日期时间格式化
      * @return 格式化模式
      */
-    String dateTimeFormat() default "";
+    String dateTimeFormat() default InputConstants.EMPTY;
 }
