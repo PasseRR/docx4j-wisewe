@@ -1,6 +1,8 @@
 package cn.wisewe.docx4j.output.builder.portable;
 
 import cn.wisewe.docx4j.output.utils.StringConverterUtil;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,20 +32,18 @@ public class DslRow {
         this.cells = new ArrayList<>();
     }
 
-    /**
-     * 表格添加单元格
-     * @param consumer 单元格消费
-     * @return {@link DslRow}
-     */
-    public DslRow cell(Consumer<DslCell> consumer) {
-        PdfPCell cell = new PdfPCell();
-        cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+    public DslRow cell(Phrase phrase, Consumer<DslCell> consumer) {
+        PdfPCell cell = new PdfPCell(phrase);
+        // 默认单元格垂直居中
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         consumer.accept(new DslCell(cell));
-
-        // 单元格顺序缓存
         this.cells.add(cell);
 
         return this;
+    }
+
+    public DslRow cell(Consumer<DslCell> consumer) {
+        return this.cell(null, consumer);
     }
 
     /**
@@ -54,12 +54,14 @@ public class DslRow {
      */
     public DslRow headCell(Object o, Consumer<DslCell> consumer) {
         return
-            this.cell(c -> {
-                c.paragraph(p -> p.phrase(StringConverterUtil.convert(o), Fonts.BOLD_NORMAL.font()));
-                if (Objects.nonNull(consumer)) {
-                    consumer.accept(c);
+            this.cell(
+                new Phrase(StringConverterUtil.convert(o), Fonts.BOLD_NORMAL.font()),
+                c -> {
+                    if (Objects.nonNull(consumer)) {
+                        consumer.accept(c);
+                    }
                 }
-            });
+            );
     }
 
     /**
@@ -114,12 +116,14 @@ public class DslRow {
      */
     public DslRow dataCell(Object o, Consumer<DslCell> consumer) {
         return
-            this.cell(c -> {
-                c.textParagraph(StringConverterUtil.convert(o));
-                if (Objects.nonNull(consumer)) {
-                    consumer.accept(c);
+            this.cell(
+                new Phrase(StringConverterUtil.convert(o), Fonts.NORMAL.font()),
+                c -> {
+                    if (Objects.nonNull(consumer)) {
+                        consumer.accept(c);
+                    }
                 }
-            });
+            );
     }
 
     /**

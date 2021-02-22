@@ -19,8 +19,6 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTXf;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.STBorderStyle;
 
-import java.awt.font.FontRenderContext;
-
 /**
  * 单元格样式工具
  * @author xiehai
@@ -28,8 +26,6 @@ import java.awt.font.FontRenderContext;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 interface CellStyleUtil {
-    FontRenderContext FONT_RENDER_CONTEXT = new FontRenderContext(null, true, true);
-
     /**
      * 设置单元格边框样式
      * @param cellStyle 单元格样式

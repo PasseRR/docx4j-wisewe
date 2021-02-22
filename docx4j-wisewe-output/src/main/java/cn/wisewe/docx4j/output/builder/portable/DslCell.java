@@ -5,6 +5,8 @@ import com.itextpdf.text.pdf.PdfPCell;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
+import java.util.function.Consumer;
+
 /**
  * pdf表格单元格dsl
  * @author xiehai
@@ -17,6 +19,16 @@ public class DslCell extends PortableDocument<DslCell> {
 
     DslCell(PdfPCell cell) {
         this.cell = cell;
+    }
+
+    /**
+     * 单元格设置
+     * @param consumer
+     * @return
+     */
+    public DslCell more(Consumer<PdfPCell> consumer) {
+        consumer.accept(this.cell);
+        return this;
     }
 
     /**

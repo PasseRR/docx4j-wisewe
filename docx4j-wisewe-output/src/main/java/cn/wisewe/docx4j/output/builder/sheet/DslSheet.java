@@ -38,6 +38,11 @@ public class DslSheet {
      */
     @NonFinal
     int maxCells = 0;
+    /**
+     * 保持所有列宽度保持最大列宽度一致
+     */
+    @NonFinal
+    boolean keepMaxColumnWidth = false;
 
     DslSheet(Sheet sheet) {
         this.sheet = sheet;
@@ -95,6 +100,16 @@ public class DslSheet {
     }
 
     /**
+     * 设置sheet列与最大列宽度一致
+     * @return {@link DslSheet}
+     */
+    public DslSheet keepMaxColumnWidth() {
+        this.keepMaxColumnWidth = true;
+
+        return this;
+    }
+
+    /**
      * 单元格自适应
      */
     protected void doAutoColumnFit() {
@@ -104,10 +119,14 @@ public class DslSheet {
                 return;
             }
 
+            // 计算列最大宽度
+            int maxWidth = DslCell.COLUMN_WIDTH.get().values().stream().mapToInt(Integer::intValue).max().orElse(5);
+
             IntStream.range(0, this.maxCells)
                 .forEach(it -> {
                     // 列宽至少宽5个字符
-                    int width =
+                    int width = this.keepMaxColumnWidth
+                        ? maxWidth :
                         Optional.ofNullable(DslCell.COLUMN_WIDTH.get())
                             // 若无数据设置 则赋值为默认宽度
                             .map(m -> m.get(it))
