@@ -173,7 +173,7 @@
 
     <scm>
         <tag>master</tag>
-        <url>git@https://gitee.com/PasseRR/docx4j-wisewe.git</url>
+        <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
         <connection>scm:git:git@https://gitee.com/PasseRR/docx4j-wisewe.git</connection>
         <developerConnection>scm:git:git@https://gitee.com/PasseRR/docx4j-wisewe.git</developerConnection>
     </scm>
