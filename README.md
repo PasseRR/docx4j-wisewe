@@ -1,6 +1,6 @@
 # docx4j-wisewe
 
-## 当前最新版本`1.0.0`(暂未发布到maven中央仓库)
+## 当前最新版本`1.0.0`
 
 ## [文档导出](./docx4j-wisewe-output/README.md)
 
