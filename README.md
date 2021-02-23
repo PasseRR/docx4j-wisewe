@@ -1,6 +1,7 @@
 # docx4j-wisewe
 
 ## 当前最新版本`1.0.0`
+[查看已发布版本](https://gitee.com/PasseRR/docx4j-wisewe/releases)
 
 ## [文档导出](./docx4j-wisewe-output/README.md)
 
