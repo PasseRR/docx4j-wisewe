@@ -8,6 +8,8 @@
     <version>1.0.0</version>
 
     <packaging>pom</packaging>
+    <name>docx4j-wisewe</name>
+    <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
     <description>常用文档的导入导出</description>
     <modules>
         <module>docx4j-wisewe-output</module>
@@ -162,6 +164,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <licenses>
         <license>
