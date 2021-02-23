@@ -19,7 +19,7 @@ gradle引入
 
 ```groovy
 dependencies {
-    compile "cn.wisewe:docx4j-wisewe-output:见上最新版本"
+    implementation "cn.wisewe:docx4j-wisewe-output:见上最新版本"
 }
 ```
 
@@ -39,6 +39,6 @@ gradle引入
 
 ```groovy
 dependencies {
-    compile "cn.wisewe:docx4j-wisewe-input:见上最新版本"
+    implementation "cn.wisewe:docx4j-wisewe-input:见上最新版本"
 }
 ```
