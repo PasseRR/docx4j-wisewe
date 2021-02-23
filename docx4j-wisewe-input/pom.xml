@@ -12,7 +12,7 @@
     <artifactId>docx4j-wisewe-input</artifactId>
     <name>docx4j-wisewe-input</name>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
-    <description>基于docx4j导入excel</description>
+    <description>excel、zip文件导入</description>
 
     <dependencies>
         <dependency>

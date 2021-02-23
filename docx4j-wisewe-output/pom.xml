@@ -13,7 +13,7 @@
     <artifactId>docx4j-wisewe-output</artifactId>
     <name>docx4j-wisewe-output</name>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
-    <description>基于freemarker模版的excel、word、pdf导出</description>
+    <description>excel、word、pdf、zip文件导出</description>
 
     <dependencies>
         <!-- Word、Excel -->
