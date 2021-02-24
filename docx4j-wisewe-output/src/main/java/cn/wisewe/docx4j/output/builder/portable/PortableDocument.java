@@ -61,16 +61,32 @@ abstract class PortableDocument<T extends PortableDocument> {
     }
 
     /**
-     * 标题段落
-     * @param text  正文段落内容
+     * 添加标题段落
+     * @param text      标题内容
+     * @param fonts     字体
+     * @param alignment 对齐方式
+     * @return {@link T}
+     */
+    public T headingParagraph(String text, Fonts fonts, int alignment) {
+        return
+            this.paragraph(p ->
+                p.chunk(text, fonts.font())
+                    .more(op -> {
+                        op.setAlignment(alignment);
+                        op.setSpacingBefore(fonts.size / 4.0f);
+                        op.setSpacingAfter(fonts.size / 3.0f);
+                    })
+            );
+    }
+
+    /**
+     * 标题段落 默认左对齐
+     * @param text  标题段落内容
      * @param fonts 预定义字体
      * @return {@link T}
      */
     public T headingParagraph(String text, Fonts fonts) {
-        return this.paragraph(p -> p.chunk(text, fonts.font()).more(op -> {
-            op.setSpacingBefore(fonts.size / 4.0f);
-            op.setSpacingAfter(fonts.size / 3.0f);
-        }));
+        return this.headingParagraph(text, fonts, Element.ALIGN_LEFT);
     }
 
     /**

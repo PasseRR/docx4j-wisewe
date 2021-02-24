@@ -31,8 +31,8 @@ public class PortableExporterSpec {
     public void simple() throws FileNotFoundException {
         PortableExporter.fastCreate()
             .headingParagraph("标题一", Fonts.HEADING_1)
-            .headingParagraph("标题二", Fonts.HEADING_2)
-            .headingParagraph("标题三", Fonts.HEADING_3)
+            .headingParagraph("居中的标题二", Fonts.HEADING_2, Element.ALIGN_CENTER)
+            .headingParagraph("居右的标题三", Fonts.HEADING_3, Element.ALIGN_RIGHT)
             .headingParagraph("标题五", Fonts.HEADING_5)
             .headingParagraph("标题七", Fonts.HEADING_7)
             .headingParagraph("标题九", Fonts.HEADING_9)

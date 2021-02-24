@@ -5,6 +5,7 @@ import cn.wisewe.docx4j.output.builder.SpecDataFactory;
 import cn.wisewe.docx4j.output.builder.sheet.SpreadSheetExporterSpec;
 import cn.wisewe.docx4j.output.utils.FileUtil;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.junit.Test;
 
 import java.io.File;
@@ -33,8 +34,8 @@ public class DocumentExporterSpec {
     public void simple() throws IOException {
         DocumentExporter.create()
             .headingParagraph("标题一", ParagraphStyle.HEADING_1)
-            .headingParagraph("标题二", ParagraphStyle.HEADING_2)
-            .headingParagraph("标题三", ParagraphStyle.HEADING_3)
+            .headingParagraph("居中标题二", ParagraphStyle.HEADING_2, ParagraphAlignment.CENTER)
+            .headingParagraph("居右标题三", ParagraphStyle.HEADING_3, ParagraphAlignment.RIGHT)
             .headingParagraph("标题五", ParagraphStyle.HEADING_5)
             .headingParagraph("标题七", ParagraphStyle.HEADING_7)
             .headingParagraph("标题九", ParagraphStyle.HEADING_9)

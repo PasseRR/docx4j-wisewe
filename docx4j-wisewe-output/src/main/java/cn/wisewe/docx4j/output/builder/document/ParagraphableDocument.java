@@ -1,6 +1,7 @@
 package cn.wisewe.docx4j.output.builder.document;
 
 import org.apache.poi.xwpf.usermodel.BreakType;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 import javax.annotation.Generated;
@@ -66,13 +67,31 @@ abstract class ParagraphableDocument<T extends ParagraphableDocument> {
     }
 
     /**
-     * 添加一个标题段落
+     * 添加一个标题段落 默认左对齐
      * @param text  标题内容
      * @param style 标题样式
      * @return {@link T}
      */
     public T headingParagraph(String text, ParagraphStyle style) {
-        return this.paragraph(p -> p.run(text).more(t -> t.setStyle(style.id)));
+        return this.headingParagraph(text, style, ParagraphAlignment.LEFT);
+    }
+
+    /**
+     * 添加一个标题段落
+     * @param text      标题内容
+     * @param style     标题样式
+     * @param alignment 对齐方式
+     * @return {@link T}
+     */
+    public T headingParagraph(String text, ParagraphStyle style, ParagraphAlignment alignment) {
+        return
+            this.paragraph(p ->
+                p.run(text)
+                    .more(t -> {
+                        t.setStyle(style.id);
+                        t.setAlignment(alignment);
+                    })
+            );
     }
 
     /**
