@@ -53,6 +53,16 @@ abstract class PortableDocument<T extends PortableDocument> {
 
     /**
      * 正文段落
+     * @param text  正文内容
+     * @param fonts 字体
+     * @return {@link T}
+     */
+    public T textParagraph(String text, Fonts fonts) {
+        return this.paragraph(p -> p.chunk(text, fonts.font()));
+    }
+
+    /**
+     * 正文段落
      * @param text 正文段落内容
      * @return {@link T}
      */
