@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
     <name>docx4j-wisewe</name>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
-    <description>常用文档的导入导出</description>
+    <description>常用文档的导入导出父pom</description>
     <modules>
         <module>docx4j-wisewe-output</module>
         <module>docx4j-wisewe-input</module>
