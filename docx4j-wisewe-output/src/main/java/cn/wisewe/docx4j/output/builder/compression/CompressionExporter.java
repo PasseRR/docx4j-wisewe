@@ -92,6 +92,8 @@ public class CompressionExporter {
                     IOUtils.copy(is, os);
                 } catch (IOException e) {
                     throw new CompressionExportException(e);
+                } finally {
+                    IOUtils.closeQuietly(is);
                 }
             });
     }
