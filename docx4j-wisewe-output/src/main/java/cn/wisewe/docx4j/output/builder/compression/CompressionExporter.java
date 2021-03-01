@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
@@ -78,6 +80,23 @@ public class CompressionExporter {
     }
 
     /**
+     * 添加一个{@link InputStream}
+     * @param fileName 文件名
+     * @param is       {@link InputStream}
+     * @return {@link CompressionExporter}
+     */
+    public CompressionExporter file(String fileName, InputStream is) {
+        return
+            this.file(fileName, os -> {
+                try {
+                    IOUtils.copy(is, os);
+                } catch (IOException e) {
+                    throw new CompressionExportException(e);
+                }
+            });
+    }
+
+    /**
      * 添加文件
      * @param file {@link File}
      * @return {@link CompressionExporter}
@@ -87,14 +106,11 @@ public class CompressionExporter {
             throw new CompressionExportException("input file is directory, only file support");
         }
 
-        return
-            this.file(file.getName(), os -> {
-                try {
-                    IOUtils.copy(new FileInputStream(file), os);
-                } catch (IOException e) {
-                    throw new CompressionExportException(e);
-                }
-            });
+        try {
+            return this.file(file.getName(), new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new CompressionExportException(e);
+        }
     }
 
     /**

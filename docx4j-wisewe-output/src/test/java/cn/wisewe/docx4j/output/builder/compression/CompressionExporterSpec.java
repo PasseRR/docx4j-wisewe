@@ -16,6 +16,7 @@ import cn.wisewe.docx4j.output.utils.FileUtil;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.List;
@@ -56,6 +57,8 @@ public class CompressionExporterSpec {
         CompressionExporter.create()
             // 已有文件
             .file(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
+            // 重命名
+            .file("重命名.jpeg", new FileInputStream(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
             // 空的word文件
             .file(DocumentFileType.DOCX.fullName("a"), os -> DocumentExporter.create().writeTo(os, false))
             // 空的excel文件
