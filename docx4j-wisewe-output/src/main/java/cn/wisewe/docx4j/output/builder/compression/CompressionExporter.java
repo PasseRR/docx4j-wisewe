@@ -37,19 +37,21 @@ public class CompressionExporter {
     ByteArrayOutputStream byteArrayOutputStream;
     ZipOutputStream zipOutputStream;
 
-    CompressionExporter(int level) {
+    CompressionExporter(int level, Charset charset) {
         this.byteArrayOutputStream = new ByteArrayOutputStream();
         // 设置中文路径支持
-        this.zipOutputStream = new ZipOutputStream(this.byteArrayOutputStream, Charset.forName("GBK"));
+        this.zipOutputStream = new ZipOutputStream(this.byteArrayOutputStream, charset);
         this.zipOutputStream.setLevel(level);
     }
 
     /**
-     * 快速构建压缩包builder
+     * 设置压缩级别及编码
+     * @param level   压缩级别
+     * @param charset 编码
      * @return {@link CompressionExporter}
      */
-    public static CompressionExporter create() {
-        return CompressionExporter.create(Deflater.DEFAULT_COMPRESSION);
+    public static CompressionExporter create(int level, Charset charset) {
+        return new CompressionExporter(level, charset);
     }
 
     /**
@@ -58,7 +60,15 @@ public class CompressionExporter {
      * @return {@link CompressionExporter}
      */
     public static CompressionExporter create(int level) {
-        return new CompressionExporter(level);
+        return CompressionExporter.create(level, Charset.forName("GBK"));
+    }
+
+    /**
+     * 快速构建压缩包builder
+     * @return {@link CompressionExporter}
+     */
+    public static CompressionExporter create() {
+        return CompressionExporter.create(Deflater.DEFAULT_COMPRESSION);
     }
 
     /**
