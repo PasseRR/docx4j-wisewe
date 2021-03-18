@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -74,6 +76,15 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
     }
 
     /**
+     * 快速构建给定文档并开启
+     * @param supplier {@link Document}提供
+     * @return {@link PortableExporter}
+     */
+    public static PortableExporter fastCreate(Supplier<Document> supplier) {
+        return PortableExporter.create(supplier).open();
+    }
+
+    /**
      * 文档开启
      * @return {@link PortableExporter}
      */
@@ -89,7 +100,20 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
      * @return {@link PortableExporter}
      */
     public <T extends PdfPageEvent> PortableExporter event(T event) {
-        this.writer.setPageEvent(event);
+        return this.events(Collections.singletonList(event));
+    }
+
+    /**
+     * 添加多个事件
+     * @param events {@link List}
+     * @param <T>    事件类型
+     * @return {@link PortableExporter}
+     */
+    public <T extends PdfPageEvent> PortableExporter events(List<T> events) {
+        if (Objects.nonNull(events)) {
+            events.forEach(this.writer::setPageEvent);
+        }
+
         return this;
     }
 
