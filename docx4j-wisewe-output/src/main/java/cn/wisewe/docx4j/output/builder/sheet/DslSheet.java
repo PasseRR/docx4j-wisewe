@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
@@ -104,31 +106,63 @@ public class DslSheet {
         return this;
     }
 
-    public DslSheet validation(int startRow, int column, List<String> data) {
-        if (Objects.nonNull(data) && !data.isEmpty()) {
-            DataValidationHelper helper = this.sheet.getDataValidationHelper();
-            // list校验
-            DataValidationConstraint constraint = helper.createExplicitListConstraint(data.toArray(new String[0]));
-            // excel版本支持最大行数
-            int maxRows = this.sheet.getWorkbook().getSpreadsheetVersion().getMaxRows();
-            // 校验规则
-            DataValidation validation = helper.createValidation(
-                constraint,
-                new CellRangeAddressList(startRow - 1, maxRows - 1, column - 1, column - 1)
-            );
-            validation.setEmptyCellAllowed(true);
-            validation.setSuppressDropDownArrow(true);
-            validation.setShowErrorBox(true);
-            validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-            this.sheet.addValidationData(validation);
-        }
-
+    /**
+     * 自定义校验器
+     * @param function 校验器生成方法
+     * @return {@link DslSheet}
+     */
+    public DslSheet validation(BiFunction<DataValidationHelper, SpreadsheetVersion, DataValidation> function) {
+        this.sheet.addValidationData(
+            function.apply(
+                this.sheet.getDataValidationHelper(),
+                this.sheet.getWorkbook().getSpreadsheetVersion()
+            )
+        );
         return this;
     }
 
-    public DslSheet validation(int column, List<String> data) {
+    /**
+     * 列表校验
+     * @param startRow 开始行
+     * @param column   校验列
+     * @param data     列表数据
+     * @return {@link DslSheet}
+     */
+    public DslSheet listValidation(int startRow, int column, List<String> data) {
+        // 列表为空不添加校验
+        if (Objects.isNull(data) || data.isEmpty()) {
+            return this;
+        }
+
+        return
+            this.validation((helper, version) -> {
+                // list校验
+                DataValidationConstraint constraint = helper.createExplicitListConstraint(data.toArray(new String[0]));
+                // excel版本支持最大行数
+                int maxRows = version.getMaxRows();
+                // 校验规则
+                DataValidation validation = helper.createValidation(
+                    constraint,
+                    new CellRangeAddressList(startRow - 1, maxRows - 1, column - 1, column - 1)
+                );
+                validation.setEmptyCellAllowed(true);
+                validation.setSuppressDropDownArrow(true);
+                validation.setShowErrorBox(true);
+                validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+
+                return validation;
+            });
+    }
+
+    /**
+     * 列表校验 默认从第二行开始
+     * @param column 校验列
+     * @param data   列表数据
+     * @return {@link DslSheet}
+     */
+    public DslSheet listValidation(int column, List<String> data) {
         // 默认从第2行开始
-        return this.validation(2, column, data);
+        return this.listValidation(2, column, data);
     }
 
     /**

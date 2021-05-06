@@ -39,8 +39,8 @@ public class SpreadSheetExporterSpec {
             .workbook(wb ->
                 wb.sheet(s ->
                     s.row(r -> r.headRedAsterCells("姓名", "性别", "职业"))
-                        .validation(2, Arrays.asList("男", "女"))
-                        .validation(3, Arrays.asList("学生", "老师", "流浪汉"))
+                        .listValidation(2, Arrays.asList("男", "女"))
+                        .listValidation(3, Arrays.asList("学生", "老师", "流浪汉"))
                 )
             )
             .writeTo(new FileOutputStream(FileUtil.brotherPath(SpreadSheetExporterSpec.class, "validation.xlsx")));
