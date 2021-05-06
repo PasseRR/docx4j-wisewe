@@ -40,17 +40,17 @@ public class ImportDetail<T> {
 
     ImportDetail(ImportResult<T> result, String separator) {
         this.valid = result.getValidRecords().size();
-        this.invalid = result.getInvalidRecords().size();
+        this.invalid = result.getInvalidRecordMessage().size();
         this.total = this.valid + this.invalid;
-        result.getInvalidRecords().forEach((key, value) -> {
+        // 使用错误消息保证顺序
+        result.getInvalidRecordMessage().forEach((key, value) -> {
             RowDetail<T> detail = new RowDetail<>();
             detail.setRow(key);
-            detail.setData(value);
+            detail.setData(result.getInvalidRecords().get(key));
 
             // 错误消息拼接
-            List<String> messages = result.getInvalidRecordMessage().get(key);
             detail.setMessage(
-                Optional.of(messages)
+                Optional.of(value)
                     .filter(it -> it.size() > 1)
                     // 一行数据存在多个错误
                     .map(it ->
@@ -59,7 +59,7 @@ public class ImportDetail<T> {
                             .collect(Collectors.joining(separator))
                     )
                     // 仅存在一个错误
-                    .orElseGet(() -> messages.get(0))
+                    .orElseGet(() -> value.get(0))
             );
 
             this.invalidRecords.add(detail);
