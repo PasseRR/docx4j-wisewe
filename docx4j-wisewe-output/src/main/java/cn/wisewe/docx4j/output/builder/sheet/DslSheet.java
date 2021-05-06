@@ -251,7 +251,7 @@ public class DslSheet {
     /**
      * 空格填充
      * @param len 填充字节数
-     * @return
+     * @return 带斜线的单元格自动填充空格
      */
     protected static String padding(int len) {
         // 预留一个字节长度
