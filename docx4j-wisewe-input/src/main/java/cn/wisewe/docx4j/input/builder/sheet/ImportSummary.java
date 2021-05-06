@@ -1,6 +1,5 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
-import cn.wisewe.docx4j.input.InputConstants;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,11 +38,11 @@ public class ImportSummary {
      */
     final List<RowMessage> invalidRecords = new ArrayList<>();
 
-    ImportSummary(ImportResult<?> importResult) {
-        this.valid = importResult.getValidRecords().size();
-        this.invalid = importResult.getInvalidRecords().size();
+    <T> ImportSummary(ImportResult<T> result, String separator) {
+        this.valid = result.getValidRecords().size();
+        this.invalid = result.getInvalidRecordMessage().size();
         this.total = this.valid + this.invalid;
-        importResult.getInvalidRecords()
+        result.getInvalidRecordMessage()
             .forEach((key, value) ->
                 this.invalidRecords.add(
                     new RowMessage(
@@ -55,7 +54,7 @@ public class ImportSummary {
                             .map(it ->
                                 IntStream.range(0, it.size())
                                     .mapToObj(row -> String.format("%d.%s", row + 1, it.get(row)))
-                                    .collect(Collectors.joining(InputConstants.SEMICOLON))
+                                    .collect(Collectors.joining(separator))
                             )
                             // 仅存在一个错误
                             .orElseGet(() -> value.get(0))

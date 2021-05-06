@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
+import cn.wisewe.docx4j.input.InputConstants;
 import cn.wisewe.docx4j.input.utils.TrConsumer;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,9 +42,13 @@ public class ImportResult<T> {
      */
     final Map<Integer, T> validRecords = new HashMap<>();
     /**
+     * 校验非法源记录
+     */
+    final Map<Integer, T> invalidRecords = new HashMap<>();
+    /**
      * 校验非法记录数 列有序
      */
-    final Map<Integer, List<String>> invalidRecords = new TreeMap<>();
+    final Map<Integer, List<String>> invalidRecordMessage = new TreeMap<>();
 
     ImportResult() {
     }
@@ -51,10 +56,12 @@ public class ImportResult<T> {
     /**
      * 添加不合法记录
      * @param index    索引
+     * @param t        数据
      * @param messages 不合法原因
      */
-    public void addInvalidRecord(int index, List<String> messages) {
-        this.invalidRecords.merge(index, messages, (o, n) -> {
+    public void addInvalidRecord(int index, T t, List<String> messages) {
+        this.invalidRecords.put(index, t);
+        this.invalidRecordMessage.merge(index, messages, (o, n) -> {
             o.addAll(n);
             return o;
         });
@@ -77,7 +84,7 @@ public class ImportResult<T> {
                         .filter(m -> !m.isEmpty())
                         // 则加入错误信息列表
                         .map(m -> {
-                            this.addInvalidRecord(it.getKey(), m);
+                            this.addInvalidRecord(it.getKey(), it.getValue(), m);
                             return true;
                         })
                         // 合法数据
@@ -125,12 +132,12 @@ public class ImportResult<T> {
      * @param consumer  合法记录消费
      * @return {@link ImportSummary}
      */
-    public ImportSummary onAny(Predicate<ImportResult<T>> predicate, Consumer<List<T>> consumer) {
+    public ImportResult<T> onAny(Predicate<ImportResult<T>> predicate, Consumer<List<T>> consumer) {
         if (predicate.test(this)) {
             consumer.accept(new ArrayList<>(this.validRecords.values()));
         }
 
-        return this.getSummary();
+        return this;
     }
 
     /**
@@ -138,7 +145,7 @@ public class ImportResult<T> {
      * @param consumer 合法记录消费
      * @return {@link ImportSummary}
      */
-    public ImportSummary onAllValid(Consumer<List<T>> consumer) {
+    public ImportResult<T> onAllValid(Consumer<List<T>> consumer) {
         // 当且仅当不存在错误数据且存在有效数据时执行
         return this.onAny(t -> !t.hasInvalid() && t.hasValid(), consumer);
     }
@@ -148,7 +155,7 @@ public class ImportResult<T> {
      * @param consumer 合法记录消费
      * @return {@link ImportSummary}
      */
-    public ImportSummary onValid(Consumer<List<T>> consumer) {
+    public ImportResult<T> onValid(Consumer<List<T>> consumer) {
         // 仅当存在有效数据时执行
         return this.onAny(ImportResult::hasValid, consumer);
     }
@@ -158,7 +165,7 @@ public class ImportResult<T> {
      * @return true/false
      */
     public boolean hasInvalid() {
-        return !this.invalidRecords.isEmpty();
+        return !this.invalidRecordMessage.isEmpty();
     }
 
     /**
@@ -174,7 +181,32 @@ public class ImportResult<T> {
      * @return {@link ImportSummary}
      */
     public ImportSummary getSummary() {
-        return new ImportSummary(this);
+        return this.getSummary(InputConstants.SEMICOLON);
+    }
+
+    /**
+     * 汇总信息
+     * @return {@link ImportSummary}
+     */
+    public ImportSummary getSummary(String separator) {
+        return new ImportSummary(this, separator);
+    }
+
+    /**
+     * 详情信息
+     * @return {@link ImportDetail}
+     */
+    public ImportDetail<T> getDetail() {
+        return this.getDetail(InputConstants.SEMICOLON);
+    }
+
+    /**
+     * 详情信息
+     * @param separator 多个错误信息分隔符
+     * @return {@link ImportDetail}
+     */
+    public ImportDetail<T> getDetail(String separator) {
+        return new ImportDetail<>(this, separator);
     }
 
     /**
@@ -212,7 +244,7 @@ public class ImportResult<T> {
         if (messages.isEmpty()) {
             this.addValidRecord(index, t);
         } else {
-            this.addInvalidRecord(index, messages);
+            this.addInvalidRecord(index, t, messages);
         }
     }
 }

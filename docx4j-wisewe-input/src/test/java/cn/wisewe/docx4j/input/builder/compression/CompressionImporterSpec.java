@@ -50,7 +50,7 @@ public class CompressionImporterSpec {
                             .resolve(Person.class);
                     System.out.println(result.hasInvalid());
                     System.out.println(result.getSkip());
-                    System.out.println(result.getInvalidRecords());
+                    System.out.println(result.getInvalidRecordMessage());
                     System.out.println(result.getValidRecords());
                 }
 
