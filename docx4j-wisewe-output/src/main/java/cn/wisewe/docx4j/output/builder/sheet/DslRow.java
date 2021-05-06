@@ -1,9 +1,13 @@
 package cn.wisewe.docx4j.output.builder.sheet;
 
+import cn.wisewe.docx4j.output.OutputConstants;
+import cn.wisewe.docx4j.output.utils.StringConverterUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.io.File;
@@ -69,7 +73,7 @@ public class DslRow {
     /**
      * 添加一个表头单元格
      * @param o 单元格对象
-     * @return {@link DslCell}
+     * @return {@link DslRow}
      */
     public DslRow headCell(Object o) {
         return this.headCell(cell -> cell.text(o));
@@ -82,6 +86,42 @@ public class DslRow {
      */
     public DslRow headCell(Supplier<Object> supplier) {
         return this.headCell(supplier.get());
+    }
+
+    /**
+     * 表头添加红星
+     * @param o 表头单元格对象
+     * @return {@link DslRow}
+     */
+    public DslRow headRedAsterCell(Object o) {
+        return
+            this.headCell(c -> {
+                RichTextString rich =
+                    this.row.getSheet()
+                        .getWorkbook()
+                        .getCreationHelper()
+                        .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
+                Font aster = CellStyleUtil.defaultHeadFont(c.getWorkBook());
+                aster.setColor(Font.COLOR_RED);
+                rich.applyFont(0, 1, aster);
+                rich.applyFont(1, rich.length(), CellStyleUtil.defaultHeadFont(c.getWorkBook()));
+                c.rich(rich);
+            });
+    }
+
+    /**
+     * 添加多个带红星的表头
+     * @param objects 多个带红星表头单元格
+     * @return {@link DslRow}
+     */
+    public DslRow headRedAsterCells(Object... objects) {
+        if (Objects.nonNull(objects) && objects.length > 0) {
+            for (Object object : objects) {
+                this.headRedAsterCell(object);
+            }
+        }
+
+        return this;
     }
 
     /**

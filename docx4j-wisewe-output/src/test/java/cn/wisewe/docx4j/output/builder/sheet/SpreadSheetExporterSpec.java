@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,6 +31,19 @@ public class SpreadSheetExporterSpec {
     public void empty() throws FileNotFoundException {
         SpreadSheetExporter.create()
             .writeTo(new FileOutputStream(FileUtil.brotherPath(SpreadSheetExporterSpec.class, "empty.xlsx")));
+    }
+
+    @Test
+    public void validation() throws FileNotFoundException {
+        SpreadSheetExporter.create()
+            .workbook(wb ->
+                wb.sheet(s ->
+                    s.row(r -> r.headRedAsterCells("姓名", "性别", "职业"))
+                        .validation(2, Arrays.asList("男", "女"))
+                        .validation(3, Arrays.asList("学生", "老师", "流浪汉"))
+                )
+            )
+            .writeTo(new FileOutputStream(FileUtil.brotherPath(SpreadSheetExporterSpec.class, "validation.xlsx")));
     }
 
     @Test

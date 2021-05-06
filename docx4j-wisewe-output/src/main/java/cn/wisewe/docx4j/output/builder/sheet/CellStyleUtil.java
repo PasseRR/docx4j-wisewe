@@ -43,14 +43,26 @@ interface CellStyleUtil {
     }
 
     /**
+     * 默认表头字体
+     * @param workbook {@link Workbook}
+     * @return {@link Font}
+     */
+    static Font defaultHeadFont(Workbook workbook) {
+        // 表头字体加粗
+        Font font = workbook.createFont();
+        font.setBold(true);
+
+        return font;
+    }
+
+    /**
      * 创建默认表头单元格样式
      * @param workbook {@link Workbook}
      * @return {@link CellStyle}
      */
     static CellStyle defaultHeadStyle(Workbook workbook) {
         // 表头字体加粗
-        Font font = workbook.createFont();
-        font.setBold(true);
+        Font font = defaultHeadFont(workbook);
 
         // 单元格居中 表头背景色
         CellStyle cellStyle = workbook.createCellStyle();

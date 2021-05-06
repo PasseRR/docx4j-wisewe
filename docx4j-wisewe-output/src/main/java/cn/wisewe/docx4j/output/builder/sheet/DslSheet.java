@@ -5,9 +5,14 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddressList;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -97,6 +102,33 @@ public class DslSheet {
         }
 
         return this;
+    }
+
+    public DslSheet validation(int startRow, int column, List<String> data) {
+        if (Objects.nonNull(data) && !data.isEmpty()) {
+            DataValidationHelper helper = this.sheet.getDataValidationHelper();
+            // list校验
+            DataValidationConstraint constraint = helper.createExplicitListConstraint(data.toArray(new String[0]));
+            // excel版本支持最大行数
+            int maxRows = this.sheet.getWorkbook().getSpreadsheetVersion().getMaxRows();
+            // 校验规则
+            DataValidation validation = helper.createValidation(
+                constraint,
+                new CellRangeAddressList(startRow - 1, maxRows - 1, column - 1, column - 1)
+            );
+            validation.setEmptyCellAllowed(true);
+            validation.setSuppressDropDownArrow(true);
+            validation.setShowErrorBox(true);
+            validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            this.sheet.addValidationData(validation);
+        }
+
+        return this;
+    }
+
+    public DslSheet validation(int column, List<String> data) {
+        // 默认从第2行开始
+        return this.validation(2, column, data);
     }
 
     /**

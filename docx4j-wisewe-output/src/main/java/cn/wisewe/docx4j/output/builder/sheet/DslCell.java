@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -75,6 +76,16 @@ public class DslCell {
         }
 
         return this.doSetText(StringConverterUtil.convert(o));
+    }
+
+    /**
+     * 富文本
+     * @param text 富文本内容
+     * @return {@link DslCell}
+     */
+    public DslCell rich(RichTextString text) {
+        this.cell.setCellValue(text);
+        return this.doUpdateLength(text.length());
     }
 
     /**
