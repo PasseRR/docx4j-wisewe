@@ -120,7 +120,7 @@ public class ImportResult<T> {
     public <R> ImportResult<T> removeIfRepeated(Function<T, R> function, String message) {
         return
             this.remove((Supplier<Set<R>>) HashSet::new, (t, m, s) -> {
-                if (!s.contains(function.apply(t))) {
+                if (!s.add(function.apply(t))) {
                     m.add(message);
                 }
             });
