@@ -176,7 +176,7 @@ class SpreadSheetHandler<T> {
 
             // 非空单元格都当作数据单元格
             if (Objects.nonNull(cell) && cell.getCellType() != CellType.BLANK) {
-                return true;
+                return false;
             }
         }
 
