@@ -58,8 +58,6 @@ class SpreadSheetHandler<T> {
      */
     AtomicInteger maxColumn;
 
-    private static final DataFormatter DATA_FORMATTER = new DataFormatter();
-
     SpreadSheetHandler(Class<T> clazz, int skip, boolean failFast) {
         this.clazz = clazz;
         this.skip = skip;
@@ -109,6 +107,8 @@ class SpreadSheetHandler<T> {
             T entity = this.clazz.newInstance();
             // 每行不合法信息
             List<String> invalidMessages = new ArrayList<>();
+            // 数据格式器
+            DataFormatter formatter = new DataFormatter();
             for (Map.Entry<CellMeta, Field> entry : this.fields.entrySet()) {
                 CellMeta meta = entry.getKey();
                 Cell cell = row.getCell(meta.index());
@@ -116,7 +116,8 @@ class SpreadSheetHandler<T> {
                     continue;
                 }
 
-                String text = DATA_FORMATTER.formatCellValue(cell);
+                // 去掉首尾空白
+                String text = formatter.formatCellValue(cell).trim();
                 Field field = entry.getValue();
                 CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
                 if (!result.isOk) {
@@ -173,8 +174,9 @@ class SpreadSheetHandler<T> {
                 break;
             }
 
-            if (cell != null && cell.getCellType() != CellType.BLANK && cell.getStringCellValue().trim().length() > 0) {
-                return false;
+            // 非空单元格都当作数据单元格
+            if (Objects.nonNull(cell) && cell.getCellType() != CellType.BLANK) {
+                return true;
             }
         }
 
