@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -101,6 +102,11 @@ enum CellSupportTypes {
     STRING(String.class) {
         @Override
         Object parse(String text, CellMeta meta) {
+            // 空字符串处理为null
+            if (Objects.nonNull(text) && text.isEmpty()) {
+                return null;
+            }
+
             return text;
         }
     },
