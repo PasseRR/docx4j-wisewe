@@ -168,7 +168,8 @@ public class SpreadSheetExporterSpec {
             .workbook(wb ->
                 wb.sheet(s ->
                     // 表头行
-                    s.row(r -> r.headCell(c -> c.rowspan(2).text("姓名")).headCell(c -> c.colspan(2).text("其他信息")))
+                    s.row(r ->
+                        r.headCell(c -> c.rowspan(2).redAster("姓名")).headCell(c -> c.colspan(2).text("其他信息")))
                         .row(r -> r.headCells("姓名", "年龄", "性别"))
                         // 数据行
                         .rows(

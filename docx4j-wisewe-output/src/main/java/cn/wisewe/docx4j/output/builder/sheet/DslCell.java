@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -79,13 +80,31 @@ public class DslCell {
     }
 
     /**
+     * 以红星开头文本
+     * @param o 文本对象
+     * @return {@link DslCell}
+     */
+    public DslCell redAster(Object o) {
+        RichTextString rich =
+            this.getWorkBook()
+                .getCreationHelper()
+                .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
+        Font aster = CellStyleUtil.defaultHeadFont(this.getWorkBook());
+        aster.setColor(Font.COLOR_RED);
+        rich.applyFont(0, 1, aster);
+        rich.applyFont(1, rich.length(), CellStyleUtil.defaultHeadFont(this.getWorkBook()));
+
+        return this.rich(rich);
+    }
+
+    /**
      * 富文本
      * @param text 富文本内容
      * @return {@link DslCell}
      */
     public DslCell rich(RichTextString text) {
         this.cell.setCellValue(text);
-        return this.doUpdateLength(text.length());
+        return this.doUpdateLength(DslCell.width(text.getString()));
     }
 
     /**

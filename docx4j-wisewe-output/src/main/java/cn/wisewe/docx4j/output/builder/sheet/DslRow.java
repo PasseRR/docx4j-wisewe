@@ -1,13 +1,9 @@
 package cn.wisewe.docx4j.output.builder.sheet;
 
-import cn.wisewe.docx4j.output.OutputConstants;
-import cn.wisewe.docx4j.output.utils.StringConverterUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections4.map.HashedMap;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.io.File;
@@ -94,19 +90,7 @@ public class DslRow {
      * @return {@link DslRow}
      */
     public DslRow headRedAsterCell(Object o) {
-        return
-            this.headCell(c -> {
-                RichTextString rich =
-                    this.row.getSheet()
-                        .getWorkbook()
-                        .getCreationHelper()
-                        .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
-                Font aster = CellStyleUtil.defaultHeadFont(c.getWorkBook());
-                aster.setColor(Font.COLOR_RED);
-                rich.applyFont(0, 1, aster);
-                rich.applyFont(1, rich.length(), CellStyleUtil.defaultHeadFont(c.getWorkBook()));
-                c.rich(rich);
-            });
+        return this.headCell(c -> c.redAster(o));
     }
 
     /**
