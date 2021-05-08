@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
+
 /**
  * 行记录解析结果
  * @author xiehai
@@ -16,7 +18,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class RowMessage {
+public class RowMessage implements Serializable {
     /**
      * 行号
      */
