@@ -95,6 +95,11 @@ enum CellSupportTypes {
     CHAR(Character.class, char.class) {
         @Override
         Object parse(String text, CellMeta meta) {
+            // 空字符串
+            if (Objects.isNull(text) || text.isEmpty()) {
+                return '\0';
+            }
+
             // 只返回一个
             return text.charAt(0);
         }
