@@ -120,7 +120,7 @@ enum CellSupportTypes {
                 Optional.of(meta.dateTimeFormat())
                     .filter(it -> !it.isEmpty())
                     .map(it -> LocalTime.parse(text, DateTimeFormatter.ofPattern(it)))
-                    .orElseGet(() -> LocalTime.parse(text, DateTimeFormatter.ofPattern("HH:mm:ss")));
+                    .orElseGet(() -> LocalTime.parse(text, DateTimeFormatter.ofPattern("H:m:s")));
         }
     },
     LOCAL_DATE(LocalDate.class) {
@@ -132,11 +132,11 @@ enum CellSupportTypes {
                     .map(it -> LocalDate.parse(text, DateTimeFormatter.ofPattern(it)))
                     .orElseGet(() -> {
                         try {
-                            return LocalDate.parse(text, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+                            return LocalDate.parse(text, DateTimeFormatter.ofPattern("u/M/d"));
                         } catch (Exception ignore) {
                         }
 
-                        return LocalDate.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                        return LocalDate.parse(text, DateTimeFormatter.ofPattern("u-M-d"));
                     });
         }
     },
@@ -149,11 +149,11 @@ enum CellSupportTypes {
                     .map(it -> LocalDateTime.parse(text, DateTimeFormatter.ofPattern(it)))
                     .orElseGet(() -> {
                         try {
-                            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+                            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("u/M/d H:m:s"));
                         } catch (Exception ignore) {
                         }
 
-                        return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("u-M-d H:m:s"));
                     });
         }
     },
@@ -181,21 +181,21 @@ enum CellSupportTypes {
                     .map(it -> this.toDate(text, it))
                     .orElseGet(() -> {
                         try {
-                            return this.toDate(text, "yyyy/MM/dd");
+                            return this.toDate(text, "u/M/d");
                         } catch (Exception ignore) {
                         }
 
                         try {
-                            return this.toDate(text, "yyyy-MM-dd");
+                            return this.toDate(text, "u-M-d");
                         } catch (Exception ignore) {
                         }
 
                         try {
-                            return this.toDate(text, "yyyy/MM/dd HH:mm:ss");
+                            return this.toDate(text, "u/M/d H:m:s");
                         } catch (Exception ignore) {
                         }
 
-                        return this.toDate(text, "yyyy-MM-dd HH:mm:ss");
+                        return this.toDate(text, "u-M-d H:m:s");
                     });
         }
     };
