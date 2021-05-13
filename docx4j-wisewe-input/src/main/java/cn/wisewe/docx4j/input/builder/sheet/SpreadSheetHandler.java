@@ -52,7 +52,11 @@ class SpreadSheetHandler<T> {
     /**
      * 列位置缓存
      */
-    Map<CellMeta, Field> fields;
+    Map<Integer, Field> fields;
+    /**
+     * 元信息缓存
+     */
+    Map<Integer, CellMeta> metas;
     /**
      * 最大列
      */
@@ -72,6 +76,7 @@ class SpreadSheetHandler<T> {
                 .getValidator();
         this.importResult = new ImportResult<>();
         this.fields = new HashMap<>(8);
+        this.metas = new HashMap<>(8);
         this.maxColumn = new AtomicInteger();
         // 解析注解缓存
         ReflectUtil.getNonStaticFields(this.clazz)
@@ -80,7 +85,8 @@ class SpreadSheetHandler<T> {
                 if (Objects.nonNull(cellMeta)) {
                     // 更新最大列
                     maxColumn.set(Integer.max(cellMeta.index(), maxColumn.get()));
-                    this.fields.putIfAbsent(cellMeta, it);
+                    this.fields.put(cellMeta.index(), it);
+                    this.metas.put(cellMeta.index(), cellMeta);
                 }
             });
     }
@@ -90,6 +96,11 @@ class SpreadSheetHandler<T> {
      * @param sheet excel表格
      */
     SpreadSheetHandler<T> handle(Sheet sheet) throws IllegalAccessException, InstantiationException {
+        // 表格最大列索引
+        final int max = this.maxColumn.get();
+        // 数据格式器
+        DataFormatter formatter = new DataFormatter();
+
         for (Row row : sheet) {
             // 行索引
             int index = row.getRowNum();
@@ -99,7 +110,7 @@ class SpreadSheetHandler<T> {
                 continue;
             }
             // 空行
-            if (SpreadSheetHandler.isEmptyRow(row, this.maxColumn.get())) {
+            if (SpreadSheetHandler.isEmptyRow(row, max)) {
                 this.importResult.addEmpty(index);
                 continue;
             }
@@ -107,18 +118,24 @@ class SpreadSheetHandler<T> {
             T entity = this.clazz.newInstance();
             // 每行不合法信息
             List<String> invalidMessages = new ArrayList<>();
-            // 数据格式器
-            DataFormatter formatter = new DataFormatter();
-            for (Map.Entry<CellMeta, Field> entry : this.fields.entrySet()) {
-                CellMeta meta = entry.getKey();
-                Cell cell = row.getCell(meta.index());
-                if (Objects.isNull(cell)) {
+
+            for (Cell cell : row) {
+                cell.getColumnIndex();
+            }
+
+            // 按照列顺序读取数据
+            for (int it = 0; it <= max; it++) {
+                Cell cell = row.getCell(it, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+
+                Field field = this.fields.get(it);
+                CellMeta meta = this.metas.get(it);
+                if (Objects.isNull(field) || Objects.isNull(meta)) {
                     continue;
                 }
 
                 // 去掉首尾空白
                 String text = formatter.formatCellValue(cell).trim();
-                Field field = entry.getValue();
+
                 CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
                 if (!result.isOk) {
                     invalidMessages.add(result.message);

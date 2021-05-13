@@ -227,7 +227,8 @@ enum CellSupportTypes {
      */
     CellResult doConvert(String text, CellMeta meta) {
         try {
-            return CellResult.ok(this.parse(text, meta));
+            // 若为空单元格直接返回null
+            return CellResult.ok(Objects.isNull(text) || text.isEmpty() ? null : this.parse(text, meta));
         } catch (Exception ignore) {
             return
                 CellResult.fail(
