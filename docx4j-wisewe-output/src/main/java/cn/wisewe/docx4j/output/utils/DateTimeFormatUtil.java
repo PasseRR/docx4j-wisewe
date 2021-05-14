@@ -14,7 +14,7 @@ import java.util.Date;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 public interface DateTimeFormatUtil {
-    String DATE_FORMAT_PATTERN = "yyyy/MM/dd";
+    String DATE_FORMAT_PATTERN = "yyyy-MM-dd";
     String TIME_FORMAT_PATTERN = "HH:mm:ss";
     DateTimeFormatter DTF_YYYY_MM_DD_HH_MM_SS =
         DateTimeFormatter.ofPattern(String.format("%s %s", DATE_FORMAT_PATTERN, TIME_FORMAT_PATTERN));
