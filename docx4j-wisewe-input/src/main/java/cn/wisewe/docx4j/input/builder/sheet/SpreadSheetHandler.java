@@ -1,11 +1,13 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
+import cn.wisewe.docx4j.input.constants.DatetimeConstants;
 import cn.wisewe.docx4j.input.utils.ReflectUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hibernate.validator.HibernateValidator;
@@ -14,7 +16,11 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +106,6 @@ class SpreadSheetHandler<T> {
         final int max = this.maxColumn.get();
         // 数据格式器
         DataFormatter formatter = new DataFormatter();
-
         for (Row row : sheet) {
             // 行索引
             int index = row.getRowNum();
@@ -119,22 +124,32 @@ class SpreadSheetHandler<T> {
             // 每行不合法信息
             List<String> invalidMessages = new ArrayList<>();
 
-            for (Cell cell : row) {
-                cell.getColumnIndex();
-            }
-
             // 按照列顺序读取数据
             for (int it = 0; it <= max; it++) {
                 Cell cell = row.getCell(it, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-
                 Field field = this.fields.get(it);
                 CellMeta meta = this.metas.get(it);
                 if (Objects.isNull(field) || Objects.isNull(meta)) {
                     continue;
                 }
 
+                String text = null;
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    Date date = cell.getDateCellValue();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD_HH_MM_SS);
+                    if (field.getDeclaringClass().isAssignableFrom(LocalDate.class)) {
+                        dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD);
+                    }
+                    if (field.getDeclaringClass().isAssignableFrom(LocalTime.class)) {
+                        dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_HH_MM_SS);
+                    }
+                    text = dateFormat.format(date);
+                }
+
                 // 去掉首尾空白
-                String text = formatter.formatCellValue(cell).trim();
+                if (Objects.isNull(text)) {
+                    text = formatter.formatCellValue(cell).trim();
+                }
 
                 CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
                 if (!result.isOk) {
@@ -158,9 +173,9 @@ class SpreadSheetHandler<T> {
 
             // 非快速失败或者当前验证消息为空
             if (!this.failFast || invalidMessages.isEmpty()) {
+                // TODO 根据校验结果按照CellMeta索引排序
                 this.validator.validate(entity).forEach(it -> invalidMessages.add(it.getMessage()));
             }
-
             this.importResult.addRecord(index, entity, invalidMessages);
         }
 

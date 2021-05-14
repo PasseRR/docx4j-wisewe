@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
+import cn.wisewe.docx4j.input.constants.DatetimeConstants;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
@@ -125,7 +126,7 @@ enum CellSupportTypes {
                 Optional.of(meta.dateTimeFormat())
                     .filter(it -> !it.isEmpty())
                     .map(it -> LocalTime.parse(text, DateTimeFormatter.ofPattern(it)))
-                    .orElseGet(() -> LocalTime.parse(text, DateTimeFormatter.ofPattern("H:m:s")));
+                    .orElseGet(() -> LocalTime.parse(text, DatetimeConstants.DTF_XLS_HH_MM_SS));
         }
     },
     LOCAL_DATE(LocalDate.class) {
@@ -137,7 +138,7 @@ enum CellSupportTypes {
                     .map(it -> LocalDate.parse(text, DateTimeFormatter.ofPattern(it)))
                     .orElseGet(() -> {
                         try {
-                            return LocalDate.parse(text, DateTimeFormatter.ofPattern("yyyy/M/d"));
+                            return LocalDate.parse(text, DatetimeConstants.DTF_XLS_YYYY_MM_DD);
                         } catch (Exception ignore) {
                         }
 
@@ -154,7 +155,7 @@ enum CellSupportTypes {
                     .map(it -> LocalDateTime.parse(text, DateTimeFormatter.ofPattern(it)))
                     .orElseGet(() -> {
                         try {
-                            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy/M/d H:m:s"));
+                            return LocalDateTime.parse(text, DatetimeConstants.DTF_XLS_YYYY_MM_DD_HH_MM_SS);
                         } catch (Exception ignore) {
                         }
 
@@ -186,7 +187,7 @@ enum CellSupportTypes {
                     .map(it -> this.toDate(text, it))
                     .orElseGet(() -> {
                         try {
-                            return this.toDate(text, "yyyy/M/d");
+                            return this.toDate(text, DatetimeConstants.XLS_YYYY_MM_DD);
                         } catch (Exception ignore) {
                         }
 
@@ -196,7 +197,7 @@ enum CellSupportTypes {
                         }
 
                         try {
-                            return this.toDate(text, "yyyy/M/d H:m:s");
+                            return this.toDate(text, DatetimeConstants.XLS_YYYY_MM_DD_HH_MM_SS);
                         } catch (Exception ignore) {
                         }
 
