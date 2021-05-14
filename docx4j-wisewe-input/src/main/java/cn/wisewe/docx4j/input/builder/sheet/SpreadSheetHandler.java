@@ -12,6 +12,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hibernate.validator.HibernateValidator;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ElementKind;
+import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.lang.reflect.Field;
@@ -20,12 +23,15 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 表格数据处理器
@@ -58,11 +64,7 @@ class SpreadSheetHandler<T> {
     /**
      * 列位置缓存
      */
-    Map<Integer, Field> fields;
-    /**
-     * 元信息缓存
-     */
-    Map<Integer, CellMeta> metas;
+    Map<CellMeta, Field> fields;
     /**
      * 最大列
      */
@@ -82,7 +84,6 @@ class SpreadSheetHandler<T> {
                 .getValidator();
         this.importResult = new ImportResult<>();
         this.fields = new HashMap<>(8);
-        this.metas = new HashMap<>(8);
         this.maxColumn = new AtomicInteger();
         // 解析注解缓存
         ReflectUtil.getNonStaticFields(this.clazz)
@@ -91,8 +92,7 @@ class SpreadSheetHandler<T> {
                 if (Objects.nonNull(cellMeta)) {
                     // 更新最大列
                     maxColumn.set(Integer.max(cellMeta.index(), maxColumn.get()));
-                    this.fields.put(cellMeta.index(), it);
-                    this.metas.put(cellMeta.index(), cellMeta);
+                    this.fields.put(cellMeta, it);
                 }
             });
     }
@@ -102,8 +102,6 @@ class SpreadSheetHandler<T> {
      * @param sheet excel表格
      */
     SpreadSheetHandler<T> handle(Sheet sheet) throws IllegalAccessException, InstantiationException {
-        // 表格最大列索引
-        final int max = this.maxColumn.get();
         // 数据格式器
         DataFormatter formatter = new DataFormatter();
         for (Row row : sheet) {
@@ -115,32 +113,28 @@ class SpreadSheetHandler<T> {
                 continue;
             }
             // 空行
-            if (SpreadSheetHandler.isEmptyRow(row, max)) {
+            if (SpreadSheetHandler.isEmptyRow(row, this.maxColumn.get())) {
                 this.importResult.addEmpty(index);
                 continue;
             }
 
             T entity = this.clazz.newInstance();
             // 每行不合法信息
-            List<String> invalidMessages = new ArrayList<>();
+            List<RowMessage> invalidMessages = new ArrayList<>();
 
             // 按照列顺序读取数据
-            for (int it = 0; it <= max; it++) {
-                Cell cell = row.getCell(it, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                Field field = this.fields.get(it);
-                CellMeta meta = this.metas.get(it);
-                if (Objects.isNull(field) || Objects.isNull(meta)) {
-                    continue;
-                }
-
+            for (Map.Entry<CellMeta, Field> it : this.fields.entrySet()) {
+                CellMeta meta = it.getKey();
+                Cell cell = row.getCell(meta.index(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                Field field = it.getValue();
                 String text = null;
-                if (DateUtil.isCellDateFormatted(cell)) {
+                if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
                     Date date = cell.getDateCellValue();
                     SimpleDateFormat dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD_HH_MM_SS);
-                    if (field.getDeclaringClass().isAssignableFrom(LocalDate.class)) {
+                    if (field.getType() == LocalDate.class) {
                         dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD);
                     }
-                    if (field.getDeclaringClass().isAssignableFrom(LocalTime.class)) {
+                    if (field.getType() == LocalTime.class) {
                         dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_HH_MM_SS);
                     }
                     text = dateFormat.format(date);
@@ -153,7 +147,7 @@ class SpreadSheetHandler<T> {
 
                 CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
                 if (!result.isOk) {
-                    invalidMessages.add(result.message);
+                    invalidMessages.add(new RowMessage(meta.index(), result.message));
                     // 快速失败模式
                     if (this.failFast) {
                         break;
@@ -173,10 +167,21 @@ class SpreadSheetHandler<T> {
 
             // 非快速失败或者当前验证消息为空
             if (!this.failFast || invalidMessages.isEmpty()) {
-                // TODO 根据校验结果按照CellMeta索引排序
-                this.validator.validate(entity).forEach(it -> invalidMessages.add(it.getMessage()));
+                invalidMessages.addAll(
+                    new ArrayList<>(this.validator.validate(entity)).stream()
+                        .map(it -> new RowMessage(index(this.clazz, it), it.getMessage()))
+                        .collect(Collectors.toList())
+                );
             }
-            this.importResult.addRecord(index, entity, invalidMessages);
+
+            this.importResult.addRecord(
+                index,
+                entity,
+                invalidMessages.stream()
+                    .sorted(Comparator.comparingInt(RowMessage::getRow))
+                    .map(RowMessage::getMessage)
+                    .collect(Collectors.toList())
+            );
         }
 
         return this;
@@ -213,5 +218,31 @@ class SpreadSheetHandler<T> {
         }
 
         return true;
+    }
+
+    /**
+     * 校验列索引
+     * @param clazz 校验实体类型
+     * @param a     校验结果
+     * @param <T>   实体泛型
+     * @return 比较数值
+     */
+    static <T> int index(Class<T> clazz, ConstraintViolation<T> a) {
+        Iterator<Path.Node> ai = a.getPropertyPath().iterator();
+        Path.Node ac = ai.next();
+        // 仅排序属性上有CellMeta注解的属性
+        if (ac.getKind() == ElementKind.PROPERTY) {
+            try {
+                Field field = clazz.getDeclaredField(ac.getName());
+                CellMeta meta = field.getAnnotation(CellMeta.class);
+                if (Objects.nonNull(meta)) {
+                    return meta.index();
+                }
+            } catch (Exception ignore) {
+            }
+        }
+
+        // 其他情况都排在最后
+        return Integer.MAX_VALUE;
     }
 }
