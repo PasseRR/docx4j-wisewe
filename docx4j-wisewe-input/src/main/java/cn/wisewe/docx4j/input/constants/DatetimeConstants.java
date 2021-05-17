@@ -9,7 +9,8 @@ import java.time.format.DateTimeFormatter;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 public interface DatetimeConstants {
-    String XLS_YYYY_MM_DD = "yyyy/M/D";
+    String XLS_MM_DD_YY = "M/d/yy";
+    String XLS_YYYY_MM_DD = "yyyy/M/d";
     String XLS_HH_MM_SS = "H:m:s";
     String XLS_YYYY_MM_DD_HH_MM_SS = String.format("%s %s", XLS_YYYY_MM_DD, XLS_HH_MM_SS);
     /**

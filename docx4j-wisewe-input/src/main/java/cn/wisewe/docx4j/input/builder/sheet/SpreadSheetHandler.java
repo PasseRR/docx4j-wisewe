@@ -1,13 +1,12 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
+import cn.wisewe.docx4j.input.constants.DatetimeConstants;
 import cn.wisewe.docx4j.input.utils.ReflectUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.apache.poi.ss.format.CellDateFormatter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hibernate.validator.HibernateValidator;
@@ -19,6 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -135,6 +135,8 @@ class SpreadSheetHandler<T> {
     private void handleRow(Row row) throws IllegalAccessException, InstantiationException {
         // 数据格式器
         DataFormatter formatter = new DataFormatter();
+        // 日期格式化
+        formatter.addFormat(DatetimeConstants.XLS_MM_DD_YY, new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD));
         T entity = this.clazz.newInstance();
         // 导入原始信息
         Map<Integer, String> origin = new HashMap<>(8);
@@ -146,14 +148,7 @@ class SpreadSheetHandler<T> {
             CellMeta meta = it.getKey();
             Cell cell = row.getCell(meta.index(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             Field field = it.getValue();
-            String text;
-            if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-                // 根据单元格日期格式样式 格式化日期字符串
-                text = new CellDateFormatter(cell.getCellStyle().getDataFormatString()).format(cell.getDateCellValue());
-            } else {
-                // 去掉首尾空白
-                text = formatter.formatCellValue(cell).trim();
-            }
+            String text = formatter.formatCellValue(cell).trim();
             origin.put(meta.index(), text);
             CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
             if (!result.isOk) {
