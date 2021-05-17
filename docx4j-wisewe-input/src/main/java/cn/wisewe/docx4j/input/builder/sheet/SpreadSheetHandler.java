@@ -102,8 +102,6 @@ class SpreadSheetHandler<T> {
      * @param sheet excel表格
      */
     SpreadSheetHandler<T> handle(Sheet sheet) throws IllegalAccessException, InstantiationException {
-        // 数据格式器
-        DataFormatter formatter = new DataFormatter();
         for (Row row : sheet) {
             // 行索引
             int index = row.getRowNum();
@@ -118,70 +116,7 @@ class SpreadSheetHandler<T> {
                 continue;
             }
 
-            T entity = this.clazz.newInstance();
-            // 每行不合法信息
-            List<RowMessage> invalidMessages = new ArrayList<>();
-
-            // 按照列顺序读取数据
-            for (Map.Entry<CellMeta, Field> it : this.fields.entrySet()) {
-                CellMeta meta = it.getKey();
-                Cell cell = row.getCell(meta.index(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                Field field = it.getValue();
-                String text = null;
-                if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-                    Date date = cell.getDateCellValue();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD_HH_MM_SS);
-                    if (field.getType() == LocalDate.class) {
-                        dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD);
-                    }
-                    if (field.getType() == LocalTime.class) {
-                        dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_HH_MM_SS);
-                    }
-                    text = dateFormat.format(date);
-                }
-
-                // 去掉首尾空白
-                if (Objects.isNull(text)) {
-                    text = formatter.formatCellValue(cell).trim();
-                }
-
-                CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
-                if (!result.isOk) {
-                    invalidMessages.add(new RowMessage(meta.index(), result.message));
-                    // 快速失败模式
-                    if (this.failFast) {
-                        break;
-                    }
-                }
-
-                try {
-                    // 设置字段值
-                    Method setter = ReflectUtil.getFieldSetter(field.getDeclaringClass(), field.getName());
-                    if (Objects.nonNull(setter)) {
-                        setter.invoke(entity, result.value);
-                    }
-                } catch (Exception e) {
-                    throw new SpreadSheetImportException(e);
-                }
-            }
-
-            // 非快速失败或者当前验证消息为空
-            if (!this.failFast || invalidMessages.isEmpty()) {
-                invalidMessages.addAll(
-                    new ArrayList<>(this.validator.validate(entity)).stream()
-                        .map(it -> new RowMessage(index(this.clazz, it), it.getMessage()))
-                        .collect(Collectors.toList())
-                );
-            }
-
-            this.importResult.addRecord(
-                index,
-                entity,
-                invalidMessages.stream()
-                    .sorted(Comparator.comparingInt(RowMessage::getRow))
-                    .map(RowMessage::getMessage)
-                    .collect(Collectors.toList())
-            );
+            this.handleRow(row);
         }
 
         return this;
@@ -193,6 +128,84 @@ class SpreadSheetHandler<T> {
      */
     ImportResult<T> result() {
         return this.importResult;
+    }
+
+    /**
+     * 行数据处理
+     * @param row {@link Row}
+     * @throws IllegalAccessException IllegalAccessException
+     * @throws InstantiationException InstantiationException
+     */
+    private void handleRow(Row row) throws IllegalAccessException, InstantiationException {
+        // 数据格式器
+        DataFormatter formatter = new DataFormatter();
+        T entity = this.clazz.newInstance();
+        // 导入原始信息
+        Map<Integer, String> origin = new HashMap<>(8);
+        // 每行不合法信息
+        List<RowMessage> invalidMessages = new ArrayList<>();
+
+        // 按照列顺序读取数据
+        for (Map.Entry<CellMeta, Field> it : this.fields.entrySet()) {
+            CellMeta meta = it.getKey();
+            Cell cell = row.getCell(meta.index(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+            Field field = it.getValue();
+            String text = null;
+            if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+                Date date = cell.getDateCellValue();
+                SimpleDateFormat dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD_HH_MM_SS);
+                if (field.getType() == LocalDate.class) {
+                    dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD);
+                }
+                if (field.getType() == LocalTime.class) {
+                    dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_HH_MM_SS);
+                }
+                text = dateFormat.format(date);
+            }
+
+            // 去掉首尾空白
+            if (Objects.isNull(text)) {
+                text = formatter.formatCellValue(cell).trim();
+            }
+            origin.put(meta.index(), text);
+            CellSupportTypes.CellResult result = CellSupportTypes.convert(field.getType(), text, meta);
+            if (!result.isOk) {
+                invalidMessages.add(new RowMessage(meta.index(), result.message));
+                // 快速失败模式
+                if (this.failFast) {
+                    break;
+                }
+            }
+
+            try {
+                // 设置字段值
+                Method setter = ReflectUtil.getFieldSetter(field.getDeclaringClass(), field.getName());
+                if (Objects.nonNull(setter)) {
+                    setter.invoke(entity, result.value);
+                }
+            } catch (Exception e) {
+                throw new SpreadSheetImportException(e);
+            }
+        }
+
+        // 非快速失败或者当前验证消息为空
+        if (!this.failFast || invalidMessages.isEmpty()) {
+            invalidMessages.addAll(
+                new ArrayList<>(this.validator.validate(entity)).stream()
+                    .map(it -> new RowMessage(index(this.clazz, it), it.getMessage()))
+                    .collect(Collectors.toList())
+            );
+        }
+
+        this.importResult.addRecord(
+            row.getRowNum(),
+            entity,
+            origin,
+            invalidMessages.stream()
+                .sorted(Comparator.comparingInt(RowMessage::getRow))
+                .map(RowMessage::getMessage)
+                .collect(Collectors.toList())
+        );
     }
 
     /**
