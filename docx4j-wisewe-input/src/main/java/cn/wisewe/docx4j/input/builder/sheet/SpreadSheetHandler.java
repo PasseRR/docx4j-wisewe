@@ -1,9 +1,9 @@
 package cn.wisewe.docx4j.input.builder.sheet;
 
-import cn.wisewe.docx4j.input.constants.DatetimeConstants;
 import cn.wisewe.docx4j.input.utils.ReflectUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.apache.poi.ss.format.CellDateFormatter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -19,12 +19,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -150,21 +146,12 @@ class SpreadSheetHandler<T> {
             CellMeta meta = it.getKey();
             Cell cell = row.getCell(meta.index(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             Field field = it.getValue();
-            String text = null;
+            String text;
             if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-                Date date = cell.getDateCellValue();
-                SimpleDateFormat dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD_HH_MM_SS);
-                if (field.getType() == LocalDate.class) {
-                    dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_YYYY_MM_DD);
-                }
-                if (field.getType() == LocalTime.class) {
-                    dateFormat = new SimpleDateFormat(DatetimeConstants.XLS_HH_MM_SS);
-                }
-                text = dateFormat.format(date);
-            }
-
-            // 去掉首尾空白
-            if (Objects.isNull(text)) {
+                // 根据单元格日期格式样式 格式化日期字符串
+                text = new CellDateFormatter(cell.getCellStyle().getDataFormatString()).format(cell.getDateCellValue());
+            } else {
+                // 去掉首尾空白
                 text = formatter.formatCellValue(cell).trim();
             }
             origin.put(meta.index(), text);
