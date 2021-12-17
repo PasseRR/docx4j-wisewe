@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,11 +26,6 @@ import java.util.function.Supplier;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SpreadSheetExporter {
     Workbook workbook;
-    /**
-     * 自定义样式
-     */
-    private static final ThreadLocal<Map<CustomStyleType, CellStyle>> CUSTOM_STYLES =
-        ThreadLocal.withInitial(HashMap::new);
 
     private SpreadSheetExporter(Workbook workbook) {
         this.workbook = workbook;
@@ -108,13 +101,13 @@ public class SpreadSheetExporter {
      * @return {@link SpreadSheetExporter}
      */
     public SpreadSheetExporter customStyle(CustomStyleType styleType, Function<Workbook, CellStyle> function) {
-        CUSTOM_STYLES.get().put(styleType, function.apply(this.workbook));
+        StyleLoader.setCustom(styleType, function);
         return this;
     }
 
     /**
      * 将电子表格写到servlet输出流并指定文件后缀
-     * @param fileName            文件名
+     * @param fileName 文件名
      */
     public void writeToServletResponse(String fileName) {
         HttpServletResponse response = HttpServletUtil.getCurrentResponse();
@@ -149,15 +142,6 @@ public class SpreadSheetExporter {
     }
 
     /**
-     * 获得自定义样式
-     * @param styleType 自定义样式类型
-     * @return {@link CellStyle}
-     */
-    protected static CellStyle getCustomStyle(CustomStyleType styleType) {
-        return CUSTOM_STYLES.get().get(styleType);
-    }
-
-    /**
      * 将电子表格写到输出流
      * @param outputStream 输出流
      * @param closeable    是否需要关闭输出流
@@ -180,7 +164,7 @@ public class SpreadSheetExporter {
                 IOUtils.closeQuietly(outputStream);
             }
             // 清空自定义样式
-            CUSTOM_STYLES.remove();
+            StyleLoader.removeCustom();
         }
     }
 }

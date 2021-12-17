@@ -60,6 +60,10 @@ public class DslCell {
     protected static final ThreadLocal<Map<Integer, Integer>> COLUMN_WIDTH = ThreadLocal.withInitial(HashMap::new);
     protected static final ThreadLocal<Map<Integer, Set<DslCell>>> DIAGONAL_COLUMNS =
         ThreadLocal.withInitial(HashMap::new);
+    /**
+     * 样式定义
+     */
+    protected static final StyleLoader LOADER = StyleLoader.instance();
 
     DslCell(Cell cell) {
         this.cell = cell;
@@ -89,10 +93,10 @@ public class DslCell {
             this.getWorkBook()
                 .getCreationHelper()
                 .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
-        Font aster = CellStyleUtil.defaultHeadFont(this.getWorkBook());
+        Font aster = LOADER.headerFont(this.getWorkBook());
         aster.setColor(Font.COLOR_RED);
         rich.applyFont(0, 1, aster);
-        rich.applyFont(1, rich.length(), CellStyleUtil.defaultHeadFont(this.getWorkBook()));
+        rich.applyFont(1, rich.length(), LOADER.headerFont(this.getWorkBook()));
 
         return this.rich(rich);
     }
@@ -194,11 +198,7 @@ public class DslCell {
      * @return {@link DslCell}
      */
     public DslCell headStyle() {
-        return
-            this.style(
-                Optional.ofNullable(SpreadSheetExporter.getCustomStyle(CustomStyleType.HEAD))
-                    .orElseGet(this::defaultHeadStyle)
-            );
+        return this.style(LOADER.headCellStyle(this.getWorkBook()));
     }
 
     /**
@@ -208,11 +208,7 @@ public class DslCell {
     public DslCell diagonalHeadStyle(boolean isDiagonalUp) {
         this.setDiagonal(isDiagonalUp);
 
-        return
-            this.style(
-                Optional.ofNullable(SpreadSheetExporter.getCustomStyle(CustomStyleType.SEPARATED_HEAD))
-                    .orElseGet(() -> this.defaultDiagonalHeadStyle(isDiagonalUp))
-            );
+        return this.style(LOADER.diagonalHeadCellStyle(this.getWorkBook(), isDiagonalUp));
     }
 
     /**
@@ -222,11 +218,7 @@ public class DslCell {
     public DslCell diagonalDataStyle(boolean isDiagonalUp) {
         this.setDiagonal(isDiagonalUp);
 
-        return
-            this.style(
-                Optional.ofNullable(SpreadSheetExporter.getCustomStyle(CustomStyleType.SEPARATED_DATA))
-                    .orElseGet(() -> this.defaultDiagonalDataStyle(isDiagonalUp))
-            );
+        return this.style(LOADER.diagonalCellStyle(this.getWorkBook(), isDiagonalUp));
     }
 
     /**
@@ -234,11 +226,7 @@ public class DslCell {
      * @return {@link DslCell}
      */
     public DslCell dataStyle() {
-        return
-            this.style(
-                Optional.ofNullable(SpreadSheetExporter.getCustomStyle(CustomStyleType.DATA))
-                    .orElseGet(this::defaultDataStyle)
-            );
+        return this.style(LOADER.cellStyle(this.getWorkBook()));
     }
 
     /**
@@ -325,40 +313,6 @@ public class DslCell {
 
                 return o;
             });
-    }
-
-    /**
-     * 默认表头样式
-     * @return {@link CellStyle}
-     */
-    protected CellStyle defaultHeadStyle() {
-        return CellStyleUtil.defaultHeadStyle(this.getWorkBook());
-    }
-
-    /**
-     * 默认斜线表头单元格
-     * @param isDiagonalUp 斜线方向
-     * @return {@link CellStyle}
-     */
-    protected CellStyle defaultDiagonalHeadStyle(boolean isDiagonalUp) {
-        return CellStyleUtil.diagonalStyle(this.getWorkBook(), this.defaultHeadStyle(), isDiagonalUp);
-    }
-
-    /**
-     * 默认数据样式
-     * @return {@link CellStyle}
-     */
-    protected CellStyle defaultDataStyle() {
-        return CellStyleUtil.defaultDataStyle(this.getWorkBook());
-    }
-
-    /**
-     * 默认斜线数据单元格
-     * @param isDiagonalUp 斜线方向
-     * @return {@link CellStyle}
-     */
-    protected CellStyle defaultDiagonalDataStyle(boolean isDiagonalUp) {
-        return CellStyleUtil.diagonalStyle(this.getWorkBook(), this.defaultDataStyle(), isDiagonalUp);
     }
 
     /**

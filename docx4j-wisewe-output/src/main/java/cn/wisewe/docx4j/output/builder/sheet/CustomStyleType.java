@@ -14,6 +14,7 @@ public enum CustomStyleType {
     /**
      * 拆分表头单元格
      */
+    @Deprecated
     SEPARATED_HEAD,
     /**
      * 数据单元格
@@ -22,5 +23,6 @@ public enum CustomStyleType {
     /**
      * 拆分数据单元格
      */
+    @Deprecated
     SEPARATED_DATA
 }
