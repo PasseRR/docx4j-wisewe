@@ -41,9 +41,6 @@ public class RowDetail extends RowMessage {
      * @return 单元格值列表
      */
     public List<String> cellValues(int from, int to) {
-        return
-            IntStream.rangeClosed(from, to)
-                .mapToObj(this.data::get)
-                .collect(Collectors.toList());
+        return IntStream.rangeClosed(from, to).mapToObj(this.data::get).collect(Collectors.toList());
     }
 }
