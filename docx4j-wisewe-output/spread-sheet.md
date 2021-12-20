@@ -43,23 +43,23 @@
 <h5> 代码 </h5>
 
 ```java
-public void simple() throws FileNotFoundException {
+public void simple()throws FileNotFoundException{
     SpreadSheetExporter.create()
-        .workbook(wb ->
-            wb.sheet(s ->
-                // 表头行：填充顺序与列表顺序一致
-                s.row(r -> r.headCells(Arrays.asList("姓名", "年龄", "性别")))
-                    // 数据行：填充顺序与dataCell()依次追加的顺序一致
-                    .rows(
-                        SpecDataFactory.excelData(),
-                        (it, row) -> row.dataCell(it::getName).dataCell(it::getAge).dataCell(it::getSex)
-                    )
-                    // 行列冻结
-                    .freeze(1, 1)
-            )
-        )
-        .writeTo(new FileOutputStream(prefix + "simple.xlsx"));
-}
+    .workbook(wb->
+    wb.sheet(s->
+    // 表头行：填充顺序与列表顺序一致
+    s.row(r->r.headCells(Arrays.asList("姓名","年龄","性别")))
+    // 数据行：填充顺序与dataCell()依次追加的顺序一致
+    .rows(
+    SpecDataFactory.excelData(),
+    (it,row)->row.dataCell(it::getName).dataCell(it::getAge).dataCell(it::getSex)
+    )
+    // 行列冻结
+    .freeze(1,1)
+    )
+    )
+    .writeTo(new FileOutputStream(prefix+"simple.xlsx"));
+    }
 ```
 
 </details>
@@ -108,23 +108,23 @@ public void simple() throws FileNotFoundException {
 <h5>代码</h5>
 
 ```java
-public void mergeHead() throws FileNotFoundException {
+public void mergeHead()throws FileNotFoundException{
     SpreadSheetExporter.create()
-        .workbook(wb ->
-            wb.sheet(s ->
-                // 表头行，首行：设置“姓名”跨2行、“其他信息”跨2列（动态填充时跨n行需在下行对应列填充n-1个占位符）
-                s.row(r -> r.headCell(c -> c.rowspan(2).text("姓名")).headCell(c -> c.colspan(2).text("其他信息")))
-                     // 表头行，第2行：设置“姓名”、“年龄”、“性别”。“姓名”处为填充跨行占位符，可为任意字符
-                    .row(r -> r.headCells(Arrays.asList("姓名", "年龄", "性别")))
-                    // 数据行
-                    .rows(
-                        SpecDataFactory.excelData(),
-                        (it, row) -> row.dataCell(it::getName).dataCell(it::getAge).dataCell(it::getSex)
-                    )
-            )
-        )
-        .writeTo(new FileOutputStream(prefix + "merge-head.xlsx"));
-}
+    .workbook(wb->
+    wb.sheet(s->
+    // 表头行，首行：设置“姓名”跨2行、“其他信息”跨2列（动态填充时跨n行需在下行对应列填充n-1个占位符）
+    s.row(r->r.headCell(c->c.rowspan(2).text("姓名")).headCell(c->c.colspan(2).text("其他信息")))
+    // 表头行，第2行：设置“姓名”、“年龄”、“性别”。“姓名”处为填充跨行占位符，可为任意字符
+    .row(r->r.headCells(Arrays.asList("姓名","年龄","性别")))
+    // 数据行
+    .rows(
+    SpecDataFactory.excelData(),
+    (it,row)->row.dataCell(it::getName).dataCell(it::getAge).dataCell(it::getSex)
+    )
+    )
+    )
+    .writeTo(new FileOutputStream(prefix+"merge-head.xlsx"));
+    }
 ```
 
 </details>

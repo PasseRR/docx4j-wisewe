@@ -89,7 +89,7 @@ public class SpreadSheetImporterSpec {
     @Test
     public void usage() throws FileNotFoundException {
         ImportResult<Person> result = SpreadSheetImporter.create(
-            new FileInputStream(FileUtil.brotherPath(this.getClass(), "/repeated.xlsx")))
+                new FileInputStream(FileUtil.brotherPath(this.getClass(), "/repeated.xlsx")))
             // 表头行数
             .skip(1)
             // 快速失败

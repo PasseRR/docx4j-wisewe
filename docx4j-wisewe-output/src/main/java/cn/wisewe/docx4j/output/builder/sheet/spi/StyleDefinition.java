@@ -23,7 +23,7 @@ public interface StyleDefinition {
     default Font cellFont(Workbook workbook) {
         return workbook.createFont();
     }
-    
+
     /**
      * 表头字体
      * @param workbook {@link Workbook}

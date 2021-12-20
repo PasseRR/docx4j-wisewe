@@ -91,11 +91,11 @@ public class DocumentExporterSpec {
             .table(people.size() + 2, 3, t -> {
                 // 表头行列合并
                 t.row(r ->
-                    r.cell(c -> c.boldText("姓名").rowspan(2))
-                        .cell(c -> c.boldText("其他信息").colspan(2))
-                        // 合并列数据补全
-                        .headCell("")
-                )
+                        r.cell(c -> c.boldText("姓名").rowspan(2))
+                            .cell(c -> c.boldText("其他信息").colspan(2))
+                            // 合并列数据补全
+                            .headCell("")
+                    )
                     // 合并行的数据需要补全
                     .row(r -> r.headCells("姓名", "年龄", "性别"));
                 groupBySex.forEach((key, value) -> {

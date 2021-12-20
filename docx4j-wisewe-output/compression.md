@@ -163,72 +163,72 @@ public void files() throws FileNotFoundException {
 ##### 代码
 
 ```java
-public void complex() throws FileNotFoundException {
-        // 文件类型示例
-        // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
-        List<String> sexList =
-            SpecDataFactory.tableData().stream().map(Person::getSex).distinct().collect(Collectors.toList());
-        Map<String, List<Person>> groupBySex =
-            SpecDataFactory.tableData().stream().collect(Collectors.groupingBy(Person::getSex));
-        CompressionExporter.create()
-            // 直接添加文件
-            .any(new File(FileUtil.rootPath(this.getClass(), "/a.jpeg")))
-            .file(new File(FileUtil.rootPath(this.getClass(), "/b.png")))
-            // 直接添加目录 test class path root
-            .any(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
-            .folder(new File(this.getClass().getResource(OutputConstants.SLASH + "cn").getPath()))
-            // 动态文件夹及文件
-            .folders(sexList, it -> it, (u, fn, b) -> {
-                // 对应性别的docx文档
-                b.folder(fn + DocumentFileType.DOCX.name(), (sfn, nb) ->
-                    nb.files(groupBySex.get(u), p -> DocumentFileType.DOCX.fullName(sfn + p.getName()), (p, os) ->
-                        DocumentBuilder.create()
-                            .header("我是页眉")
-                            .footer("我是页脚")
-                            .headingParagraph(p.getName() + "个人信息", ParagraphStyle.SUB_HEADING)
-                            .table(2, 3, t ->
-                                t.row(r -> r.headCells("姓名", "年龄", "性别"))
-                                    .row(r -> r.dataCells(p::getName, p::getAge, p::getSex))
-                            )
-                            .writeTo(os, false)
-                    )
-                );
-                // 对应性别的xlsx文档
-                b.folder(fn + SpreadSheetFileType.XLSX.name(), (sfn, nb) ->
-                    nb.files(groupBySex.get(u), p -> SpreadSheetFileType.XLSX.fullName(sfn + p.getName()), (p, os) ->
-                        SpreadSheetBuilder.create()
-                            .workbook(wb ->
-                                wb.sheet(s ->
-                                    // 表头行
-                                    s.row(r -> r.headCells("姓名", "年龄", "性别"))
-                                        // 数据行
-                                        .row(r -> r.dataCells(p::getName, p::getAge, p::getSex))
-                                )
-                            )
-                            .writeTo(os, false)
-                    )
-                );
-                // 对应性别的pdf文档
-                b.folder(fn + PortableFileType.PDF.name(), (sfn, nb) ->
-                    nb.files(groupBySex.get(u), p -> PortableFileType.PDF.fullName(sfn + p.getName()), (p, os) ->
-                        PortableBuilder.create()
-                            .event(new DefaultTextWatermarkHandler(p.getName()))
-                            .open()
-                            .headingParagraph(p.getName() + "个人信息", Fonts.HEADING_1)
-                            .textParagraph(String.format("姓名:%s", p.getName()))
-                            .textParagraph(String.format("年龄:%s", p.getAge()))
-                            .textParagraph(String.format("性别:%s", p.getSex()))
-                            .writeTo(os, false)
-                    )
-                );
-                // 空压缩包
-                b.folder(fn + CompressionFileType.ZIP.name(), (sfn, nb) ->
-                    nb.files(groupBySex.get(u), p -> CompressionFileType.ZIP.fullName(sfn + p.getName()), (p, os) ->
-                        CompressionExporter.create().writeTo(os, false)
-                    )
-                );
-            })
-            .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "complex.zip")));
+public void complex()throws FileNotFoundException{
+    // 文件类型示例
+    // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
+    List<String> sexList=
+    SpecDataFactory.tableData().stream().map(Person::getSex).distinct().collect(Collectors.toList());
+    Map<String, List<Person>>groupBySex=
+    SpecDataFactory.tableData().stream().collect(Collectors.groupingBy(Person::getSex));
+    CompressionExporter.create()
+    // 直接添加文件
+    .any(new File(FileUtil.rootPath(this.getClass(),"/a.jpeg")))
+    .file(new File(FileUtil.rootPath(this.getClass(),"/b.png")))
+    // 直接添加目录 test class path root
+    .any(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
+    .folder(new File(this.getClass().getResource(OutputConstants.SLASH+"cn").getPath()))
+    // 动态文件夹及文件
+    .folders(sexList,it->it,(u,fn,b)->{
+    // 对应性别的docx文档
+    b.folder(fn+DocumentFileType.DOCX.name(),(sfn,nb)->
+    nb.files(groupBySex.get(u),p->DocumentFileType.DOCX.fullName(sfn+p.getName()),(p,os)->
+    DocumentBuilder.create()
+    .header("我是页眉")
+    .footer("我是页脚")
+    .headingParagraph(p.getName()+"个人信息",ParagraphStyle.SUB_HEADING)
+    .table(2,3,t->
+    t.row(r->r.headCells("姓名","年龄","性别"))
+    .row(r->r.dataCells(p::getName,p::getAge,p::getSex))
+    )
+    .writeTo(os,false)
+    )
+    );
+    // 对应性别的xlsx文档
+    b.folder(fn+SpreadSheetFileType.XLSX.name(),(sfn,nb)->
+    nb.files(groupBySex.get(u),p->SpreadSheetFileType.XLSX.fullName(sfn+p.getName()),(p,os)->
+    SpreadSheetBuilder.create()
+    .workbook(wb->
+    wb.sheet(s->
+    // 表头行
+    s.row(r->r.headCells("姓名","年龄","性别"))
+    // 数据行
+    .row(r->r.dataCells(p::getName,p::getAge,p::getSex))
+    )
+    )
+    .writeTo(os,false)
+    )
+    );
+    // 对应性别的pdf文档
+    b.folder(fn+PortableFileType.PDF.name(),(sfn,nb)->
+    nb.files(groupBySex.get(u),p->PortableFileType.PDF.fullName(sfn+p.getName()),(p,os)->
+    PortableBuilder.create()
+    .event(new DefaultTextWatermarkHandler(p.getName()))
+    .open()
+    .headingParagraph(p.getName()+"个人信息",Fonts.HEADING_1)
+    .textParagraph(String.format("姓名:%s",p.getName()))
+    .textParagraph(String.format("年龄:%s",p.getAge()))
+    .textParagraph(String.format("性别:%s",p.getSex()))
+    .writeTo(os,false)
+    )
+    );
+    // 空压缩包
+    b.folder(fn+CompressionFileType.ZIP.name(),(sfn,nb)->
+    nb.files(groupBySex.get(u),p->CompressionFileType.ZIP.fullName(sfn+p.getName()),(p,os)->
+    CompressionExporter.create().writeTo(os,false)
+    )
+    );
+    })
+    .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(),"complex.zip")));
     }
 ```
 
