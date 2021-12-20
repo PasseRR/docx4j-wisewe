@@ -8,6 +8,6 @@ package cn.wisewe.docx4j.output.builder.sheet.spi;
 public class DefaultStyleDefinitionSpi implements OrderedStyleDefinition {
     @Override
     public int order() {
-        return 0;
+        return Integer.MAX_VALUE;
     }
 }
