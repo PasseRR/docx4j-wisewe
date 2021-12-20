@@ -28,13 +28,13 @@ import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 /**
- * spi加载器
+ * 样式持有
  * @author xiehai
  * @date 2021/12/17 14:26
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
-class StyleLoader implements StyleDefinition {
-    static volatile StyleLoader instance = null;
+class StylesHolder implements StyleDefinition {
+    static volatile StylesHolder instance = null;
     final Function<Workbook, Font> fontFunc;
     final Function<Workbook, Font> headFontFunc;
     final Function<Workbook, CellStyle> cellStyleFunc;
@@ -45,7 +45,7 @@ class StyleLoader implements StyleDefinition {
     private static final ThreadLocal<EnumMap<CustomStyleType, Function<Workbook, CellStyle>>> CUSTOM_STYLE_FUNCS =
         ThreadLocal.withInitial(() -> new EnumMap<>(CustomStyleType.class));
 
-    private StyleLoader(OrderedStyleDefinition orderedStyleDefinition) {
+    private StylesHolder(OrderedStyleDefinition orderedStyleDefinition) {
         this.fontFunc = orderedStyleDefinition::cellFont;
         this.headFontFunc = orderedStyleDefinition::headerFont;
         this.cellStyleFunc = orderedStyleDefinition::cellStyle;
@@ -56,12 +56,12 @@ class StyleLoader implements StyleDefinition {
      * 获取默认spi实例
      * @return {@link OrderedStyleDefinition}
      */
-    static StyleLoader instance() {
+    static StylesHolder instance() {
         if (instance == null) {
-            synchronized (StyleLoader.class) {
+            synchronized (StylesHolder.class) {
                 if (instance == null) {
                     instance =
-                        new StyleLoader(
+                        new StylesHolder(
                             StreamSupport.stream(ServiceLoader.load(OrderedStyleDefinition.class).spliterator(), false)
                                 // 取排序号最小的实现
                                 .min(Comparator.comparing(OrderedStyleDefinition::order))
@@ -128,7 +128,7 @@ class StyleLoader implements StyleDefinition {
      * @param type     样式类型
      * @param function 样式生成方法
      */
-    static void setCustom(CustomStyleType type, Function<Workbook, CellStyle> function) {
+    static void addCustom(CustomStyleType type, Function<Workbook, CellStyle> function) {
         CUSTOM_STYLE_FUNCS.get().put(type, function);
     }
 

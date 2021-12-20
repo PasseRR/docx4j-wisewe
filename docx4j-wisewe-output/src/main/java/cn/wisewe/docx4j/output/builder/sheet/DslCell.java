@@ -63,7 +63,7 @@ public class DslCell {
     /**
      * 样式定义
      */
-    protected static final StyleLoader LOADER = StyleLoader.instance();
+    protected static final StylesHolder LOADER = StylesHolder.instance();
 
     DslCell(Cell cell) {
         this.cell = cell;

@@ -101,7 +101,7 @@ public class SpreadSheetExporter {
      * @return {@link SpreadSheetExporter}
      */
     public SpreadSheetExporter customStyle(CustomStyleType styleType, Function<Workbook, CellStyle> function) {
-        StyleLoader.setCustom(styleType, function);
+        StylesHolder.addCustom(styleType, function);
         return this;
     }
 
@@ -164,7 +164,7 @@ public class SpreadSheetExporter {
                 IOUtils.closeQuietly(outputStream);
             }
             // 清空自定义样式
-            StyleLoader.removeCustom();
+            StylesHolder.removeCustom();
         }
     }
 }
