@@ -22,9 +22,12 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.STBorderStyle;
 
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
 /**
@@ -35,21 +38,24 @@ import java.util.stream.StreamSupport;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class StylesHolder implements StyleDefinition {
     static volatile StylesHolder instance = null;
-    final Function<Workbook, Font> fontFunc;
-    final Function<Workbook, Font> headFontFunc;
-    final Function<Workbook, CellStyle> cellStyleFunc;
-    final Function<Workbook, CellStyle> headCellStyleFunc;
+    final StyleDefinition styleDefinition;
+    /**
+     * 字体实例缓存 仅当前线程 避免重复创建{@link Font}
+     */
+    private static final ThreadLocal<EnumMap<FontType, Font>> FONTS =
+        ThreadLocal.withInitial(() -> new EnumMap<>(FontType.class));
+    /**
+     * 单元格样式实例缓存 仅当前现场 避免重复创建{@link CellStyle}
+     */
+    private static final ThreadLocal<Map<StyleType, CellStyle>> CELL_STYLES = ThreadLocal.withInitial(HashMap::new);
     /**
      * 自定义样式方法 仅对当前线程有效
      */
-    private static final ThreadLocal<EnumMap<CustomStyleType, Function<Workbook, CellStyle>>> CUSTOM_STYLE_FUNCS =
-        ThreadLocal.withInitial(() -> new EnumMap<>(CustomStyleType.class));
+    private static final ThreadLocal<Map<StyleType, Function<Workbook, CellStyle>>> CUSTOM_STYLE_FUNCS =
+        ThreadLocal.withInitial(HashMap::new);
 
-    private StylesHolder(OrderedStyleDefinition orderedStyleDefinition) {
-        this.fontFunc = orderedStyleDefinition::cellFont;
-        this.headFontFunc = orderedStyleDefinition::headerFont;
-        this.cellStyleFunc = orderedStyleDefinition::cellStyle;
-        this.headCellStyleFunc = orderedStyleDefinition::headCellStyle;
+    private StylesHolder(StyleDefinition styleDefinition) {
+        this.styleDefinition = styleDefinition;
     }
 
     /**
@@ -79,28 +85,37 @@ class StylesHolder implements StyleDefinition {
 
     @Override
     public Font cellFont(Workbook workbook) {
-        return this.fontFunc.apply(workbook);
+        return this.font(FontType.DATA, () -> this.styleDefinition.cellFont(workbook));
     }
 
     @Override
     public Font headerFont(Workbook workbook) {
-        return this.headFontFunc.apply(workbook);
+        return this.font(FontType.HEADER, () -> this.styleDefinition.headerFont(workbook));
+    }
+
+    /**
+     * 红星表头字体
+     * @param workbook {@link Workbook}
+     * @return {@link Font}
+     */
+    public Font readHeadFont(Workbook workbook) {
+        return
+            this.font(FontType.RED_HEADER, () -> {
+                Font font = this.styleDefinition.headerFont(workbook);
+                font.setColor(Font.COLOR_RED);
+
+                return font;
+            });
     }
 
     @Override
     public CellStyle cellStyle(Workbook workbook) {
-        return
-            Optional.ofNullable(CUSTOM_STYLE_FUNCS.get().get(CustomStyleType.DATA))
-                .orElse(this.cellStyleFunc)
-                .apply(workbook);
+        return this.style(CustomStyleType.DATA, workbook, this.styleDefinition::cellStyle);
     }
 
     @Override
     public CellStyle headCellStyle(Workbook workbook) {
-        return
-            Optional.ofNullable(CUSTOM_STYLE_FUNCS.get().get(CustomStyleType.HEAD))
-                .orElse(this.headCellStyleFunc)
-                .apply(workbook);
+        return this.style(CustomStyleType.HEAD, workbook, this.styleDefinition::headCellStyle);
     }
 
     /**
@@ -110,7 +125,12 @@ class StylesHolder implements StyleDefinition {
      * @return {@link CellStyle}
      */
     public CellStyle diagonalCellStyle(Workbook workbook, boolean isDiagonalUp) {
-        return diagonalStyle(workbook, this.cellStyle(workbook), isDiagonalUp);
+        return
+            this.style(
+                isDiagonalUp ? CustomStyleType.SEPARATED_DATA_UP : CustomStyleType.SEPARATED_DATA_DOWN,
+                workbook,
+                wb -> diagonalStyle(wb, this.cellStyle(wb), isDiagonalUp)
+            );
     }
 
     /**
@@ -120,7 +140,55 @@ class StylesHolder implements StyleDefinition {
      * @return {@link CellStyle}
      */
     public CellStyle diagonalHeadCellStyle(Workbook workbook, boolean isDiagonalUp) {
-        return diagonalStyle(workbook, this.headCellStyle(workbook), isDiagonalUp);
+        return
+            this.style(
+                isDiagonalUp ? CustomStyleType.SEPARATED_HEAD_UP : CustomStyleType.SEPARATED_HEAD_DOWN,
+                workbook,
+                wb -> diagonalStyle(wb, this.headCellStyle(wb), isDiagonalUp)
+            );
+    }
+
+    /**
+     * 字体缓存
+     * @param fontType 字体类型
+     * @param supplier 字体实例提供
+     * @return {@link Font}
+     */
+    Font font(FontType fontType, Supplier<Font> supplier) {
+        if (!FONTS.get().containsKey(fontType)) {
+            synchronized (FONTS.get()) {
+                if (!FONTS.get().containsKey(fontType)) {
+                    FONTS.get().put(fontType, supplier.get());
+                }
+            }
+        }
+
+        return FONTS.get().get(fontType);
+    }
+
+    /**
+     * 单元格样式缓存
+     * @param styleType 样式类型
+     * @param workbook  {@link Workbook}
+     * @param function  样式生成
+     * @return {@link CellStyle}
+     */
+    CellStyle style(StyleType styleType, Workbook workbook, Function<Workbook, CellStyle> function) {
+        if (!CELL_STYLES.get().containsKey(styleType)) {
+            synchronized (CELL_STYLES.get()) {
+                if (!CELL_STYLES.get().containsKey(styleType)) {
+                    CELL_STYLES.get()
+                        .put(
+                            styleType,
+                            Optional.ofNullable(CUSTOM_STYLE_FUNCS.get().get(styleType))
+                                .orElse(function)
+                                .apply(workbook)
+                        );
+                }
+            }
+        }
+
+        return CELL_STYLES.get().get(styleType);
     }
 
     /**
@@ -135,7 +203,9 @@ class StylesHolder implements StyleDefinition {
     /**
      * 线程变量移除
      */
-    static void removeCustom() {
+    static void clean() {
+        FONTS.remove();
+        CELL_STYLES.remove();
         CUSTOM_STYLE_FUNCS.remove();
     }
 

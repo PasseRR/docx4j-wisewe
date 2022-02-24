@@ -164,7 +164,7 @@ public class SpreadSheetExporter {
                 IOUtils.closeQuietly(outputStream);
             }
             // 清空自定义样式
-            StylesHolder.removeCustom();
+            StylesHolder.clean();
         }
     }
 }

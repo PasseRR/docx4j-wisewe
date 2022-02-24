@@ -93,8 +93,7 @@ public class DslCell {
             this.getWorkBook()
                 .getCreationHelper()
                 .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
-        Font aster = LOADER.headerFont(this.getWorkBook());
-        aster.setColor(Font.COLOR_RED);
+        Font aster = LOADER.readHeadFont(this.getWorkBook());
         rich.applyFont(0, 1, aster);
         rich.applyFont(1, rich.length(), LOADER.headerFont(this.getWorkBook()));
 
