@@ -139,20 +139,20 @@ public void breakPage() throws FileNotFoundException {
 <h5>代码</h5>
 
 ```java
-public void table()throws FileNotFoundException{
+public void table() throws FileNotFoundException {
     PortableExporter.fastCreate()
-    .paragraph(p->
-    p.chunk("教职工列表",Fonts.HEADING_1.font()).more(pp->pp.setAlignment(Element.ALIGN_CENTER))
-    )
-    // 需要指定表格列数
-    .table(3,t->
-    // 表头
-    t.row(r->r.headCells("姓名","年龄","性别"))
-    // 数据单元格
-    .rows(SpecDataFactory.tableData(),(u,r)->r.dataCells(u::getName,u::getAge,u::getSex))
-    )
-    .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class,"table.pdf")));
-    }
+        .paragraph(p ->
+            p.chunk("教职工列表", Fonts.HEADING_1.font()).more(pp -> pp.setAlignment(Element.ALIGN_CENTER))
+        )
+        // 需要指定表格列数
+        .table(3, t ->
+            // 表头
+            t.row(r -> r.headCells("姓名", "年龄", "性别"))
+                // 数据单元格
+                .rows(SpecDataFactory.tableData(), (u, r) -> r.dataCells(u::getName, u::getAge, u::getSex))
+        )
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "table.pdf")));
+}
 ```
 
 </details>
@@ -201,36 +201,36 @@ public void table()throws FileNotFoundException{
 <h5>代码</h5>
 
 ```java
-public void mergeTable()throws FileNotFoundException{
-    List<Person> people=SpecDataFactory.tableData();
+public void mergeTable() throws FileNotFoundException {
+    List<Person> people = SpecDataFactory.tableData();
     // 将数据按照性别分组 合并处理性别列 模拟sql分组 但不保证列表数据顺序
-    Map<String, List<Person>>groupBySex=people.stream().collect(Collectors.groupingBy(Person::getSex));
+    Map<String, List<Person>> groupBySex = people.stream().collect(Collectors.groupingBy(Person::getSex));
     PortableExporter.fastCreate()
-    .paragraph(p->
-    p.chunk("教职工列表",Fonts.HEADING_1.font()).more(pp->pp.setAlignment(Element.ALIGN_CENTER))
-    )
-    // 需要指定表格行数及列数
-    .table(3,t->{
-    // 表头行列合并 从左往右从上之下渲染 合并的单元格只渲染一次
-    t.row(r->r.headCell("姓名",c->c.rowspan(2)).headCell("其他信息",c->c.colspan(2)))
-    .row(r->r.headCells("年龄","性别"));
-    // 数据合并
-    groupBySex.forEach((key,value)->{
-    AtomicBoolean merged=new AtomicBoolean();
-    int rowspan=value.size();
-    t.rows(value,(it,r)->{
-    // 前两列数据
-    r.dataCells(it::getName,it::getAge);
-    // 行合并一次 单元格也只添加一次
-    if(!merged.get()){
-    merged.set(true);
-    r.dataCell(it::getSex,c->c.rowspan(rowspan));
-    }
-    });
-    });
-    })
-    .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class,"merge-table.pdf")));
-    }
+        .paragraph(p ->
+            p.chunk("教职工列表", Fonts.HEADING_1.font()).more(pp -> pp.setAlignment(Element.ALIGN_CENTER))
+        )
+        // 需要指定表格行数及列数
+        .table(3, t -> {
+            // 表头行列合并 从左往右从上之下渲染 合并的单元格只渲染一次
+            t.row(r -> r.headCell("姓名", c -> c.rowspan(2)).headCell("其他信息", c -> c.colspan(2)))
+                .row(r -> r.headCells("年龄", "性别"));
+            // 数据合并
+            groupBySex.forEach((key, value) -> {
+                AtomicBoolean merged = new AtomicBoolean();
+                int rowspan = value.size();
+                t.rows(value, (it, r) -> {
+                    // 前两列数据
+                    r.dataCells(it::getName, it::getAge);
+                    // 行合并一次 单元格也只添加一次
+                    if (!merged.get()) {
+                        merged.set(true);
+                        r.dataCell(it::getSex, c -> c.rowspan(rowspan));
+                    }
+                });
+            });
+        })
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "merge-table.pdf")));
+}
 ```
 
 </details>
@@ -286,25 +286,25 @@ public void mergeTable()throws FileNotFoundException{
 <h5>代码</h5>
 
 ```java
-public void headerAndFooter()throws FileNotFoundException{
+public void headerAndFooter() throws FileNotFoundException {
     PortableExporter.create()
-    // 页眉事件
-    .event(new DefaultTextHeaderHandler("成都中教智汇"))
-    // 页脚事件
-    .event(new DefaultPageFooterHandler("第","页/共","页"))
-    // 事件必须在open之间设置
-    .open()
-    // 多个文档 自动添加分页符
-    .documents(SpecDataFactory.tableData(),(it,d)->
-    // 分页文档
-    d.headingParagraph(it.getName()+"个人信息",Fonts.HEADING_1)
-    .table(3,t->
-    t.row(r->r.headCells("姓名","年龄","性别"))
-    .row(r->r.dataCells(it::getName,it::getAge,it::getSex))
-    )
-    )
-    .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(),"header-footer.pdf")));
-    }
+        // 页眉事件
+        .event(new DefaultTextHeaderHandler("成都中教智汇"))
+        // 页脚事件
+        .event(new DefaultPageFooterHandler("第", "页/共", "页"))
+        // 事件必须在open之间设置
+        .open()
+        // 多个文档 自动添加分页符
+        .documents(SpecDataFactory.tableData(), (it, d) ->
+            // 分页文档
+            d.headingParagraph(it.getName() + "个人信息", Fonts.HEADING_1)
+                .table(3, t ->
+                    t.row(r -> r.headCells("姓名", "年龄", "性别"))
+                        .row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
+                )
+        )
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "header-footer.pdf")));
+}
 ```
 
 </details>
@@ -361,26 +361,26 @@ public void headerAndFooter()throws FileNotFoundException{
 <h5>代码</h5>
 
 ```java
-public void watermark()throws FileNotFoundException{
+public void watermark() throws FileNotFoundException {
     PortableExporter.create()
-    // 页眉事件
-    .event(new DefaultTextHeaderHandler("成都中教智汇"))
-    // 页脚事件
-    .event(new DefaultPageFooterHandler("第","页/共","页"))
-    .event(new DefaultTextWatermarkHandler("成都中教智汇",28))
-    // 事件必须在open之前设置
-    .open()
-    // 多个文档 自动添加分页符
-    .documents(SpecDataFactory.tableData(),(it,d)->
-    // 分页文档
-    d.headingParagraph(it.getName()+"个人信息",Fonts.HEADING_1)
-    .table(3,t->
-    t.row(r->r.headCells("姓名","年龄","性别"))
-    .row(r->r.dataCells(it::getName,it::getAge,it::getSex))
-    )
-    )
-    .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(),"watermark.pdf")));
-    }
+        // 页眉事件
+        .event(new DefaultTextHeaderHandler("成都中教智汇"))
+        // 页脚事件
+        .event(new DefaultPageFooterHandler("第", "页/共", "页"))
+        .event(new DefaultTextWatermarkHandler("成都中教智汇", 28))
+        // 事件必须在open之前设置
+        .open()
+        // 多个文档 自动添加分页符
+        .documents(SpecDataFactory.tableData(), (it, d) ->
+            // 分页文档
+            d.headingParagraph(it.getName() + "个人信息", Fonts.HEADING_1)
+                .table(3, t ->
+                    t.row(r -> r.headCells("姓名", "年龄", "性别"))
+                        .row(r -> r.dataCells(it::getName, it::getAge, it::getSex))
+                )
+        )
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "watermark.pdf")));
+}
 ```
 
 </details>
@@ -446,27 +446,27 @@ public void watermark()throws FileNotFoundException{
 <h5>代码</h5>
 
 ```java
-public void picture()throws FileNotFoundException{
+public void picture() throws FileNotFoundException {
     PortableExporter.create()
-    // 水印图片
-    .event(new DefaultPictureWatermarkHandler(new File(FileUtil.rootPath(this.getClass(),"/b.png")),50))
-    // 事件必须在open之前设置
-    .open()
-    .headingParagraph("教职工列表",Fonts.HEADING_3)
-    // 需要指定表格行数及列数
-    .table(5,t->
-    // 表头行会自动加粗
-    t.row(r->r.headCells("姓名","年龄","性别","图片","文字图片"))
-    .rows(SpecDataFactory.tableData(),(p,r)->
-    r.dataCells(p::getName,p::getAge,p::getSex)
-    // 图片单元格
-    .cell(c->c.pictureParagraph(p.picture(),20))
-    // 文字及图片
-    .cell(c->c.textParagraph("我是单元格图片").pictureParagraph(p.picture(),20))
-    )
-    )
-    .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(),"picture.pdf")));
-    }
+        // 水印图片
+        .event(new DefaultPictureWatermarkHandler(new File(FileUtil.rootPath(this.getClass(), "/b.png")), 50))
+        // 事件必须在open之前设置
+        .open()
+        .headingParagraph("教职工列表", Fonts.HEADING_3)
+        // 需要指定表格行数及列数
+        .table(5, t ->
+            // 表头行会自动加粗
+            t.row(r -> r.headCells("姓名", "年龄", "性别", "图片", "文字图片"))
+                .rows(SpecDataFactory.tableData(), (p, r) ->
+                    r.dataCells(p::getName, p::getAge, p::getSex)
+                        // 图片单元格
+                        .cell(c -> c.pictureParagraph(p.picture(), 20))
+                        // 文字及图片
+                        .cell(c -> c.textParagraph("我是单元格图片").pictureParagraph(p.picture(), 20))
+                )
+        )
+        .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "picture.pdf")));
+}
 ```
 
 </details>
