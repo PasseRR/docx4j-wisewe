@@ -445,11 +445,11 @@ public void picture() throws FileNotFoundException {
                      .pictureCell(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")), 20, 20)
                      .cell(c ->
                            c.text("我是单元格图片")
-                           .pictureParagraph(
-                               new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")),
-                               20,
-                               20
-                           )
+                               .pictureParagraph(
+                                   new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")),
+                                   20,
+                                   20
+                               )
                           )
                     )
               )
@@ -458,14 +458,14 @@ public void picture() throws FileNotFoundException {
         .pictureParagraph(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "c.gif")), 400, 150)
         // 页眉图片
         .header(HeaderFooterType.DEFAULT, h ->
-                h.textParagraph("我是页眉图片")
+            h.textParagraph("我是页眉图片")
                 .pictureParagraph(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "b.png")), 20, 20)
-               )
+        )
         // 页脚图片
         .footer(HeaderFooterType.DEFAULT, f ->
-                f.textParagraph("我是页脚图片")
+            f.textParagraph("我是页脚图片")
                 .pictureParagraph(new File(FileUtil.brotherPath(DocumentExporterSpec.class, "b.png")), 20, 20)
-               )
+        )
         .writeTo(new FileOutputStream(FileUtil.brotherPath(DocumentExporterSpec.class, "picture.docx")));
 }
 ```
