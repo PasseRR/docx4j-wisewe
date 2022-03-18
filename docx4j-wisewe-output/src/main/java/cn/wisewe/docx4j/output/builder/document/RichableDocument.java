@@ -4,7 +4,6 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 
-import javax.annotation.Generated;
 import java.math.BigInteger;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -20,8 +19,8 @@ import java.util.function.Function;
  * @date 2020/12/25 14:20
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-@Generated({})
-abstract class RichableDocument<T extends RichableDocument> extends ParagraphableDocument<T> {
+@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
+abstract class RichableDocument<T extends RichableDocument<?>> extends ParagraphableDocument<T> {
     /**
      * 添加固定表格
      * @param rows     行数

@@ -4,7 +4,6 @@ import org.apache.poi.xwpf.usermodel.BreakType;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
-import javax.annotation.Generated;
 import java.io.File;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -20,8 +19,8 @@ import java.util.function.Consumer;
  * @date 2020/12/28 19:36
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
-@Generated({})
-abstract class ParagraphableDocument<T extends ParagraphableDocument> {
+@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
+abstract class ParagraphableDocument<T extends ParagraphableDocument<?>> {
     /**
      * 添加一个段落
      * @param consumer 段落消费
