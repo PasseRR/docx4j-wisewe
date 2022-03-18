@@ -65,26 +65,34 @@ public class DefaultPictureWatermarkHandler extends PdfPageEventHelper {
 
         this.width = w;
         this.height = h;
-
         this.rotate = rotate;
     }
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
-        // TODO 根据纸张大小调整水印
+        // 长度按照对角线计算
+        float x = (float) Math.sqrt(this.width * this.width + this.height * this.height),
+            // 间隔长度为0.5倍长度
+            interval = x * 0.5F,
+            // 加间隔长度
+            y = x + interval;
+        float w = document.getPageSize().getWidth(), h = document.getPageSize().getHeight();
+        int row = (int) (h / y) + 2, column = (int) (w / y) + 2;
+        // 多余宽度及高度
+        float lx = (w % y) / row, ly = (h % y) / column;
         PdfContentByte contentUnder = writer.getDirectContentUnder();
-        int count = 10;
-        IntStream.range(0, count)
+        
+        IntStream.rangeClosed(1, row)
             .boxed()
-            .forEach(x ->
-                IntStream.range(0, count)
+            .forEach(r ->
+                IntStream.rangeClosed(1, column)
                     .boxed()
-                    .forEach(y -> {
+                    .forEach(c -> {
                         Image image = Image.getInstance(this.image);
                         image.scaleAbsoluteWidth(this.width);
                         image.scaleAbsoluteHeight(this.height);
                         image.setRotation(this.rotate);
-                        image.setAbsolutePosition(x * this.width * 1.5F + 50.5F, y * this.height * 2.5F + 40.0F);
+                        image.setAbsolutePosition((c - 1) * (lx + y), (r - 1) * (ly + y));
 
                         PdfGState state = new PdfGState();
                         // 水印图片透明度

@@ -25,10 +25,11 @@ public class DefaultTextWatermarkHandler extends PdfPageEventHelper {
      * 水印文本
      */
     String text;
+    float rotate;
     /**
      * 文本旋转度数
      */
-    float rotate;
+    double radians;
     /**
      * 字体设置
      */
@@ -46,6 +47,7 @@ public class DefaultTextWatermarkHandler extends PdfPageEventHelper {
     public DefaultTextWatermarkHandler(String text, float size, float rotate) {
         this.text = text;
         this.rotate = rotate;
+        this.radians = Math.toRadians(rotate);
         // 设置水印字体颜色
         this.font = Fonts.font(size, Font.BOLD);
         // 字体颜色透明度
@@ -57,8 +59,8 @@ public class DefaultTextWatermarkHandler extends PdfPageEventHelper {
         // x、y轴间隔为字体大小的1.5倍
         float size = this.font.getSize(), interval = size * 1.5F, max = size * text.length();
         // 根据三角函数计算字体x轴和y轴高度
-        float x = Float.max((float) Math.cos(Math.toRadians(rotate)) * max, size) + interval,
-            y = Float.max((float) Math.sin(Math.toRadians(rotate)) * max, size) + interval;
+        float x = Float.max((float) Math.cos(this.radians) * max, size) + interval,
+            y = Float.max((float) Math.sin(this.radians) * max, size) + interval;
         // 根据纸张的长度和宽度计算最多迭代次数
         float w = document.getPageSize().getWidth(), h = document.getPageSize().getHeight();
         // 多绘制两次 使得水印不工整

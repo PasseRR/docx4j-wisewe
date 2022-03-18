@@ -139,7 +139,7 @@ public class PortableExporterSpec {
             // 页脚事件
             .event(new DefaultPageFooterHandler("第", "页/共", "页"))
             // 事件必须在open之前设置
-            .event(new DefaultTextWatermarkHandler("成都中教智汇", 28))
+            .event(new DefaultTextWatermarkHandler("成都中教智汇", 32F))
             .pageSize(PageSize.A4.rotate())
             .open()
             // 多个文档 自动添加分页符
@@ -158,8 +158,9 @@ public class PortableExporterSpec {
     public void picture() throws FileNotFoundException {
         PortableExporter.create()
             // 水印图片
-            .event(new DefaultPictureWatermarkHandler(new File(FileUtil.rootPath(this.getClass(), "/b.png")), 50))
+            .event(new DefaultPictureWatermarkHandler(new File(FileUtil.rootPath(this.getClass(), "/d.bmp")), 1024))
             // 事件必须在open之前设置
+            .pageSize(PageSize.A0)
             .open()
             .headingParagraph("教职工列表", Fonts.HEADING_3)
             // 需要指定表格行数及列数
