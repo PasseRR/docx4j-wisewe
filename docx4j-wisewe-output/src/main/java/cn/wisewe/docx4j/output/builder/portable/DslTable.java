@@ -27,9 +27,18 @@ public class DslTable {
      * @param consumer 表格消费
      * @return {@link DslTable}
      */
-    public DslTable more(Consumer<PdfPTable> consumer) {
+    public DslTable accept(Consumer<PdfPTable> consumer) {
         consumer.accept(this.table);
         return this;
+    }
+
+    /**
+     * 表格其他设置 兼容方法 使用{@link #accept(Consumer)}代替，后期会移除此方法
+     * @param consumer 设置方法
+     * @return {@link DslTable}
+     */
+    public DslTable more(Consumer<PdfPTable> consumer) {
+        return this.accept(consumer);
     }
 
     /**
@@ -41,7 +50,7 @@ public class DslTable {
         DslRow row = new DslRow();
         consumer.accept(row);
         // 将行单元格数据依次添加
-        row.getCells().forEach(this.table::addCell);
+        row.getCells().forEach(c -> this.accept(t -> t.addCell(c)));
 
         return this;
     }

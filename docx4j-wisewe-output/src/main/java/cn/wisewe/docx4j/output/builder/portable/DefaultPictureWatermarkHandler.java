@@ -71,6 +71,7 @@ public class DefaultPictureWatermarkHandler extends PdfPageEventHelper {
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
+        // TODO 根据纸张大小调整水印
         PdfContentByte contentUnder = writer.getDirectContentUnder();
         int count = 10;
         IntStream.range(0, count)

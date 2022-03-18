@@ -7,6 +7,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 
 /**
  * word文档纸张
+ * <a href="https://www.gnu.org/software/gv/manual/html_node/Paper-Keywords-and-paper-size-in-points.html">参考</a>
  * @author xiehai
  * @date 2022/03/18 13:29
  */

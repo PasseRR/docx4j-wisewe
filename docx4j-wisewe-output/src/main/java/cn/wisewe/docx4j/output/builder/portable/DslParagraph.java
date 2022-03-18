@@ -33,10 +33,19 @@ public class DslParagraph {
      * @param consumer 段落设置消费
      * @return {@link DslParagraph}
      */
-    public DslParagraph more(Consumer<Paragraph> consumer) {
+    public DslParagraph accept(Consumer<Paragraph> consumer) {
         consumer.accept(this.paragraph);
 
         return this;
+    }
+
+    /**
+     * 段落设置 兼容方法使用{@link #accept(Consumer)}代替，后期会移除此方法
+     * @param consumer 设置方法
+     * @return {@link DslParagraph}
+     */
+    public DslParagraph more(Consumer<Paragraph> consumer) {
+        return this.accept(consumer);
     }
 
     /**
@@ -45,8 +54,7 @@ public class DslParagraph {
      * @return {@link DslParagraph}
      */
     public DslParagraph chunk(Supplier<Chunk> supplier) {
-        this.paragraph.add(supplier.get());
-        return this;
+        return this.accept(p -> p.add(supplier.get()));
     }
 
     /**
@@ -76,8 +84,7 @@ public class DslParagraph {
      * @return {@link DslParagraph}
      */
     public DslParagraph phrase(Supplier<Phrase> supplier) {
-        this.paragraph.add(supplier.get());
-        return this;
+        return this.accept(p -> p.add(supplier.get()));
     }
 
     /**
@@ -107,8 +114,7 @@ public class DslParagraph {
      * @return {@link DslParagraph}
      */
     public DslParagraph picture(Supplier<Image> supplier) {
-        this.paragraph.add(supplier.get());
-        return this;
+        return this.accept(p -> p.add(supplier.get()));
     }
 
     /**

@@ -5,6 +5,7 @@ import cn.wisewe.docx4j.output.utils.HttpServletUtil;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPageEvent;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.AccessLevel;
@@ -20,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -89,8 +91,42 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
      * @return {@link PortableExporter}
      */
     public PortableExporter open() {
-        this.document.open();
+        return this.documentAccept(Document::open);
+    }
+
+    /**
+     * {@link Document}设置
+     * @param consumer 设置方法
+     * @return {@link PortableExporter}
+     */
+    public PortableExporter documentAccept(Consumer<Document> consumer) {
+        consumer.accept(this.document);
         return this;
+    }
+
+    /**
+     * {@link PdfWriter}设置
+     * @param consumer 设置方法
+     * @return {@link PortableExporter}
+     */
+    public PortableExporter writerAccept(Consumer<PdfWriter> consumer) {
+        consumer.accept(this.writer);
+        return this;
+    }
+
+    /**
+     * 纸张设置{@link com.itextpdf.text.PageSize}中的常量定义 纸张设置应该在open之前，横纵切换{@link Rectangle#rotate()}
+     * @param rectangle 纸张矩形大小
+     * @return {@link PortableExporter}
+     */
+    public PortableExporter pageSize(Rectangle rectangle) {
+        return
+            this.documentAccept(d -> {
+                if (d.isOpen()) {
+                    throw new PortableExportException("设置纸张大小应该在open之前");
+                }
+                d.setPageSize(rectangle);
+            });
     }
 
     /**
@@ -110,7 +146,10 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
      * @return {@link PortableExporter}
      */
     public <T extends PdfPageEvent> PortableExporter events(List<T> events) {
-        if (Objects.nonNull(events)) {
+        if (Objects.nonNull(events) && !events.isEmpty()) {
+            if (this.document.isOpen()) {
+                throw new PortableExportException("事件设置应该open之前");
+            }
             events.forEach(this.writer::setPageEvent);
         }
 
@@ -122,9 +161,8 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
      * @return {@link PortableExporter}
      */
     public PortableExporter pageBreak() {
-        this.writer.setPageEmpty(false);
-        this.document.newPage();
-        return this;
+        this.writerAccept(w -> w.setPageEmpty(false));
+        return this.documentAccept(Document::newPage);
     }
 
     /**
@@ -191,14 +229,15 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
         try {
             // 若文档为空 添加一页空文档
             if (this.document.getPageNumber() == 0) {
-                this.writer.setPageEmpty(false);
-                this.document.newPage();
+                this.pageBreak();
             }
 
             // 先关闭文档再访问字节输出流
             this.document.close();
-            this.writer.flush();
-            this.writer.close();
+            this.writerAccept(w -> {
+                w.flush();
+                w.close();
+            });
 
             this.byteArrayOutputStream.writeTo(outputStream);
         } catch (IOException e) {

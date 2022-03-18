@@ -9,6 +9,10 @@ import cn.wisewe.docx4j.output.OutputException;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 public class PortableExportException extends OutputException {
+    public PortableExportException(String message) {
+        super(message);
+    }
+
     public PortableExportException(String message, Throwable t) {
         super(message, t);
     }

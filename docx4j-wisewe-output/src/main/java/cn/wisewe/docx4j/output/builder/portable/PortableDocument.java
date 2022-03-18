@@ -81,7 +81,7 @@ abstract class PortableDocument<T extends PortableDocument> {
         return
             this.paragraph(p ->
                 p.chunk(text, fonts.font())
-                    .more(op -> {
+                    .accept(op -> {
                         op.setAlignment(alignment);
                         op.setSpacingBefore(fonts.size / 4.0f);
                         op.setSpacingAfter(fonts.size / 3.0f);

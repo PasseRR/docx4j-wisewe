@@ -23,12 +23,21 @@ public class DslCell extends PortableDocument<DslCell> {
 
     /**
      * 单元格设置
-     * @param consumer
-     * @return
+     * @param consumer 设置方法
+     * @return {@link DslCell}
      */
-    public DslCell more(Consumer<PdfPCell> consumer) {
+    public DslCell accept(Consumer<PdfPCell> consumer) {
         consumer.accept(this.cell);
         return this;
+    }
+
+    /**
+     * 单元格设置 兼容方法 使用{@link #accept(Consumer)}代替，后期会移除此方法
+     * @param consumer 设置方法
+     * @return {@link DslCell}
+     */
+    public DslCell more(Consumer<PdfPCell> consumer) {
+        return this.accept(consumer);
     }
 
     /**
@@ -37,8 +46,7 @@ public class DslCell extends PortableDocument<DslCell> {
      * @return {@link DslCell}
      */
     public DslCell colspan(int colspan) {
-        this.cell.setColspan(colspan);
-        return this;
+        return this.accept(c -> c.setColspan(colspan));
     }
 
     /**
@@ -47,8 +55,7 @@ public class DslCell extends PortableDocument<DslCell> {
      * @return {@link DslCell}
      */
     public DslCell rowspan(int rowspan) {
-        this.cell.setRowspan(rowspan);
-        return this;
+        return this.accept(c -> c.setRowspan(rowspan));
     }
 
     @Override

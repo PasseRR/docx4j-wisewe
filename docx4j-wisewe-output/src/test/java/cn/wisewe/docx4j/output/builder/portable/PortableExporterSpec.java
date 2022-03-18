@@ -4,6 +4,7 @@ import cn.wisewe.docx4j.output.builder.Person;
 import cn.wisewe.docx4j.output.builder.SpecDataFactory;
 import cn.wisewe.docx4j.output.utils.FileUtil;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.PageSize;
 import org.junit.Test;
 
 import java.io.File;
@@ -64,7 +65,7 @@ public class PortableExporterSpec {
     public void table() throws FileNotFoundException {
         PortableExporter.fastCreate()
             .paragraph(p ->
-                p.chunk("教职工列表", Fonts.HEADING_1.font()).more(pp -> pp.setAlignment(Element.ALIGN_CENTER))
+                p.chunk("教职工列表", Fonts.HEADING_1.font()).accept(pp -> pp.setAlignment(Element.ALIGN_CENTER))
             )
             // 需要指定表格列数
             .table(3, t ->
@@ -83,7 +84,7 @@ public class PortableExporterSpec {
         Map<String, List<Person>> groupBySex = people.stream().collect(Collectors.groupingBy(Person::getSex));
         PortableExporter.fastCreate()
             .paragraph(p ->
-                p.chunk("教职工列表", Fonts.HEADING_1.font()).more(pp -> pp.setAlignment(Element.ALIGN_CENTER))
+                p.chunk("教职工列表", Fonts.HEADING_1.font()).accept(pp -> pp.setAlignment(Element.ALIGN_CENTER))
             )
             // 需要指定表格行数及列数
             .table(3, t -> {
@@ -137,8 +138,9 @@ public class PortableExporterSpec {
             .event(new DefaultTextHeaderHandler("成都中教智汇"))
             // 页脚事件
             .event(new DefaultPageFooterHandler("第", "页/共", "页"))
-            .event(new DefaultTextWatermarkHandler("成都中教智汇", 28))
             // 事件必须在open之前设置
+            .event(new DefaultTextWatermarkHandler("成都中教智汇", 28))
+            .pageSize(PageSize.A4.rotate())
             .open()
             // 多个文档 自动添加分页符
             .documents(SpecDataFactory.tableData(), (it, d) ->

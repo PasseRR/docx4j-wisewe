@@ -54,12 +54,11 @@ public class DefaultTextWatermarkHandler extends PdfPageEventHelper {
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
+        // TODO 根据纸张大小调整水印
         int count = 10;
         IntStream.range(0, count)
-            .boxed()
             .forEach(x ->
                 IntStream.range(0, count)
-                    .boxed()
                     .forEach(y ->
                         ColumnText.showTextAligned(
                             writer.getDirectContentUnder(),
