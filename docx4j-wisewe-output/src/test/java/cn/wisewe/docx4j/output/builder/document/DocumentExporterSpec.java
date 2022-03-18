@@ -33,7 +33,7 @@ public class DocumentExporterSpec {
     @Test
     public void simple() throws IOException {
         DocumentExporter.create()
-            .pageSize(DocumentPaperSize.A4, DocumentOrientation.LANDSCAPE)
+            .pageSize(DocumentPaperSize.A4.rotate())
             .headingParagraph("标题一", ParagraphStyle.HEADING_1)
             .headingParagraph("居中标题二", ParagraphStyle.HEADING_2, ParagraphAlignment.CENTER)
             .headingParagraph("居右标题三", ParagraphStyle.HEADING_3, ParagraphAlignment.RIGHT)

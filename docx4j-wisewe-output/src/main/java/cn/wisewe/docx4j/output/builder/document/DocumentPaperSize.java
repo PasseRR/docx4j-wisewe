@@ -3,7 +3,6 @@ package cn.wisewe.docx4j.output.builder.document;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 
 /**
  * word文档纸张
@@ -39,7 +38,11 @@ public enum DocumentPaperSize {
 
     static final long BASE = 20L;
 
-    void apply(CTPageSz pageSz, DocumentOrientation orientation) {
-        orientation.apply(pageSz, this.width * BASE, this.height * BASE);
+    DocumentRectangle rectangle() {
+        return new DocumentRectangle(this.width * BASE, this.height * BASE);
+    }
+
+    public DocumentRectangle rotate() {
+        return this.rectangle().rotate();
     }
 }

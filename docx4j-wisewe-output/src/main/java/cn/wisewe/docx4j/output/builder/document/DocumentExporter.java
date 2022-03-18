@@ -116,21 +116,21 @@ public class DocumentExporter extends RichableDocument<DocumentExporter> {
     }
 
     /**
+     * 设置纸张 默认纵向 {@link DocumentRectangle#rotate()}转为横向
+     * @return {@link DocumentExporter}
+     */
+    public DocumentExporter pageSize(DocumentRectangle rectangle) {
+        return this.pageSize(rectangle::apply);
+    }
+
+    /**
      * 设置纸张大小及方向
      * @param paperSize   纸张大小
      * @param orientation 方向
      * @return {@link DocumentExporter}
      */
-    public DocumentExporter pageSize(DocumentPaperSize paperSize, DocumentOrientation orientation) {
-        return this.pageSize(pz -> paperSize.apply(pz, orientation));
-    }
-
-    /**
-     * 设置纸张 默认纵向
-     * @return {@link DocumentExporter}
-     */
     public DocumentExporter pageSize(DocumentPaperSize paperSize) {
-        return this.pageSize(paperSize, DocumentOrientation.PORTRAIT);
+        return this.pageSize(paperSize.rectangle());
     }
 
     /**
