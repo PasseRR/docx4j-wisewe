@@ -54,18 +54,28 @@ public class DefaultTextWatermarkHandler extends PdfPageEventHelper {
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
-        // TODO 根据纸张大小调整水印
-        int count = 10;
-        IntStream.range(0, count)
-            .forEach(x ->
-                IntStream.range(0, count)
-                    .forEach(y ->
+        // x、y轴间隔为字体大小的1.5倍
+        float size = this.font.getSize(), interval = size * 1.5F, max = size * text.length();
+        // 根据三角函数计算字体x轴和y轴高度
+        float x = Float.max((float) Math.cos(Math.toRadians(rotate)) * max, size) + interval,
+            y = Float.max((float) Math.sin(Math.toRadians(rotate)) * max, size) + interval;
+        // 根据纸张的长度和宽度计算最多迭代次数
+        float w = document.getPageSize().getWidth(), h = document.getPageSize().getHeight();
+        // 多绘制两次 使得水印不工整
+        int row = (int) (h / y) + 2, column = (int) (w / x) + 2;
+        // 不够整除的多余宽度及高度把起作为间隔
+        float lx = (w % x) / column, ly = (h % x) / row;
+
+        IntStream.rangeClosed(1, row)
+            .forEach(r ->
+                IntStream.rangeClosed(1, column)
+                    .forEach(c ->
                         ColumnText.showTextAligned(
                             writer.getDirectContentUnder(),
                             Element.ALIGN_CENTER,
                             new Phrase(this.text, this.font),
-                            (50.5F + x * 250.0F),
-                            (40.0F + y * 150.0F),
+                            (c - 1) * (lx + x),
+                            (r - 1) * (ly + y),
                             this.rotate
                         )
                     )
