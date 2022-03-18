@@ -20,8 +20,9 @@ import java.util.function.Function;
  * @date 2021/01/04 15:43
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
+@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 @Generated({})
-abstract class PortableDocument<T extends PortableDocument> {
+abstract class PortableDocument<T extends PortableDocument<T>> {
     /**
      * 添加单个段落
      * @param consumer 段落消费
