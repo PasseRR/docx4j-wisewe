@@ -25,9 +25,18 @@ public class DslHyperlinkRun {
      * @param consumer 超链接消费
      * @return {@link DslHyperlinkRun}
      */
-    public DslHyperlinkRun more(Consumer<XWPFHyperlinkRun> consumer) {
+    public DslHyperlinkRun accept(Consumer<XWPFHyperlinkRun> consumer) {
         consumer.accept(this.hyperlinkRun);
         return this;
+    }
+
+    /**
+     * 超链接更多设置，兼容方法使用{@link #accept(Consumer)}代替，后期会删除此方法
+     * @param consumer 超链接设置
+     * @return {@link DslHyperlinkRun}
+     */
+    public DslHyperlinkRun more(Consumer<XWPFHyperlinkRun> consumer) {
+        return this.accept(consumer);
     }
 
     /**
@@ -36,6 +45,6 @@ public class DslHyperlinkRun {
      * @return {@link DslHyperlinkRun}
      */
     public DslHyperlinkRun text(String text) {
-        return this.more(r -> r.setText(text));
+        return this.accept(r -> r.setText(text));
     }
 }

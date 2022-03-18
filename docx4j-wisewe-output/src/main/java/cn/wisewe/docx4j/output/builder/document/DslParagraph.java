@@ -21,11 +21,21 @@ public class DslParagraph {
     }
 
     /**
+     * 段落更多设置 兼容方法使用{@link #accept(Consumer)}代替，后期会移除
+     * @param consumer 段落设置
+     * @return {@link DslParagraph}
+     */
+    @Deprecated
+    public DslParagraph more(Consumer<XWPFParagraph> consumer) {
+        return this.accept(consumer);
+    }
+
+    /**
      * 段落更多设置
      * @param consumer 段落消费
      * @return {@link DslParagraph}
      */
-    public DslParagraph more(Consumer<XWPFParagraph> consumer) {
+    public DslParagraph accept(Consumer<XWPFParagraph> consumer) {
         consumer.accept(this.paragraph);
         return this;
     }
@@ -36,7 +46,7 @@ public class DslParagraph {
      * @return {@link DslParagraph}
      */
     public DslParagraph run(Consumer<DslRun> consumer) {
-        return this.more(p -> consumer.accept(new DslRun(p.createRun())));
+        return this.accept(p -> consumer.accept(new DslRun(p.createRun())));
     }
 
     /**

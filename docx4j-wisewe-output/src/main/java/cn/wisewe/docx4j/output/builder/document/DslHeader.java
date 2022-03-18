@@ -7,6 +7,8 @@ import org.apache.poi.xwpf.usermodel.XWPFHeader;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 
+import java.util.function.Consumer;
+
 /**
  * 页眉
  * @author xiehai
@@ -22,12 +24,22 @@ public class DslHeader extends RichableDocument<DslHeader> {
     }
 
     /**
+     * 页眉更多设置
+     * @param consumer 设置方法
+     * @return {@link DslHeader}
+     */
+    public DslHeader accept(Consumer<XWPFHeader> consumer) {
+        consumer.accept(this.header);
+        return this;
+    }
+
+    /**
      * 默认居中页眉文本
      * @param text 文本内容
      * @return {@link DslHeader}
      */
     public DslHeader text(String text) {
-        return this.paragraph(p -> p.run(text).more(xp -> xp.setAlignment(ParagraphAlignment.CENTER)));
+        return this.paragraph(p -> p.run(text).accept(xp -> xp.setAlignment(ParagraphAlignment.CENTER)));
     }
 
     @Override

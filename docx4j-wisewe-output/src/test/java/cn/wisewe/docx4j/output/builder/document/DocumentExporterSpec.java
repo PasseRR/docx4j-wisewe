@@ -33,6 +33,15 @@ public class DocumentExporterSpec {
     @Test
     public void simple() throws IOException {
         DocumentExporter.create()
+            .pageSize(DocumentPaperSize.A4, DocumentOrientation.LANDSCAPE)
+            .headingParagraph("标题一", ParagraphStyle.HEADING_1)
+            .headingParagraph("居中标题二", ParagraphStyle.HEADING_2, ParagraphAlignment.CENTER)
+            .headingParagraph("居右标题三", ParagraphStyle.HEADING_3, ParagraphAlignment.RIGHT)
+            .headingParagraph("标题五", ParagraphStyle.HEADING_5)
+            .headingParagraph("标题七", ParagraphStyle.HEADING_7)
+            .headingParagraph("标题九", ParagraphStyle.HEADING_9)
+            .textParagraph("这是正文这是正文这是正文这是正文这是正文这是正文这是正文这是正文")
+            .pageBreak()
             .headingParagraph("标题一", ParagraphStyle.HEADING_1)
             .headingParagraph("居中标题二", ParagraphStyle.HEADING_2, ParagraphAlignment.CENTER)
             .headingParagraph("居右标题三", ParagraphStyle.HEADING_3, ParagraphAlignment.RIGHT)

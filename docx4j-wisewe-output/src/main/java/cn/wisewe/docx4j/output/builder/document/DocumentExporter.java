@@ -1,6 +1,5 @@
 package cn.wisewe.docx4j.output.builder.document;
 
-import cn.wisewe.docx4j.output.utils.FileUtil;
 import cn.wisewe.docx4j.output.utils.HttpResponseUtil;
 import cn.wisewe.docx4j.output.utils.HttpServletUtil;
 import lombok.AccessLevel;
@@ -12,10 +11,13 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFStyle;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.xmlbeans.XmlException;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDocument1;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.StylesDocument;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,7 +47,7 @@ public class DocumentExporter extends RichableDocument<DocumentExporter> {
         // 添加默认样式
         try {
             StylesDocument stylesDocument =
-                StylesDocument.Factory.parse(new File(FileUtil.brotherPath(DocumentExporter.class, "styles.xml")));
+                StylesDocument.Factory.parse(DocumentExporter.class.getResourceAsStream("styles.xml"));
             this.document.getStyles().setStyles(stylesDocument.getStyles());
         } catch (XmlException | IOException e) {
             throw new DocumentExportException(e);
@@ -74,12 +76,61 @@ public class DocumentExporter extends RichableDocument<DocumentExporter> {
     }
 
     /**
+     * 文档设置
+     * @param consumer 消费
+     * @return {@link DocumentExporter}
+     */
+    public DocumentExporter accept(Consumer<XWPFDocument> consumer) {
+        consumer.accept(this.document);
+        return this;
+    }
+
+    /**
      * 自定义样式
      * @return {@link DocumentExporter}
      */
     public DocumentExporter style(Supplier<XWPFStyle> supplier) {
-        this.addStyle(supplier);
-        return this;
+        return this.accept(d -> d.getStyles().addStyle(supplier.get()));
+    }
+
+    /**
+     * 纸张设置
+     * @param consumer 自定义纸张
+     * @return {@link DocumentExporter}
+     */
+    public DocumentExporter pageSize(Consumer<CTPageSz> consumer) {
+        return
+            this.accept(d -> {
+                CTDocument1 document = d.getDocument();
+                CTBody body = document.getBody();
+                if (!body.isSetSectPr()) {
+                    body.addNewSectPr();
+                }
+
+                CTSectPr sectPr = body.getSectPr();
+                if (!sectPr.isSetPgSz()) {
+                    sectPr.addNewPgSz();
+                }
+                consumer.accept(sectPr.getPgSz());
+            });
+    }
+
+    /**
+     * 设置纸张大小及方向
+     * @param paperSize   纸张大小
+     * @param orientation 方向
+     * @return {@link DocumentExporter}
+     */
+    public DocumentExporter pageSize(DocumentPaperSize paperSize, DocumentOrientation orientation) {
+        return this.pageSize(pz -> paperSize.apply(pz, orientation));
+    }
+
+    /**
+     * 设置纸张 默认纵向
+     * @return {@link DocumentExporter}
+     */
+    public DocumentExporter pageSize(DocumentPaperSize paperSize) {
+        return this.pageSize(paperSize, DocumentOrientation.PORTRAIT);
     }
 
     /**
@@ -176,22 +227,6 @@ public class DocumentExporter extends RichableDocument<DocumentExporter> {
      */
     public void writeTo(OutputStream outputStream) {
         this.writeTo(outputStream, true);
-    }
-
-    /**
-     * 为文档添加一个特定样式
-     * @param supplier 样式提供
-     */
-    protected void addStyle(Supplier<XWPFStyle> supplier) {
-        this.document.getStyles().addStyle(supplier.get());
-    }
-
-    /**
-     * 为文档添加一个特定样式
-     * @param style {@link XWPFStyle}
-     */
-    protected void addStyle(XWPFStyle style) {
-        this.addStyle(() -> style);
     }
 
     /**

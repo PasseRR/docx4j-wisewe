@@ -30,9 +30,18 @@ public class DslTable {
      * @param consumer 表格消费
      * @return {@link DslTable}
      */
-    public DslTable more(Consumer<XWPFTable> consumer) {
+    public DslTable accept(Consumer<XWPFTable> consumer) {
         consumer.accept(this.table);
         return this;
+    }
+
+    /**
+     * table更多设置，兼容方法使用{@link #accept(Consumer)}代替，后期会移除此方法
+     * @param consumer 设置方法
+     * @return {@link DslTable}
+     */
+    public DslTable more(Consumer<XWPFTable> consumer) {
+        return this.accept(consumer);
     }
 
     /**

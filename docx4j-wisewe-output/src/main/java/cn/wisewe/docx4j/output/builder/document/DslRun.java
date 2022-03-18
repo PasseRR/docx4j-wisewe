@@ -30,9 +30,18 @@ public class DslRun {
      * @param consumer 文本消费
      * @return {@link DslRun}
      */
-    public DslRun more(Consumer<XWPFRun> consumer) {
+    public DslRun accept(Consumer<XWPFRun> consumer) {
         consumer.accept(this.run);
         return this;
+    }
+
+    /**
+     * 文本更多设置，兼容方法使用{@link #accept(Consumer)}代替，后期会移除此方法
+     * @param consumer 设置方法
+     * @return {@link DslRun}
+     */
+    public DslRun more(Consumer<XWPFRun> consumer) {
+        return this.accept(consumer);
     }
 
     /**
@@ -41,7 +50,7 @@ public class DslRun {
      * @return {@link DslRun}
      */
     public DslRun text(String text) {
-        return this.more(r -> r.setText(text));
+        return this.accept(r -> r.setText(text));
     }
 
     /**
@@ -52,18 +61,19 @@ public class DslRun {
      * @return {@link DslRun}
      */
     public DslRun picture(File file, int width, int height) {
-        try {
-            this.run.addPicture(
-                new FileInputStream(file),
-                DocumentPictureType.getFormat(file.getName()),
-                file.getName(),
-                Units.toEMU(width),
-                Units.toEMU(height)
-            );
-        } catch (InvalidFormatException | IOException e) {
-            throw new DocumentExportException(e);
-        }
-
-        return this;
+        return
+            this.accept(run -> {
+                try {
+                    run.addPicture(
+                        new FileInputStream(file),
+                        DocumentPictureType.getFormat(file.getName()),
+                        file.getName(),
+                        Units.toEMU(width),
+                        Units.toEMU(height)
+                    );
+                } catch (InvalidFormatException | IOException e) {
+                    throw new DocumentExportException(e);
+                }
+            });
     }
 }

@@ -35,6 +35,16 @@ public class DslTableRow {
     }
 
     /**
+     * 表格行更多设置
+     * @param consumer 设置方法
+     * @return {@link DslTableRow}
+     */
+    public DslTableRow accept(Consumer<XWPFTableRow> consumer) {
+        consumer.accept(this.row);
+        return this;
+    }
+
+    /**
      * 添加一个单元格主要方法
      * @param consumer 单元格消费
      * @return {@link DslTableRow}

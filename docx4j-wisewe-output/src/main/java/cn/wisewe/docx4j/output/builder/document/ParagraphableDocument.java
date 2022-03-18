@@ -87,7 +87,7 @@ abstract class ParagraphableDocument<T extends ParagraphableDocument> {
         return
             this.paragraph(p ->
                 p.run(text)
-                    .more(t -> {
+                    .accept(t -> {
                         t.setStyle(style.id);
                         t.setAlignment(alignment);
                     })
@@ -99,7 +99,7 @@ abstract class ParagraphableDocument<T extends ParagraphableDocument> {
      * @return {@link T}
      */
     public T pageBreak() {
-        return this.paragraph(t -> t.run(r -> r.more(xr -> xr.addBreak(BreakType.PAGE))));
+        return this.paragraph(t -> t.run(r -> r.accept(xr -> xr.addBreak(BreakType.PAGE))));
     }
 
     /**

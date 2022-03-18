@@ -10,6 +10,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -30,6 +31,16 @@ public class DslTableCell extends ParagraphableDocument<DslTableCell> {
 
     DslTableCell(XWPFTableCell cell) {
         this.cell = cell;
+    }
+
+    /**
+     * 表格单元格更多设置
+     * @param consumer 设置方法
+     * @return {@link DslTableCell}
+     */
+    public DslTableCell accept(Consumer<XWPFTableCell> consumer) {
+        consumer.accept(this.cell);
+        return this;
     }
 
     /**
@@ -56,7 +67,7 @@ public class DslTableCell extends ParagraphableDocument<DslTableCell> {
      * @return {@link DslTableCell}
      */
     public DslTableCell boldText(Object o) {
-        return super.paragraph(p -> p.run(t -> t.text(StringConverterUtil.convert(o)).more(r -> r.setBold(true))));
+        return super.paragraph(p -> p.run(t -> t.text(StringConverterUtil.convert(o)).accept(r -> r.setBold(true))));
     }
 
     /**

@@ -8,6 +8,8 @@ import org.apache.poi.xwpf.usermodel.XWPFFooter;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 
+import java.util.function.Consumer;
+
 /**
  * 页脚
  * @author xiehai
@@ -23,6 +25,16 @@ public class DslFooter extends RichableDocument<DslFooter> {
     }
 
     /**
+     * 页脚更多设置
+     * @param consumer 设置方法
+     * @return {@link DslFooter}
+     */
+    public DslFooter accept(Consumer<XWPFFooter> consumer) {
+        consumer.accept(this.footer);
+        return this;
+    }
+
+    /**
      * 默认居中分页页脚
      * @param left   页码左侧字符串
      * @param center 页码右侧字符串
@@ -34,12 +46,12 @@ public class DslFooter extends RichableDocument<DslFooter> {
             this.paragraph(p ->
                 p.run(left)
                     // 当前页码
-                    .more(xp -> xp.getCTP().addNewFldSimple().setInstr(OutputConstants.DOCX_PAGES))
+                    .accept(xp -> xp.getCTP().addNewFldSimple().setInstr(OutputConstants.DOCX_PAGES))
                     .run(center)
                     // 总页码
-                    .more(xp -> xp.getCTP().addNewFldSimple().setInstr(OutputConstants.DOCX_NUM_PAGES))
+                    .accept(xp -> xp.getCTP().addNewFldSimple().setInstr(OutputConstants.DOCX_NUM_PAGES))
                     .run(right)
-                    .more(xp -> xp.setAlignment(ParagraphAlignment.CENTER))
+                    .accept(xp -> xp.setAlignment(ParagraphAlignment.CENTER))
             );
     }
 
