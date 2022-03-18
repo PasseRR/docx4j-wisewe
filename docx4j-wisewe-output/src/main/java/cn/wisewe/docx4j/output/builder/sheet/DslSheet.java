@@ -193,8 +193,10 @@ public class DslSheet {
                 return;
             }
 
+            // 最小5个字符 最大100个字符
+            final int base = 3, min = 5 * base, max = 100 * base;
             // 计算列最大宽度
-            int maxWidth = DslCell.COLUMN_WIDTH.get().values().stream().mapToInt(Integer::intValue).max().orElse(5);
+            int maxWidth = DslCell.COLUMN_WIDTH.get().values().stream().mapToInt(Integer::intValue).max().orElse(min);
 
             IntStream.range(0, this.maxCells)
                 .forEach(it -> {
@@ -204,11 +206,11 @@ public class DslSheet {
                         Optional.ofNullable(DslCell.COLUMN_WIDTH.get())
                             // 若无数据设置 则赋值为默认宽度
                             .map(m -> m.get(it))
-                            .filter(w -> w >= 5)
-                            .orElse(5);
+                            .filter(w -> w >= min)
+                            .orElse(min);
                     // 使一列最大宽度为100个字符 并多出2个字符保持美观
-                    int fitWidth = Integer.min(width, 100) + 2;
-                    this.sheet.setColumnWidth(it, fitWidth * 256);
+                    int fitWidth = Integer.min(width, max) + 2 * base;
+                    this.sheet.setColumnWidth(it, (fitWidth >> 1) * 256);
 
                     // 设置斜线单元格 自动补全空格
                     Optional.ofNullable(DslCell.DIAGONAL_COLUMNS.get())
@@ -264,15 +266,15 @@ public class DslSheet {
      * @return 带斜线的单元格自动填充空格
      */
     protected static String padding(int len) {
-        // 预留一个字节长度
-        len -= 1;
+        len >>= 1;
         // 多余2个字节使用双字节空格填充
         String padding = String.join(
             OutputConstants.EMPTY,
-            Collections.nCopies(len / 2, OutputConstants.DOUBLE_BYTE_SPACE)
+            // 
+            Collections.nCopies((len >> 1) - (len & 1 ^ 1), OutputConstants.DOUBLE_BYTE_SPACE)
         );
         // 剩余字节使用单字节空格填充
-        if ((len & 1) > 0) {
+        if ((len & 1) == 0) {
             padding += OutputConstants.SPACE;
         }
 

@@ -338,6 +338,6 @@ public class DslCell {
     }
 
     protected static int width(String s) {
-        return (s.getBytes(StandardCharsets.UTF_8).length + s.length()) >> 1;
+        return s.getBytes(StandardCharsets.UTF_8).length + s.length();
     }
 }
