@@ -43,6 +43,7 @@
         <dependency>
             <groupId>servletapi</groupId>
             <artifactId>servletapi</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -43,7 +44,6 @@ import java.util.stream.Stream;
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DslCell {
-    @PackagePrivate
     Cell cell;
     @NonFinal
     @PackagePrivate
@@ -70,14 +70,23 @@ public class DslCell {
     }
 
     /**
+     * 单元格设置
+     * @param consumer 设置方法
+     * @return {@link DslCell}
+     */
+    public DslCell accept(Consumer<Cell> consumer) {
+        consumer.accept(this.cell);
+        return this;
+    }
+
+    /**
      * 设置单元格内容
      * @param o 单元格内容对象
      * @return {@link DslCell}
      */
     public DslCell text(Object o) {
         if (Objects.isNull(o)) {
-            this.cell.setBlank();
-            return this;
+            return this.accept(Cell::setBlank);
         }
 
         return this.doSetText(StringConverterUtil.convert(o));
@@ -106,7 +115,7 @@ public class DslCell {
      * @return {@link DslCell}
      */
     public DslCell rich(RichTextString text) {
-        this.cell.setCellValue(text);
+        this.accept(c -> c.setCellValue(text));
         return this.doUpdateLength(DslCell.width(text.getString()));
     }
 
@@ -187,9 +196,7 @@ public class DslCell {
      * @return {@link DslCell}
      */
     public DslCell style(CellStyle style) {
-        this.cell.setCellStyle(style);
-
-        return this;
+        return this.accept(c -> c.setCellStyle(style));
     }
 
     /**
@@ -273,7 +280,7 @@ public class DslCell {
      * @return {@link DslCell}
      */
     protected DslCell doSetText(String text) {
-        this.cell.setCellValue(text);
+        this.accept(c -> c.setCellValue(text));
 
         Integer length = Optional.of(text)
             .filter(it -> it.contains(OutputConstants.BREAK_LINE))
@@ -331,6 +338,6 @@ public class DslCell {
     }
 
     protected static int width(String s) {
-        return (s.getBytes(StandardCharsets.UTF_8).length + s.length()) / 2;
+        return (s.getBytes(StandardCharsets.UTF_8).length + s.length()) >> 1;
     }
 }

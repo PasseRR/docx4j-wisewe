@@ -59,14 +59,23 @@ public class DslSheet {
     }
 
     /**
+     * sheet设置
+     * @param consumer 设置方法
+     * @return {@link DslSheet}
+     */
+    public DslSheet accept(Consumer<Sheet> consumer) {
+        consumer.accept(this.sheet);
+        return this;
+    }
+
+    /**
      * 表格冻结行列
      * @param column 冻结列数
      * @param row    冻结行数
      * @return {@link DslSheet}
      */
     public DslSheet freeze(int column, int row) {
-        this.sheet.createFreezePane(column, row);
-        return this;
+        return this.accept(s -> s.createFreezePane(column, row));
     }
 
     /**
@@ -112,13 +121,12 @@ public class DslSheet {
      * @return {@link DslSheet}
      */
     public DslSheet validation(BiFunction<DataValidationHelper, SpreadsheetVersion, DataValidation> function) {
-        this.sheet.addValidationData(
-            function.apply(
-                this.sheet.getDataValidationHelper(),
-                this.sheet.getWorkbook().getSpreadsheetVersion()
-            )
-        );
-        return this;
+        return
+            this.accept(s ->
+                s.addValidationData(
+                    function.apply(s.getDataValidationHelper(), s.getWorkbook().getSpreadsheetVersion())
+                )
+            );
     }
 
     /**
@@ -206,25 +214,27 @@ public class DslSheet {
                     Optional.ofNullable(DslCell.DIAGONAL_COLUMNS.get())
                         .map(m -> m.get(it))
                         .ifPresent(s ->
-                            s.forEach(c -> {
-                                String text = c.cell.getStringCellValue();
-                                int index = text.indexOf(OutputConstants.BREAK_LINE);
-                                if (index < 0) {
-                                    return;
-                                }
+                            s.forEach(c ->
+                                c.accept(cl -> {
+                                    String text = cl.getStringCellValue();
+                                    int index = text.indexOf(OutputConstants.BREAK_LINE);
+                                    if (index < 0) {
+                                        return;
+                                    }
 
-                                String left = text.substring(0, index), right = text.substring(index + 1);
-                                // 自动补齐空格
-                                if (c.diagonalUp) {
-                                    int len = fitWidth - DslCell.width(right);
-                                    // 右上至左下斜线
-                                    c.cell.setCellValue(left + OutputConstants.BREAK_LINE + padding(len) + right);
-                                } else {
-                                    int len = fitWidth - DslCell.width(left);
-                                    // 左上至右下斜线
-                                    c.cell.setCellValue(padding(len) + left + OutputConstants.BREAK_LINE + right);
-                                }
-                            })
+                                    String left = text.substring(0, index), right = text.substring(index + 1);
+                                    // 自动补齐空格
+                                    if (c.diagonalUp) {
+                                        int len = fitWidth - DslCell.width(right);
+                                        // 右上至左下斜线
+                                        cl.setCellValue(left + OutputConstants.BREAK_LINE + padding(len) + right);
+                                    } else {
+                                        int len = fitWidth - DslCell.width(left);
+                                        // 左上至右下斜线
+                                        cl.setCellValue(padding(len) + left + OutputConstants.BREAK_LINE + right);
+                                    }
+                                })
+                            )
                         );
                 });
         } finally {

@@ -41,6 +41,16 @@ public class DslRow {
     }
 
     /**
+     * 行设置
+     * @param consumer 设置方法
+     * @return {@link DslRow}
+     */
+    public DslRow accept(Consumer<Row> consumer) {
+        consumer.accept(this.row);
+        return this;
+    }
+
+    /**
      * 添加一个单元格主要方法
      * @param consumer 单元格消费
      * @return {@link DslCell}

@@ -84,6 +84,16 @@ public class SpreadSheetExporter {
     }
 
     /**
+     * 电子表格配置
+     * @param consumer 配置方法
+     * @return {@link SpreadSheetExporter}
+     */
+    public SpreadSheetExporter accept(Consumer<Workbook> consumer) {
+        consumer.accept(this.workbook);
+        return this;
+    }
+
+    /**
      * workbook操作
      * @param consumer workbook消费
      * @return {@link SpreadSheetExporter}

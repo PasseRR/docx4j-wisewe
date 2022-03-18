@@ -45,6 +45,16 @@ public class DslWorkbook {
     }
 
     /**
+     * 表格设置
+     * @param consumer 设置方法
+     * @return {@link DslWorkbook}
+     */
+    public DslWorkbook accept(Consumer<Workbook> consumer) {
+        consumer.accept(this.workbook);
+        return this;
+    }
+
+    /**
      * 添加单个sheet
      * @param name     sheet名称
      * @param consumer sheet消费
