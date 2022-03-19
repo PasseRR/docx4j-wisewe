@@ -2,8 +2,6 @@
 
 # docx4j-wisewe
 
-## 1.4.0.RELEASE版本存在bug，不要使用!!!!
-
 ## [文档导出](./docx4j-wisewe-output/README.md)
 
 maven引入
