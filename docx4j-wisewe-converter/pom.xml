@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>docx4j-wisewe</artifactId>
+        <groupId>cn.wisewe</groupId>
+        <version>1.4.2.RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>docx4j-wisewe-converter</artifactId>
+    <name>docx4j-wisewe-converter</name>
+    <description>文档转换器</description>
+    <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.xls</include>
+                    <include>**/*.xlsx</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+</project>
