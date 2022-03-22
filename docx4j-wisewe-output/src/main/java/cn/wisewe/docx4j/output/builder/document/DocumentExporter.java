@@ -1,7 +1,6 @@
 package cn.wisewe.docx4j.output.builder.document;
 
-import cn.wisewe.docx4j.output.utils.HttpResponseUtil;
-import cn.wisewe.docx4j.output.utils.HttpServletUtil;
+import cn.wisewe.docx4j.output.builder.Exportable;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.util.IOUtils;
@@ -17,7 +16,6 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.StylesDocument;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,7 +32,7 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DocumentExporter extends RichableDocument<DocumentExporter> {
+public class DocumentExporter extends RichableDocument<DocumentExporter> implements Exportable {
     XWPFDocument document;
 
     private DocumentExporter(XWPFDocument document) {
@@ -197,44 +195,13 @@ public class DocumentExporter extends RichableDocument<DocumentExporter> {
         return this.footer(HeaderFooterType.DEFAULT, footer -> footer.textParagraph(text));
     }
 
-    /**
-     * 将word文档写到servlet输出流并指定文件后缀
-     * @param fileName 文件名
-     */
-    public void writeToServletResponse(String fileName) {
-        HttpServletResponse response = HttpServletUtil.getCurrentResponse();
-        try {
-            // http文件名处理 并固定为docx后缀
-            HttpResponseUtil.handleOutputFileName(DocumentFileType.DOCX.fullName(fileName), response);
-            this.writeTo(response.getOutputStream(), false);
-        } catch (IOException e) {
-            throw new DocumentExportException(e);
-        }
+    @Override
+    public DocumentFileType defaultFileType() {
+        return DocumentFileType.DOCX;
     }
 
-    /**
-     * 将word文档写到给定输出流并关闭流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
+    @Override
     public void writeTo(OutputStream outputStream, boolean closeable) {
-        this.doWrite(outputStream, closeable);
-    }
-
-    /**
-     * 将word文档写到给定输出流并关闭流
-     * @param outputStream 输出流
-     */
-    public void writeTo(OutputStream outputStream) {
-        this.writeTo(outputStream, true);
-    }
-
-    /**
-     * 将word文档写到输出流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
-    protected void doWrite(OutputStream outputStream, boolean closeable) {
         try {
             this.document.write(outputStream);
         } catch (IOException e) {

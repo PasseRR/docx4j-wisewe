@@ -1,7 +1,6 @@
 package cn.wisewe.docx4j.output.builder.sheet;
 
-import cn.wisewe.docx4j.output.utils.HttpResponseUtil;
-import cn.wisewe.docx4j.output.utils.HttpServletUtil;
+import cn.wisewe.docx4j.output.builder.Exportable;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -9,7 +8,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,7 +22,7 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SpreadSheetExporter {
+public class SpreadSheetExporter implements Exportable {
     Workbook workbook;
 
     private SpreadSheetExporter(Workbook workbook) {
@@ -115,48 +113,14 @@ public class SpreadSheetExporter {
         return this;
     }
 
-    /**
-     * 将电子表格写到servlet输出流并指定文件后缀
-     * @param fileName 文件名
-     */
-    public void writeToServletResponse(String fileName) {
-        HttpServletResponse response = HttpServletUtil.getCurrentResponse();
-        try {
-            // http文件名处理
-            HttpResponseUtil.handleOutputFileName(
-                SpreadSheetFileType.getTypeByWorkbook(this.workbook).fullName(fileName),
-                response
-            );
-
-            this.writeTo(response.getOutputStream(), false);
-        } catch (IOException e) {
-            throw new SpreadSheetExportException(e);
-        }
+    @Override
+    public SpreadSheetFileType defaultFileType() {
+        // 通过电子表格类型决定文件后缀
+        return SpreadSheetFileType.getTypeByWorkbook(this.workbook);
     }
-
-    /**
-     * 将电子表格写到给定输出流并关闭流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
+    
+    @Override
     public void writeTo(OutputStream outputStream, boolean closeable) {
-        this.doWrite(outputStream, closeable);
-    }
-
-    /**
-     * 将电子表格写到给定输出流并关闭流
-     * @param outputStream 输出流
-     */
-    public void writeTo(OutputStream outputStream) {
-        this.writeTo(outputStream, true);
-    }
-
-    /**
-     * 将电子表格写到输出流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
-    protected void doWrite(OutputStream outputStream, boolean closeable) {
         try {
             // 若是空excel 自动添加一个sheet
             if (this.workbook.getNumberOfSheets() == 0) {

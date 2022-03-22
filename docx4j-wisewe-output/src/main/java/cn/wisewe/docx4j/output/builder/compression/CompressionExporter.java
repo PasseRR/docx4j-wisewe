@@ -1,14 +1,12 @@
 package cn.wisewe.docx4j.output.builder.compression;
 
 import cn.wisewe.docx4j.output.OutputConstants;
-import cn.wisewe.docx4j.output.utils.HttpResponseUtil;
-import cn.wisewe.docx4j.output.utils.HttpServletUtil;
+import cn.wisewe.docx4j.output.builder.Exportable;
 import cn.wisewe.docx4j.output.utils.TrConsumer;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.util.IOUtils;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +31,7 @@ import java.util.zip.ZipOutputStream;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CompressionExporter {
+public class CompressionExporter implements Exportable {
     ByteArrayOutputStream byteArrayOutputStream;
     ZipOutputStream zipOutputStream;
 
@@ -201,44 +199,13 @@ public class CompressionExporter {
         return file.isDirectory() ? this.folder(file) : this.file(file);
     }
 
-    /**
-     * 将word文档写到servlet输出流并指定文件后缀
-     * @param fileName 文件名
-     */
-    public void writeToServletResponse(String fileName) {
-        HttpServletResponse response = HttpServletUtil.getCurrentResponse();
-        try {
-            // http文件名处理 并固定为zip后缀
-            HttpResponseUtil.handleOutputFileName(CompressionFileType.ZIP.fullName(fileName), response);
-            this.writeTo(response.getOutputStream(), false);
-        } catch (IOException e) {
-            throw new CompressionExportException(e);
-        }
+    @Override
+    public CompressionFileType defaultFileType() {
+        return CompressionFileType.ZIP;
     }
-
-    /**
-     * 将word文档写到给定输出流并关闭流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
+    
+    @Override
     public void writeTo(OutputStream outputStream, boolean closeable) {
-        this.doWrite(outputStream, closeable);
-    }
-
-    /**
-     * 将word文档写到给定输出流并关闭流
-     * @param outputStream 输出流
-     */
-    public void writeTo(OutputStream outputStream) {
-        this.writeTo(outputStream, true);
-    }
-
-    /**
-     * 将word文档写到输出流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
-    protected void doWrite(OutputStream outputStream, boolean closeable) {
         try {
             // 结束压缩
             this.zipOutputStream.finish();

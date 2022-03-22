@@ -7,8 +7,8 @@ package cn.wisewe.docx4j.output;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 public class OutputException extends RuntimeException {
-    public OutputException() {
-        super();
+    public OutputException(Throwable t) {
+        super(t);
     }
 
     public OutputException(String message) {

@@ -1,7 +1,6 @@
 package cn.wisewe.docx4j.output.builder.portable;
 
-import cn.wisewe.docx4j.output.utils.HttpResponseUtil;
-import cn.wisewe.docx4j.output.utils.HttpServletUtil;
+import cn.wisewe.docx4j.output.builder.Exportable;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -12,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.util.IOUtils;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,7 +29,7 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PortableExporter extends PortableDocument<PortableExporter> {
+public class PortableExporter extends PortableDocument<PortableExporter> implements Exportable {
     /**
      * pdf文档
      */
@@ -187,45 +185,14 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
         return this;
     }
 
-    /**
-     * 将pdf文档写到servlet输出流
-     * @param fileName 下载文件名名称
-     */
-    public void writeToServletResponse(String fileName) {
-        HttpServletResponse response = HttpServletUtil.getCurrentResponse();
-        try {
-            // http文件名处理
-            HttpResponseUtil.handleOutputFileName(PortableFileType.PDF.fullName(fileName), response);
-
-            this.writeTo(response.getOutputStream(), false);
-        } catch (IOException e) {
-            throw new PortableExportException(e);
-        }
+    @Override
+    public PortableFileType defaultFileType() {
+        return PortableFileType.PDF;
     }
 
-    /**
-     * 将pdf文档写到给定输出流并关闭流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
+
+    @Override
     public void writeTo(OutputStream outputStream, boolean closeable) {
-        this.doWrite(outputStream, closeable);
-    }
-
-    /**
-     * 将pdf文档写到给定输出流并关闭流
-     * @param outputStream 输出流
-     */
-    public void writeTo(OutputStream outputStream) {
-        this.writeTo(outputStream, true);
-    }
-
-    /**
-     * 将pdf文档写到输出流
-     * @param outputStream 输出流
-     * @param closeable    是否需要关闭输出流
-     */
-    protected void doWrite(OutputStream outputStream, boolean closeable) {
         try {
             // 若文档为空 添加一页空文档
             if (this.document.getPageNumber() == 0) {
@@ -250,6 +217,7 @@ public class PortableExporter extends PortableDocument<PortableExporter> {
             }
         }
     }
+
 
     @Override
     void addElement(Element element) {
