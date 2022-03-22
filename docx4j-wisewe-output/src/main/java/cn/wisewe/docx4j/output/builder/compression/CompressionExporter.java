@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -34,6 +35,19 @@ import java.util.zip.ZipOutputStream;
 public class CompressionExporter implements Exportable {
     ByteArrayOutputStream byteArrayOutputStream;
     ZipOutputStream zipOutputStream;
+
+    CompressionExporter() {
+        this(Deflater.DEFAULT_COMPRESSION);
+    }
+
+    CompressionExporter(int level) {
+        // 默认UTF编码
+        this(level, StandardCharsets.UTF_8);
+    }
+
+    CompressionExporter(Charset charset) {
+        this(Deflater.DEFAULT_COMPRESSION, charset);
+    }
 
     CompressionExporter(int level, Charset charset) {
         this.byteArrayOutputStream = new ByteArrayOutputStream();
@@ -58,7 +72,16 @@ public class CompressionExporter implements Exportable {
      * @return {@link CompressionExporter}
      */
     public static CompressionExporter create(int level) {
-        return CompressionExporter.create(level, Charset.forName("GBK"));
+        return new CompressionExporter(level);
+    }
+
+    /**
+     * 设置编码并构建builder
+     * @param charset 编码
+     * @return {@link CompressionExporter}
+     */
+    public static CompressionExporter create(Charset charset) {
+        return new CompressionExporter(charset);
     }
 
     /**
@@ -66,8 +89,9 @@ public class CompressionExporter implements Exportable {
      * @return {@link CompressionExporter}
      */
     public static CompressionExporter create() {
-        return CompressionExporter.create(Deflater.DEFAULT_COMPRESSION);
+        return new CompressionExporter();
     }
+
 
     /**
      * 添加一个文件进压缩包
@@ -203,7 +227,7 @@ public class CompressionExporter implements Exportable {
     public CompressionFileType defaultFileType() {
         return CompressionFileType.ZIP;
     }
-    
+
     @Override
     public void writeTo(OutputStream outputStream, boolean closeable) {
         try {

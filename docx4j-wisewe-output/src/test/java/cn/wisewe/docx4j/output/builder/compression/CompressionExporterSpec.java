@@ -43,7 +43,7 @@ public class CompressionExporterSpec {
             // 文件目录
             .folder(new File(this.getClass().getResource(OutputConstants.SLASH).getPath()))
             // 自定义目录
-            .folder("abc", (fn, b) ->
+            .folder("目录1", (fn, b) ->
                 b.folders(IntStream.range(1, 6).boxed().collect(Collectors.toList()), t -> fn + t, (n, nfn, t) -> {})
             )
             .folder("cde", (fn, b) ->
