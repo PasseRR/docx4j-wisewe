@@ -1,7 +1,5 @@
 package cn.wisewe.docx4j.convert;
 
-import java.util.Optional;
-
 /**
  * 文件工具类
  * @author xiehai
@@ -36,18 +34,5 @@ public interface FileUtil {
      */
     static String brotherPath(Class<?> clazz, String fileName) {
         return classPath(clazz) + fileName;
-    }
-
-    /**
-     * 获得文件后缀名
-     * @param fileName 文件名
-     * @return 后缀名
-     */
-    static String suffix(String fileName) {
-        return
-            Optional.ofNullable(fileName)
-                .filter(it -> it.contains("."))
-                .map(it -> it.substring(it.lastIndexOf(".") + 1))
-                .orElse("");
     }
 }
