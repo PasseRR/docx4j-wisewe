@@ -18,14 +18,24 @@ public interface W3cDocumentUtils {
     static void mobileSupport(Document document) {
         NodeList head = document.getElementsByTagName("head");
         if (head.getLength() > 0) {
-            Element meta = document.createElement("meta");
-            meta.setAttribute("name", "viewport");
-            meta.setAttribute(
-                "content",
-                "width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1," +
-                    "maximum-scale=1,target-densitydpi=device-dpi"
-            );
-            head.item(0).appendChild(meta);
+
+            head.item(0).appendChild(mobileMeta(document));
         }
+    }
+
+    /**
+     * 移动端meta节点
+     * @param document {@link Document}
+     * @return {@link Element}
+     */
+    static Element mobileMeta(Document document) {
+        Element meta = document.createElement("meta");
+        meta.setAttribute("name", "viewport");
+        meta.setAttribute(
+            "content",
+            "width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1," +
+                "maximum-scale=1,target-densitydpi=device-dpi"
+        );
+        return meta;
     }
 }

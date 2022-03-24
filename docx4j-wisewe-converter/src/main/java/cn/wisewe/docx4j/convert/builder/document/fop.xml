@@ -1,0 +1,8 @@
+<renderers>
+    <renderer mime="application/pdf">
+        <fonts>
+            <!-- automatically detect operating system installed fonts -->
+            <auto-detect/>
+        </fonts>
+    </renderer>
+</renderers>

@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
  */
 public class DocumentConverterSpec {
     @Test
-    public void doc() throws FileNotFoundException {
+    public void docToPdf() throws FileNotFoundException {
         DocumentConverter.create()
             .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2003.doc")))
             .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "2003.pdf")))
@@ -30,11 +30,19 @@ public class DocumentConverterSpec {
     }
 
     @Test
-    public void docXml() throws FileNotFoundException {
+    public void xmlToPdf() throws FileNotFoundException {
         DocumentConverter.create()
             .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "xml.doc")))
             .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "xml.pdf")))
             .convert(DocumentConvertType.PDF);
+    }
+
+    @Test
+    public void xmlToHtml() throws FileNotFoundException {
+        DocumentConverter.create()
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "xml.doc")))
+            .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "xml.html")))
+            .convert(DocumentConvertType.HTML);
     }
 
     @Test

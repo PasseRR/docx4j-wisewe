@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
  * @author xiehai
  * @date 2022/03/23 16:03
  */
-public enum DocumentConvertType implements Convertable {
+public enum DocumentConvertType implements Convertable<BufferedInputStream> {
     /**
      * pdf转换
      */
