@@ -4,6 +4,7 @@ import cn.wisewe.docx4j.convert.builder.Convertable;
 
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
+import java.util.function.BiConsumer;
 
 /**
  * 支持转换类型
@@ -16,8 +17,17 @@ public enum DocumentConvertType implements Convertable {
      */
     PDF {
         @Override
-        public void convert(BufferedInputStream inputStream, OutputStream outputStream) {
-            DocumentType.convertPdf(inputStream, outputStream);
+        public BiConsumer<BufferedInputStream, OutputStream> consumer() {
+            return DocumentType::convertPdf;
+        }
+    },
+    /**
+     * html转换
+     */
+    HTML {
+        @Override
+        public BiConsumer<BufferedInputStream, OutputStream> consumer() {
+            return DocumentType::convertHtml;
         }
     }
 }

@@ -2,6 +2,7 @@ package cn.wisewe.docx4j.convert.builder;
 
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
+import java.util.function.BiConsumer;
 
 /**
  * 可转换的
@@ -11,8 +12,7 @@ import java.io.OutputStream;
 public interface Convertable {
     /**
      * 文件转换
-     * @param inputStream  待转换流
-     * @param outputStream 转换后的流
+     * @return 文件转换方法
      */
-    void convert(BufferedInputStream inputStream, OutputStream outputStream);
+    BiConsumer<BufferedInputStream, OutputStream> consumer();
 }

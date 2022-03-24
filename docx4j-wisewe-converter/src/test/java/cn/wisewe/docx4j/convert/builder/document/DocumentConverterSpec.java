@@ -22,10 +22,34 @@ public class DocumentConverterSpec {
     }
 
     @Test
-    public void docx() throws FileNotFoundException {
+    public void docToHtml() throws FileNotFoundException {
+        DocumentConverter.create()
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2003.doc")))
+            .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "2003.html")))
+            .convert(DocumentConvertType.HTML);
+    }
+
+    @Test
+    public void docXml() throws FileNotFoundException {
+        DocumentConverter.create()
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "xml.doc")))
+            .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "xml.pdf")))
+            .convert(DocumentConvertType.PDF);
+    }
+
+    @Test
+    public void docxToPdf() throws FileNotFoundException {
         DocumentConverter.create()
             .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2007.docx")))
             .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "2007.pdf")))
             .convert(DocumentConvertType.PDF);
+    }
+
+    @Test
+    public void docxToHtml() throws FileNotFoundException {
+        DocumentConverter.create()
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2007.docx")))
+            .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "2007.html")))
+            .convert(DocumentConvertType.HTML);
     }
 }
