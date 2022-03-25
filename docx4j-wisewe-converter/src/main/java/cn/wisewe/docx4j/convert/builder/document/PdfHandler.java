@@ -42,14 +42,14 @@ class PdfHandler extends OfficeDocumentHandler {
 
     static {
         // FOP 字体初始化配置
-        DefaultConfiguration build;
         try {
-            build = new DefaultConfigurationBuilder()
-                .build(PdfHandler.class.getResourceAsStream("fop.xml"));
+            DefaultConfiguration build =
+                new DefaultConfigurationBuilder()
+                    .build(PdfHandler.class.getResourceAsStream("fop.xml"));
+            FOP_FACTORY = new FopFactoryBuilder(new File(".").toURI()).setConfiguration(build).build();
         } catch (ConfigurationException e) {
             throw new DocumentConvertException(e);
         }
-        FOP_FACTORY = new FopFactoryBuilder(new File(".").toURI()).setConfiguration(build).build();
     }
 
     private PdfHandler() {
@@ -89,9 +89,7 @@ class PdfHandler extends OfficeDocumentHandler {
 
     @Override
     protected void handleZipped(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
-        XWPFDocument document = new XWPFDocument(inputStream);
-        PdfOptions options = PdfOptions.create();
-        PdfConverter.getInstance().convert(document, outputStream, options);
+        PdfConverter.getInstance().convert(new XWPFDocument(inputStream), outputStream, PdfOptions.create());
     }
 
     @Override

@@ -104,10 +104,9 @@ class HtmlHandler extends OfficeDocumentHandler {
 
     @Override
     protected void handleZipped(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
-        XWPFDocument document = new XWPFDocument(inputStream);
         // 带图片的word，则将图片转为base64编码，保存在一个页面中
         XHTMLOptions options = XHTMLOptions.create().indent(4).setImageManager(new Base64EmbedImgManager());
-        XHTMLConverter.getInstance().convert(document, outputStream, options);
+        XHTMLConverter.getInstance().convert(new XWPFDocument(inputStream), outputStream, options);
     }
 
     @Override
