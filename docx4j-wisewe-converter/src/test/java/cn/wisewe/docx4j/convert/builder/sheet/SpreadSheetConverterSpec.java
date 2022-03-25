@@ -12,14 +12,26 @@ import java.io.File;
  */
 public class SpreadSheetConverterSpec {
     @Test
-    public void xls() {
-        SpreadSheetConverter.create(new File(FileUtil.brotherPath(this.getClass(), "/2003.xls")))
-            .toHtml(new File(FileUtil.brotherPath(this.getClass(), "2003.html")));
+    public void xml(){
+        SpreadSheetConverter.create()
+            .input(new File(FileUtil.brotherPath(this.getClass(), "/xml.xls")))
+            .output(new File(FileUtil.brotherPath(this.getClass(), "/xml.html")))
+            .convert(SpreadSheetOfficeConvertType.HTML);
     }
     
     @Test
-    public void xlsx(){
-        SpreadSheetConverter.create(new File(FileUtil.brotherPath(this.getClass(), "/2010.xlsx")))
-            .toHtml(new File(FileUtil.brotherPath(this.getClass(), "2010.html")));
+    public void xls() {
+        SpreadSheetConverter.create()
+            .input(new File(FileUtil.brotherPath(this.getClass(), "/2003.xls")))
+            .output(new File(FileUtil.brotherPath(this.getClass(), "/2003.html")))
+            .convert(SpreadSheetOfficeConvertType.HTML);
+    }
+
+    @Test
+    public void xlsx() {
+        SpreadSheetConverter.create()
+            .input(new File(FileUtil.brotherPath(this.getClass(), "/2007.xlsx")))
+            .output(new File(FileUtil.brotherPath(this.getClass(), "/2007.html")))
+            .convert(SpreadSheetOfficeConvertType.HTML);
     }
 }
