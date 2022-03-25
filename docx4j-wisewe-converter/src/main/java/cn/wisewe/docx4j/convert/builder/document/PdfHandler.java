@@ -1,17 +1,12 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
-import cn.wisewe.docx4j.convert.ConvertException;
+import cn.wisewe.docx4j.convert.fop.FopUtils;
 import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
 import cn.wisewe.docx4j.convert.utils.ImageUtils;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
-import org.apache.fop.apps.MimeConstants;
-import org.apache.fop.configuration.ConfigurationException;
-import org.apache.fop.configuration.DefaultConfiguration;
-import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.converter.WordToFoConverter;
 import org.apache.poi.util.XMLHelper;
@@ -25,9 +20,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.OutputStream;
-import java.util.function.Function;
 
 /**
  * word转pdf文档处理器
@@ -36,19 +29,6 @@ import java.util.function.Function;
  */
 class PdfHandler extends OfficeDocumentHandler {
     static final PdfHandler INSTANCE = new PdfHandler();
-    private static final FopFactory FOP_FACTORY;
-
-    static {
-        // FOP 字体初始化配置
-        try {
-            DefaultConfiguration build =
-                new DefaultConfigurationBuilder()
-                    .build(PdfHandler.class.getResourceAsStream("fop.xml"));
-            FOP_FACTORY = new FopFactoryBuilder(new File(".").toURI()).setConfiguration(build).build();
-        } catch (ConfigurationException e) {
-            throw new DocumentConvertException(e);
-        }
-    }
 
     private PdfHandler() {
 
@@ -73,12 +53,12 @@ class PdfHandler extends OfficeDocumentHandler {
         converter.setPicturesManager((content, pt, sn, w, h) -> ImageUtils.base64(content));
         // 字体转换
         converter.setFontReplacer(t -> {
-            t.fontName = "SimSun";
+            t.fontName = FopUtils.defaultFont();
             return t;
         });
         converter.processDocument(document);
 
-        Fop fop = FOP_FACTORY.newFop(MimeConstants.MIME_PDF, FOP_FACTORY.newFOUserAgent(), outputStream);
+        Fop fop = FopUtils.newFopInstance(outputStream);
 
         TransformerFactory.newInstance()
             .newTransformer()
@@ -88,10 +68,5 @@ class PdfHandler extends OfficeDocumentHandler {
     @Override
     protected void handleZipped(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
         PdfConverter.getInstance().convert(new XWPFDocument(inputStream), outputStream, PdfOptions.create());
-    }
-
-    @Override
-    protected Function<Exception, ConvertException> handleException() {
-        return DocumentConvertException::new;
     }
 }

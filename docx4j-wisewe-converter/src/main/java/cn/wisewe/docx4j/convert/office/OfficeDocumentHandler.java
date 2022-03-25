@@ -1,6 +1,5 @@
 package cn.wisewe.docx4j.convert.office;
 
-import cn.wisewe.docx4j.convert.ConvertException;
 import org.docx4j.fonts.BestMatchingMapper;
 import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.fonts.Mapper;
@@ -10,7 +9,6 @@ import org.w3c.dom.NodeList;
 
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
-import java.util.function.Function;
 
 /**
  * word文档转换处理器
@@ -49,37 +47,25 @@ public abstract class OfficeDocumentHandler {
     protected abstract void handleZipped(BufferedInputStream inputStream, OutputStream outputStream) throws Exception;
 
     /**
-     * 异常转换 精确异常类型
-     * @return {@link Function}
-     */
-    protected Function<Exception, ConvertException> handleException() {
-        return ConvertException::new;
-    }
-
-    /**
      * 对外处理文档方法
      * @param inputStream  {@link BufferedInputStream}
      * @param outputStream {@link OutputStream}
      */
-    public void handle(BufferedInputStream inputStream, OutputStream outputStream) {
-        try {
-            // 通过文件头的两个字节判断文件类型
-            switch (OfficeFileType.type(inputStream)) {
-                case ZIP: {
-                    this.handleZipped(inputStream, outputStream);
-                    break;
-                }
-                case COMPOUND: {
-                    this.handleBinary(inputStream, outputStream);
-                    break;
-                }
-                default: {
-                    this.handleFlat(inputStream, outputStream);
-                    break;
-                }
+    protected void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
+        // 通过文件头的两个字节判断文件类型
+        switch (OfficeFileType.type(inputStream)) {
+            case ZIP: {
+                this.handleZipped(inputStream, outputStream);
+                break;
             }
-        } catch (Exception e) {
-            throw this.handleException().apply(e);
+            case COMPOUND: {
+                this.handleBinary(inputStream, outputStream);
+                break;
+            }
+            default: {
+                this.handleFlat(inputStream, outputStream);
+                break;
+            }
         }
     }
 
