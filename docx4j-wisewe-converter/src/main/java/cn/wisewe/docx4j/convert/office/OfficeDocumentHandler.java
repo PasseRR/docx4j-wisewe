@@ -1,6 +1,9 @@
-package cn.wisewe.docx4j.convert.builder;
+package cn.wisewe.docx4j.convert.office;
 
 import cn.wisewe.docx4j.convert.ConvertException;
+import org.docx4j.fonts.BestMatchingMapper;
+import org.docx4j.fonts.IdentityPlusMapper;
+import org.docx4j.fonts.Mapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -19,7 +22,7 @@ public abstract class OfficeDocumentHandler {
     /**
      * 判断当前操作系统是否是windows
      */
-    protected static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
 
     /**
      * 处理flat xml格式文档
@@ -78,6 +81,14 @@ public abstract class OfficeDocumentHandler {
         } catch (Exception e) {
             throw this.handleException().apply(e);
         }
+    }
+
+    /**
+     * 不同操作系统不同字体
+     * @return {@link Mapper}
+     */
+    protected static Mapper fontMapper() {
+        return IS_WINDOWS ? new BestMatchingMapper() : new IdentityPlusMapper();
     }
 
     /**

@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
 import cn.wisewe.docx4j.convert.ConvertException;
-import cn.wisewe.docx4j.convert.builder.OfficeDocumentHandler;
+import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
 import cn.wisewe.docx4j.convert.utils.ImageUtils;
 import fr.opensagres.poi.xwpf.converter.xhtml.Base64EmbedImgManager;
 import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLConverter;
@@ -12,8 +12,6 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.out.HTMLSettings;
 import org.docx4j.convert.out.html.HtmlCssHelper;
-import org.docx4j.fonts.BestMatchingMapper;
-import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,7 +45,7 @@ class HtmlHandler extends OfficeDocumentHandler {
         // 先初始化样式
         pkg.getMainDocumentPart().getStyleTree();
         HTMLSettings htmlSettings = Docx4J.createHTMLSettings();
-        htmlSettings.setFontMapper(IS_WINDOWS ? new BestMatchingMapper() : new IdentityPlusMapper());
+        htmlSettings.setFontMapper(fontMapper());
         htmlSettings.setOpcPackage(pkg);
         htmlSettings.setStyleElementHandler((pg, doc, sd) -> {
             pkg.getMainDocumentPart()

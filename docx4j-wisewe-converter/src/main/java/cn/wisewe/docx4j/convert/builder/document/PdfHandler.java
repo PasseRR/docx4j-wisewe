@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
 import cn.wisewe.docx4j.convert.ConvertException;
-import cn.wisewe.docx4j.convert.builder.OfficeDocumentHandler;
+import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
 import cn.wisewe.docx4j.convert.utils.ImageUtils;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
@@ -19,8 +19,6 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.out.FOSettings;
 import org.docx4j.convert.out.fo.renderers.FORendererApacheFOP;
-import org.docx4j.fonts.BestMatchingMapper;
-import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 
 import javax.xml.transform.TransformerFactory;
@@ -59,7 +57,7 @@ class PdfHandler extends OfficeDocumentHandler {
     @Override
     protected void handleFlat(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
         WordprocessingMLPackage pkg = WordprocessingMLPackage.load(inputStream);
-        pkg.setFontMapper(IS_WINDOWS ? new BestMatchingMapper() : new IdentityPlusMapper());
+        pkg.setFontMapper(fontMapper());
         FOSettings foSettings = new FOSettings(pkg);
         FopFactoryBuilder fopFactoryBuilder = FORendererApacheFOP.getFopFactoryBuilder(foSettings);
         FORendererApacheFOP.getFOUserAgent(foSettings, fopFactoryBuilder.build());

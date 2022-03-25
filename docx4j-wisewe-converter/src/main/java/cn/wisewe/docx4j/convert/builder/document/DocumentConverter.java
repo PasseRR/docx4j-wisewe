@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
+import cn.wisewe.docx4j.convert.office.OfficeConverter;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.util.IOUtils;
@@ -19,7 +20,7 @@ import java.util.Objects;
  * @date 2022/03/23 15:59
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DocumentConverter {
+public class DocumentConverter implements OfficeConverter<DocumentConvertType> {
     BufferedInputStream bufferedInputStream;
     OutputStream outputStream;
 
@@ -81,6 +82,7 @@ public class DocumentConverter {
     }
 
 
+    @Override
     public void convert(DocumentConvertType type) {
         if (Objects.isNull(this.bufferedInputStream)) {
             throw new DocumentConvertException("input stream not set");

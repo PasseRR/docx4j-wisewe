@@ -1,4 +1,4 @@
-package cn.wisewe.docx4j.convert.builder;
+package cn.wisewe.docx4j.convert.office;
 
 import cn.wisewe.docx4j.convert.ConvertException;
 
