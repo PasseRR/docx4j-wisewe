@@ -46,7 +46,7 @@ public class DocumentConverter {
         }
 
         try {
-            type.consumer().accept(bufferedInputStream, outputStream);
+            type.getHandler().handle(bufferedInputStream, outputStream);
         } finally {
             IOUtils.closeQuietly(this.bufferedInputStream);
             IOUtils.closeQuietly(this.outputStream);

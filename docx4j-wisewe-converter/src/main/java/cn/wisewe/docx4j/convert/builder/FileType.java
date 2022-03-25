@@ -11,7 +11,7 @@ import java.util.Arrays;
  * @author xiehai
  * @date 2022/03/23 18:28
  */
-public enum FileType {
+enum FileType {
     /**
      * 压缩包
      */

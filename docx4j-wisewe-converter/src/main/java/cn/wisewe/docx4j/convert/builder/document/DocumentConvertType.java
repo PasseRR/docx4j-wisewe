@@ -1,24 +1,20 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
-import cn.wisewe.docx4j.convert.builder.Convertable;
-
-import java.io.BufferedInputStream;
-import java.io.OutputStream;
-import java.util.function.BiConsumer;
+import cn.wisewe.docx4j.convert.builder.OfficeDocumentHandler;
 
 /**
  * 支持转换类型
  * @author xiehai
  * @date 2022/03/23 16:03
  */
-public enum DocumentConvertType implements Convertable<BufferedInputStream> {
+public enum DocumentConvertType {
     /**
      * pdf转换
      */
     PDF {
         @Override
-        public BiConsumer<BufferedInputStream, OutputStream> consumer() {
-            return DocumentType::convertPdf;
+        OfficeDocumentHandler getHandler() {
+            return PdfHandler.INSTANCE;
         }
     },
     /**
@@ -26,8 +22,14 @@ public enum DocumentConvertType implements Convertable<BufferedInputStream> {
      */
     HTML {
         @Override
-        public BiConsumer<BufferedInputStream, OutputStream> consumer() {
-            return DocumentType::convertHtml;
+        OfficeDocumentHandler getHandler() {
+            return HtmlHandler.INSTANCE;
         }
-    }
+    };
+
+    /**
+     * 文档转换实例
+     * @return {@link OfficeDocumentHandler}
+     */
+    abstract OfficeDocumentHandler getHandler();
 }
