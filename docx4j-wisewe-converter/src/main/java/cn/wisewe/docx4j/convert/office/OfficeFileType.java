@@ -12,7 +12,7 @@ import java.util.Arrays;
  * @date 2022/03/23 18:28
  * @see org.docx4j.openpackaging.packages.OpcPackage#load(org.docx4j.events.PackageIdentifier, java.io.InputStream, java.lang.String)
  */
-enum FileType {
+enum OfficeFileType {
     /**
      * 压缩包
      */
@@ -50,7 +50,7 @@ enum FileType {
      */
     protected abstract boolean match(byte[] bytes);
 
-    public static FileType type(BufferedInputStream bufferedInputStream) {
+    public static OfficeFileType type(BufferedInputStream bufferedInputStream) {
         bufferedInputStream.mark(0);
         byte[] firstTwoBytes = new byte[2];
         int read;
@@ -66,7 +66,7 @@ enum FileType {
         }
 
         return
-            Arrays.stream(FileType.values())
+            Arrays.stream(OfficeFileType.values())
                 .filter(it -> it.match(firstTwoBytes))
                 .findFirst()
                 .orElseThrow(() -> new ConvertException("unknown file type"));

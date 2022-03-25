@@ -64,7 +64,7 @@ public abstract class OfficeDocumentHandler {
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) {
         try {
             // 通过文件头的两个字节判断文件类型
-            switch (FileType.type(inputStream)) {
+            switch (OfficeFileType.type(inputStream)) {
                 case ZIP: {
                     this.handleZipped(inputStream, outputStream);
                     break;
