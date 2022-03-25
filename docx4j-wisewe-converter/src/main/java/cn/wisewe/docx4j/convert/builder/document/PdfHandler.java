@@ -1,7 +1,8 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
+import cn.wisewe.docx4j.convert.ConvertException;
 import cn.wisewe.docx4j.convert.builder.OfficeDocumentHandler;
-import cn.wisewe.docx4j.convert.builder.utils.ImageUtils;
+import cn.wisewe.docx4j.convert.utils.ImageUtils;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import org.apache.fop.apps.Fop;
@@ -28,6 +29,7 @@ import javax.xml.transform.sax.SAXResult;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.util.function.Function;
 
 /**
  * word转pdf文档处理器
@@ -90,5 +92,10 @@ class PdfHandler extends OfficeDocumentHandler {
         XWPFDocument document = new XWPFDocument(inputStream);
         PdfOptions options = PdfOptions.create();
         PdfConverter.getInstance().convert(document, outputStream, options);
+    }
+
+    @Override
+    protected Function<Exception, ConvertException> handleException() {
+        return DocumentConvertException::new;
     }
 }

@@ -1,7 +1,8 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
+import cn.wisewe.docx4j.convert.ConvertException;
 import cn.wisewe.docx4j.convert.builder.OfficeDocumentHandler;
-import cn.wisewe.docx4j.convert.builder.utils.ImageUtils;
+import cn.wisewe.docx4j.convert.utils.ImageUtils;
 import fr.opensagres.poi.xwpf.converter.xhtml.Base64EmbedImgManager;
 import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLConverter;
 import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLOptions;
@@ -26,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * word文档转html处理器
@@ -35,7 +37,7 @@ import java.util.Objects;
 class HtmlHandler extends OfficeDocumentHandler {
     static final HtmlHandler INSTANCE = new HtmlHandler();
 
-    HtmlHandler() {
+    private HtmlHandler() {
 
     }
 
@@ -106,5 +108,10 @@ class HtmlHandler extends OfficeDocumentHandler {
         // 带图片的word，则将图片转为base64编码，保存在一个页面中
         XHTMLOptions options = XHTMLOptions.create().indent(4).setImageManager(new Base64EmbedImgManager());
         XHTMLConverter.getInstance().convert(document, outputStream, options);
+    }
+
+    @Override
+    protected Function<Exception, ConvertException> handleException() {
+        return DocumentConvertException::new;
     }
 }

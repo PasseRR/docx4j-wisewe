@@ -1,4 +1,4 @@
-package cn.wisewe.docx4j.convert.builder.utils;
+package cn.wisewe.docx4j.convert.utils;
 
 import java.util.Base64;
 

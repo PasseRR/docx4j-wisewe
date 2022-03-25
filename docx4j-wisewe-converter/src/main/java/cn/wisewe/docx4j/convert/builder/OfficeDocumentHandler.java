@@ -7,6 +7,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
+import java.util.function.Function;
 
 /**
  * word文档转换处理器
@@ -19,7 +20,7 @@ public abstract class OfficeDocumentHandler {
      * 判断当前操作系统是否是windows
      */
     protected static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
-    
+
     /**
      * 处理flat xml格式文档
      * @param inputStream  {@link BufferedInputStream}
@@ -45,6 +46,14 @@ public abstract class OfficeDocumentHandler {
     protected abstract void handleZipped(BufferedInputStream inputStream, OutputStream outputStream) throws Exception;
 
     /**
+     * 异常转换 精确异常类型
+     * @return {@link Function}
+     */
+    protected Function<Exception, ConvertException> handleException() {
+        return ConvertException::new;
+    }
+
+    /**
      * 对外处理文档方法
      * @param inputStream  {@link BufferedInputStream}
      * @param outputStream {@link OutputStream}
@@ -67,7 +76,7 @@ public abstract class OfficeDocumentHandler {
                 }
             }
         } catch (Exception e) {
-            throw new ConvertException(e);
+            throw this.handleException().apply(e);
         }
     }
 

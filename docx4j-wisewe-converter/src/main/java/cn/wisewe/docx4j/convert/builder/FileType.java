@@ -10,6 +10,7 @@ import java.util.Arrays;
  * 文件类型枚举
  * @author xiehai
  * @date 2022/03/23 18:28
+ * @see org.docx4j.openpackaging.packages.OpcPackage#load(org.docx4j.events.PackageIdentifier, java.io.InputStream, java.lang.String)
  */
 enum FileType {
     /**
@@ -17,7 +18,7 @@ enum FileType {
      */
     ZIP {
         @Override
-        boolean match(byte[] bytes) {
+        protected boolean match(byte[] bytes) {
             final int first = 80, second = 75;
             return bytes[0] == first && bytes[1] == second;
         }
@@ -27,22 +28,27 @@ enum FileType {
      */
     COMPOUND {
         @Override
-        boolean match(byte[] bytes) {
+        protected boolean match(byte[] bytes) {
             final int first = -48, second = -49;
             return bytes[0] == first && bytes[1] == second;
         }
     },
     /**
-     * xml
+     * xml 不能以字节数组区分 必须放在最后
      */
     FLAT_OPC {
         @Override
-        boolean match(byte[] bytes) {
+        protected boolean match(byte[] bytes) {
             return true;
         }
     };
 
-    abstract boolean match(byte[] bytes);
+    /**
+     * 是否匹配文件类型
+     * @param bytes 字节数组
+     * @return true/false
+     */
+    protected abstract boolean match(byte[] bytes);
 
     public static FileType type(BufferedInputStream bufferedInputStream) {
         bufferedInputStream.mark(0);
