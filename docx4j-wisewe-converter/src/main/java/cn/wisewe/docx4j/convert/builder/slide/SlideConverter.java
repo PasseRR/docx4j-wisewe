@@ -1,4 +1,4 @@
-package cn.wisewe.docx4j.convert.builder.sheet;
+package cn.wisewe.docx4j.convert.builder.slide;
 
 import cn.wisewe.docx4j.convert.ConvertException;
 import cn.wisewe.docx4j.convert.office.OfficeConverter;
@@ -13,21 +13,21 @@ import java.util.function.Function;
  * @date 2022/03/22 11:14
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SpreadSheetConverter extends OfficeConverter<SpreadSheetConverter, SpreadSheetOfficeConvertType> {
-    SpreadSheetConverter() {
+public class SlideConverter extends OfficeConverter<SlideConverter, SlideConvertType> {
+    SlideConverter() {
     }
 
-    public static SpreadSheetConverter create() {
-        return new SpreadSheetConverter();
+    public static SlideConverter create() {
+        return new SlideConverter();
     }
 
     @Override
     protected Function<String, ConvertException> messageException() {
-        return SpreadSheetConvertException::new;
+        return SlideConvertException::new;
     }
 
     @Override
     protected Function<Exception, ConvertException> exception() {
-        return SpreadSheetConvertException::new;
+        return SlideConvertException::new;
     }
 }

@@ -12,13 +12,13 @@ import java.io.File;
  */
 public class SpreadSheetConverterSpec {
     @Test
-    public void xml(){
+    public void xml() {
         SpreadSheetConverter.create()
             .input(new File(FileUtil.brotherPath(this.getClass(), "/xml.xls")))
             .output(new File(FileUtil.brotherPath(this.getClass(), "/xml.html")))
             .convert(SpreadSheetOfficeConvertType.HTML);
     }
-    
+
     @Test
     public void xls() {
         SpreadSheetConverter.create()

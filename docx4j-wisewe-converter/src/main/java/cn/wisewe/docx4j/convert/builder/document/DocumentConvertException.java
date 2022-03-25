@@ -7,7 +7,7 @@ import cn.wisewe.docx4j.convert.ConvertException;
  * @author xiehai
  * @date 2022/03/23 15:59
  */
-public class DocumentConvertException extends ConvertException {
+class DocumentConvertException extends ConvertException {
     public DocumentConvertException(Throwable t) {
         super(t);
     }

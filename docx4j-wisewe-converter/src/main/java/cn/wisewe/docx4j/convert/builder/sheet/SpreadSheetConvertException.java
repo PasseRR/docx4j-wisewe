@@ -7,7 +7,7 @@ import cn.wisewe.docx4j.convert.ConvertException;
  * @author xiehai
  * @date 2022/03/22 11:11
  */
-public class SpreadSheetConvertException extends ConvertException {
+class SpreadSheetConvertException extends ConvertException {
     public SpreadSheetConvertException(String message) {
         super(message);
     }
