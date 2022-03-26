@@ -7,6 +7,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
 
@@ -88,7 +92,7 @@ public abstract class OfficeDocumentHandler {
             head.item(0).appendChild(mobileMeta(document));
         }
     }
-
+    
     /**
      * 移动端meta节点
      * @param document {@link Document}
@@ -103,5 +107,19 @@ public abstract class OfficeDocumentHandler {
                 "maximum-scale=1,target-densitydpi=device-dpi"
         );
         return meta;
+    }
+
+    /**
+     * html{@link Transformer}
+     * @return {@link Transformer}
+     * @throws TransformerConfigurationException 配置异常
+     */
+    protected static Transformer htmlTransformer() throws TransformerConfigurationException {
+        Transformer serializer = TransformerFactory.newInstance().newTransformer();
+        serializer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+        serializer.setOutputProperty(OutputKeys.METHOD, "html");
+
+        return serializer;
     }
 }

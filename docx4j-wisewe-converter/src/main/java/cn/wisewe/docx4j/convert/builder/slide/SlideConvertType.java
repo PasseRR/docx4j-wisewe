@@ -17,5 +17,14 @@ public enum SlideConvertType implements OfficeConvertHandler {
         public OfficeDocumentHandler getHandler() {
             return PdfHandler.INSTANCE;
         }
+    },
+    /**
+     * ppt转html
+     */
+    HTML {
+        @Override
+        public OfficeDocumentHandler getHandler() {
+            return HtmlHandler.INSTANCE;
+        }
     }
 }

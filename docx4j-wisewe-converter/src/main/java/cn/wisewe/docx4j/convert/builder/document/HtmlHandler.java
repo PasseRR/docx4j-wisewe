@@ -16,9 +16,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedInputStream;
@@ -86,16 +83,11 @@ class HtmlHandler extends OfficeDocumentHandler {
         wordToHtmlConverter.setPicturesManager((content, pt, sn, w, h) -> ImageUtils.base64(content));
         wordToHtmlConverter.processDocument(new HWPFDocument(inputStream));
 
-        Transformer serializer = TransformerFactory.newInstance().newTransformer();
-        serializer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-        serializer.setOutputProperty(OutputKeys.METHOD, "html");
-
         Document document = wordToHtmlConverter.getDocument();
         // 移动端支持
         mobileSupport(document);
 
-        serializer.transform(new DOMSource(document), new StreamResult(outputStream));
+        htmlTransformer().transform(new DOMSource(document), new StreamResult(outputStream));
     }
 
     @Override
