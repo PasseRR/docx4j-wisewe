@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
+import cn.wisewe.docx4j.convert.fop.FontUtils;
 import cn.wisewe.docx4j.convert.fop.FopUtils;
 import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
 import cn.wisewe.docx4j.convert.utils.ImageUtils;
@@ -53,7 +54,7 @@ class PdfHandler extends OfficeDocumentHandler {
         converter.setPicturesManager((content, pt, sn, w, h) -> ImageUtils.base64(content));
         // 字体转换
         converter.setFontReplacer(t -> {
-            t.fontName = FopUtils.defaultFont();
+            t.fontName = FontUtils.defaultFontName();
             return t;
         });
         converter.processDocument(document);

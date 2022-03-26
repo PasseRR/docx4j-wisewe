@@ -33,7 +33,7 @@
             <artifactId>poi-scratchpad</artifactId>
             <version>${poi.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.docx4j</groupId>
             <artifactId>docx4j-JAXB-Internal</artifactId>
@@ -91,6 +91,7 @@
                     <include>**/*.docx</include>
                     <include>**/*.pptx</include>
                     <include>**/*.ppt</include>
+                    <include>**/*.xml</include>
                 </includes>
             </testResource>
         </testResources>

@@ -92,6 +92,10 @@ public abstract class OfficeConverter<T extends OfficeConverter<?, U>, U extends
         try {
             type.getHandler().handle(this.inputStream, this.outputStream);
         } catch (Exception e) {
+            if (e instanceof ConvertException) {
+                throw (ConvertException) e;
+            }
+            
             throw this.exception().apply(e);
         } finally {
             IOUtils.closeQuietly(this.inputStream);

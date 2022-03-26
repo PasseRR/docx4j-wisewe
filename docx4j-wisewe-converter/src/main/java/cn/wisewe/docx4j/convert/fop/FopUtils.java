@@ -21,10 +21,6 @@ import java.io.OutputStream;
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class FopUtils {
     private static final FopFactory FOP_FACTORY;
-    /**
-     * 默认字体名字
-     */
-    private static final String SIM_SUN = "SimSun";
 
     static {
         // FOP 字体初始化配置
@@ -36,14 +32,6 @@ public abstract class FopUtils {
         } catch (ConfigurationException e) {
             throw new ConvertException(e);
         }
-    }
-
-    /**
-     * 默认字体名字
-     * @return 字体名字
-     */
-    public static String defaultFont() {
-        return SIM_SUN;
     }
 
     /**
