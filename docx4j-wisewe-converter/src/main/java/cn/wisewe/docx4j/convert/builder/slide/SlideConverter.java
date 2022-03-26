@@ -17,6 +17,10 @@ public class SlideConverter extends OfficeConverter<SlideConverter, SlideConvert
     SlideConverter() {
     }
 
+    /**
+     * {@link SlideConverter}工厂方法
+     * @return {@link SlideConverter}
+     */
     public static SlideConverter create() {
         return new SlideConverter();
     }

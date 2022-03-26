@@ -89,6 +89,8 @@
                     <include>**/*.xlsx</include>
                     <include>**/*.doc</include>
                     <include>**/*.docx</include>
+                    <include>**/*.pptx</include>
+                    <include>**/*.ppt</include>
                 </includes>
             </testResource>
         </testResources>
