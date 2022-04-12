@@ -69,6 +69,7 @@ enum OfficeFileType {
             Arrays.stream(OfficeFileType.values())
                 .filter(it -> it.match(firstTwoBytes))
                 .findFirst()
+                // 默认匹配xml文本格式
                 .orElseThrow(() -> new ConvertException("unknown file type"));
     }
 }

@@ -15,7 +15,7 @@ import java.io.BufferedInputStream;
 import java.io.OutputStream;
 
 /**
- * word文档转换处理器
+ * office文档转换处理器
  * @author xiehai
  * @date 2022/03/25 09:54
  */

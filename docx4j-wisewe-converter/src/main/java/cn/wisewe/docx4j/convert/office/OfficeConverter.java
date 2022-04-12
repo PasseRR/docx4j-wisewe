@@ -28,6 +28,20 @@ import java.util.function.Function;
 public abstract class OfficeConverter<T extends OfficeConverter<?, U>, U extends OfficeConvertHandler> {
     BufferedInputStream inputStream;
     OutputStream outputStream;
+    /**
+     * 消息异常转换方法
+     */
+    Function<String, ? extends ConvertException> messageConvertExceptionFunction;
+    /**
+     * 异常转换方法
+     */
+    Function<Exception, ? extends ConvertException> exceptionConvertExceptionFunction;
+
+    protected OfficeConverter(Function<String, ? extends ConvertException> messageConvertExceptionFunction,
+                              Function<Exception, ? extends ConvertException> exceptionConvertExceptionFunction) {
+        this.messageConvertExceptionFunction = messageConvertExceptionFunction;
+        this.exceptionConvertExceptionFunction = exceptionConvertExceptionFunction;
+    }
 
     /**
      * 待转换文件输入流
@@ -48,7 +62,7 @@ public abstract class OfficeConverter<T extends OfficeConverter<?, U>, U extends
         try {
             return this.input(new FileInputStream(file));
         } catch (FileNotFoundException e) {
-            throw this.exception().apply(e);
+            throw this.exceptionConvertExceptionFunction.apply(e);
         }
     }
 
@@ -72,7 +86,7 @@ public abstract class OfficeConverter<T extends OfficeConverter<?, U>, U extends
         try {
             return this.output(new FileOutputStream(file));
         } catch (FileNotFoundException e) {
-            throw this.exception().apply(e);
+            throw this.exceptionConvertExceptionFunction.apply(e);
         }
     }
 
@@ -82,11 +96,11 @@ public abstract class OfficeConverter<T extends OfficeConverter<?, U>, U extends
      */
     public void convert(U type) {
         if (Objects.isNull(this.inputStream)) {
-            throw this.messageException().apply("input stream not set");
+            throw this.messageConvertExceptionFunction.apply("input stream not set");
         }
 
         if (Objects.isNull(this.outputStream)) {
-            throw this.messageException().apply("output stream not set");
+            throw this.messageConvertExceptionFunction.apply("output stream not set");
         }
 
         try {
@@ -95,23 +109,11 @@ public abstract class OfficeConverter<T extends OfficeConverter<?, U>, U extends
             if (e instanceof ConvertException) {
                 throw (ConvertException) e;
             }
-            
-            throw this.exception().apply(e);
+
+            throw this.exceptionConvertExceptionFunction.apply(e);
         } finally {
             IOUtils.closeQuietly(this.inputStream);
             IOUtils.closeQuietly(this.outputStream);
         }
     }
-
-    /**
-     * 消息异常
-     * @return {@link Function}
-     */
-    protected abstract Function<String, ConvertException> messageException();
-
-    /**
-     * 异常转换
-     * @return {@link Function}
-     */
-    protected abstract Function<Exception, ConvertException> exception();
 }
