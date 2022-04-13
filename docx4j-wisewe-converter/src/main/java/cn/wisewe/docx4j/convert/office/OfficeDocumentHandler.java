@@ -1,85 +1,79 @@
 package cn.wisewe.docx4j.convert.office;
 
-import org.docx4j.fonts.BestMatchingMapper;
-import org.docx4j.fonts.IdentityPlusMapper;
-import org.docx4j.fonts.Mapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * office文档转换处理器
+ * @param <T> 文档类型
  * @author xiehai
  * @date 2022/03/25 09:54
  */
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-public abstract class OfficeDocumentHandler {
+public abstract class OfficeDocumentHandler<T> {
     /**
-     * 判断当前操作系统是否是windows
+     * 新建文档
+     * @return 文档提供器
      */
-    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("windows");
+    protected abstract Supplier<T> newDocument();
 
     /**
-     * 处理flat xml格式文档
-     * @param inputStream  {@link BufferedInputStream}
-     * @param outputStream {@link OutputStream}
-     * @throws Exception 转换异常
+     * 前置处理flat xml格式文档
+     * @return 处理过程
      */
-    protected abstract void handleFlat(BufferedInputStream inputStream, OutputStream outputStream) throws Exception;
+    protected abstract BiConsumer<T, InputStream> preHandleFlat();
 
     /**
-     * 处理二进制格式文档
-     * @param inputStream  {@link BufferedInputStream}
-     * @param outputStream {@link OutputStream}
-     * @throws Exception 转换异常
+     * 前置处理二进制格式文档
+     * @return 处理过程
      */
-    protected abstract void handleBinary(BufferedInputStream inputStream, OutputStream outputStream) throws Exception;
+    protected abstract BiConsumer<T, InputStream> preHandleBinary();
 
     /**
-     * 处理压缩包格式文档
-     * @param inputStream  {@link BufferedInputStream}
-     * @param outputStream {@link OutputStream}
-     * @throws Exception 转换异常
+     * 前置处理压缩包格式文档
+     * @return 处理过程
      */
-    protected abstract void handleZipped(BufferedInputStream inputStream, OutputStream outputStream) throws Exception;
+    protected abstract BiConsumer<T, InputStream> preHandleZipped();
 
     /**
      * 对外处理文档方法
      * @param inputStream  {@link BufferedInputStream}
      * @param outputStream {@link OutputStream}
      */
-    protected void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
+    protected void handle(BufferedInputStream inputStream, OutputStream outputStream) {
         // 通过文件头的两个字节判断文件类型
+        T t = this.newDocument().get();
         switch (OfficeFileType.type(inputStream)) {
             case ZIP: {
-                this.handleZipped(inputStream, outputStream);
+                this.preHandleZipped().accept(t, inputStream);
                 break;
             }
             case COMPOUND: {
-                this.handleBinary(inputStream, outputStream);
+                this.preHandleBinary().accept(t, inputStream);
                 break;
             }
             default: {
-                this.handleFlat(inputStream, outputStream);
+                this.preHandleFlat().accept(t, inputStream);
                 break;
             }
         }
+
+        this.postHandle(t, outputStream);
     }
 
     /**
-     * 不同操作系统不同字体
-     * @return {@link Mapper}
+     * 后置处理
+     * @param t            文档
+     * @param outputStream 输出流
      */
-    protected static Mapper fontMapper() {
-        return IS_WINDOWS ? new BestMatchingMapper() : new IdentityPlusMapper();
-    }
+    protected abstract void postHandle(T t, OutputStream outputStream);
 
     /**
      * html {@link Document} 移动端支持
@@ -92,7 +86,7 @@ public abstract class OfficeDocumentHandler {
             head.item(0).appendChild(mobileMeta(document));
         }
     }
-    
+
     /**
      * 移动端meta节点
      * @param document {@link Document}
@@ -107,19 +101,5 @@ public abstract class OfficeDocumentHandler {
                 "maximum-scale=1,target-densitydpi=device-dpi"
         );
         return meta;
-    }
-
-    /**
-     * html{@link Transformer}
-     * @return {@link Transformer}
-     * @throws TransformerConfigurationException 配置异常
-     */
-    protected static Transformer htmlTransformer() throws TransformerConfigurationException {
-        Transformer serializer = TransformerFactory.newInstance().newTransformer();
-        serializer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-        serializer.setOutputProperty(OutputKeys.METHOD, "html");
-
-        return serializer;
     }
 }

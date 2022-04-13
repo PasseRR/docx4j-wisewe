@@ -14,7 +14,7 @@ public class SpreadSheetConverterSpec {
     @Test
     public void xml() {
         SpreadSheetConverter.create()
-            .input(new File(FileUtil.brotherPath(this.getClass(), "/xml.xls")))
+            .input(new File(FileUtil.brotherPath(this.getClass(), "/xml.xml")))
             .output(new File(FileUtil.brotherPath(this.getClass(), "/xml.html")))
             .convert(SpreadSheetOfficeConvertType.HTML);
     }
