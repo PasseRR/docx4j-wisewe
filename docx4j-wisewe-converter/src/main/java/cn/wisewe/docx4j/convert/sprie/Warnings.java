@@ -50,10 +50,22 @@ public enum Warnings {
             }
         }
     },
+    HTML_EXCEL {
+        @Override
+        public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
+            Transfer.<Document>create(consumer)
+                .source(HtmlUtils::parse)
+                .transfer(document -> {
+                    document.body().select("h2:lt(1)").remove();
+
+                    HtmlUtils.convert(document, outputStream);
+                });
+        }
+    },
     /**
-     * 移除html中的警告信息
+     * 移除word转换html中p的警告信息
      */
-    HTML_SPAN {
+    HTML_DOC {
         @Override
         public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
             Transfer.<Document>create(consumer)
@@ -74,9 +86,9 @@ public enum Warnings {
         }
     },
     /**
-     * 移除html svg中的信息
+     * 移除ppt转换html中svg的信息
      */
-    HTML_SVG {
+    HTML_SLIDE {
         @Override
         public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
             Transfer.<Document>create(consumer)

@@ -20,7 +20,7 @@ class HtmlHandler extends SlideHandler {
 
     @Override
     protected void postHandle(Presentation presentation, OutputStream outputStream) {
-        Warnings.HTML_SVG.remove(os -> {
+        Warnings.HTML_SLIDE.remove(os -> {
             presentation.getSaveToHtmlOption().setCenter(true);
             presentation.saveToFile(os, FileFormat.HTML);
         }, outputStream);

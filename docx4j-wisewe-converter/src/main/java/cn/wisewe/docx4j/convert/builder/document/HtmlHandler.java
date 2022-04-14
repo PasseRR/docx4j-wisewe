@@ -20,7 +20,7 @@ class HtmlHandler extends DocumentHandler {
 
     @Override
     protected void postHandle(Document document, OutputStream outputStream) {
-        Warnings.HTML_SPAN.remove(os -> {
+        Warnings.HTML_DOC.remove(os -> {
             document.getHtmlExportOptions().setImageEmbedded(true);
             document.saveToStream(os, FileFormat.Html);
         }, outputStream);
