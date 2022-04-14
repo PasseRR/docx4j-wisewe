@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
+import cn.wisewe.docx4j.convert.sprie.Warnings;
 import com.spire.doc.Document;
 import com.spire.doc.FileFormat;
 
@@ -19,7 +20,9 @@ class HtmlHandler extends DocumentHandler {
 
     @Override
     protected void postHandle(Document document, OutputStream outputStream) {
-        document.getHtmlExportOptions().setImageEmbedded(true);
-        document.saveToStream(outputStream, FileFormat.Html);
+        Warnings.HTML_SPAN.remove(os -> {
+            document.getHtmlExportOptions().setImageEmbedded(true);
+            document.saveToStream(os, FileFormat.Html);
+        }, outputStream);
     }
 }

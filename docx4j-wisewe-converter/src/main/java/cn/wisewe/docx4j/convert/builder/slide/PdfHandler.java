@@ -18,6 +18,7 @@ class PdfHandler extends SlideHandler {
 
     @Override
     protected void postHandle(Presentation presentation, OutputStream outputStream) {
+        // TODO pdf移除
         presentation.saveToFile(outputStream, FileFormat.PDF);
     }
 }

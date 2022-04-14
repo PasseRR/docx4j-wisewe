@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
+import cn.wisewe.docx4j.convert.sprie.Warnings;
 import com.spire.presentation.FileFormat;
 import com.spire.presentation.Presentation;
 
@@ -19,6 +20,9 @@ class HtmlHandler extends SlideHandler {
 
     @Override
     protected void postHandle(Presentation presentation, OutputStream outputStream) {
-        presentation.saveToFile(outputStream, FileFormat.HTML);
+        Warnings.HTML_SVG.remove(os -> {
+            presentation.getSaveToHtmlOption().setCenter(true);
+            presentation.saveToFile(os, FileFormat.HTML);
+        }, outputStream);
     }
 }
