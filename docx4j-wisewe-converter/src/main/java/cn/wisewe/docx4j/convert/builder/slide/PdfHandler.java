@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
+import cn.wisewe.docx4j.convert.sprie.Warnings;
 import com.spire.presentation.FileFormat;
 import com.spire.presentation.Presentation;
 
@@ -19,6 +20,6 @@ class PdfHandler extends SlideHandler {
     @Override
     protected void postHandle(Presentation presentation, OutputStream outputStream) {
         // TODO pdf移除
-        presentation.saveToFile(outputStream, FileFormat.PDF);
+        Warnings.PDF.remove(os -> presentation.saveToFile(os, FileFormat.PDF), outputStream);
     }
 }

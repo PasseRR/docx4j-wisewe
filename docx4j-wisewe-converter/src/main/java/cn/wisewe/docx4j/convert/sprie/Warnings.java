@@ -1,19 +1,15 @@
 package cn.wisewe.docx4j.convert.sprie;
 
 import cn.wisewe.docx4j.convert.ConvertException;
-import com.itextpdf.text.pdf.PRStream;
-import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfReader;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 
 /**
  * sprie警告信息移除
@@ -31,19 +27,8 @@ public enum Warnings {
                 consumer.accept(baos);
                 try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
                     PdfReader reader = new PdfReader(bais);
-                    IntStream.rangeClosed(1, reader.getNumberOfPages())
-                        .mapToObj(reader::getPageN)
-                        .map(it -> it.get(PdfName.CONTENTS))
-                        .peek(it -> System.out.println(it.getClass().getName()))
-                        .filter(it -> it instanceof PRStream)
-                        .map(PRStream.class::cast)
-                        .forEach(it -> {
-                            try {
-                                System.out.println(new String(PdfReader.getStreamBytes(it)));
-                            } catch (IOException e) {
-                            }
-                        });
-                    reader.close();
+                    PdfDictionary catalog = reader.getCatalog();
+                    System.out.println(catalog.size());
                 }
             } catch (Exception e) {
                 throw new ConvertException(e);
@@ -53,13 +38,9 @@ public enum Warnings {
     HTML_EXCEL {
         @Override
         public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
-            Transfer.<Document>create(consumer)
-                .source(HtmlUtils::parse)
-                .transfer(document -> {
-                    document.body().select("h2:lt(1)").remove();
-
-                    HtmlUtils.convert(document, outputStream);
-                });
+            HtmlTransfer.create(consumer)
+                .handle(document -> document.body().select("h2:lt(1)").remove())
+                .transfer(outputStream);
         }
     },
     /**
@@ -68,9 +49,8 @@ public enum Warnings {
     HTML_DOC {
         @Override
         public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
-            Transfer.<Document>create(consumer)
-                .source(HtmlUtils::parse)
-                .transfer(document -> {
+            HtmlTransfer.create(consumer)
+                .handle(document -> {
                     Optional.of(document.body().getElementsByTag("p"))
                         .filter(it -> it.size() > 0)
                         .map(it -> it.get(0))
@@ -80,9 +60,8 @@ public enum Warnings {
                         .filter(it -> it.size() > 0)
                         .map(it -> it.get(0))
                         .ifPresent(it -> it.removeAttr("style"));
-
-                    HtmlUtils.convert(document, outputStream);
-                });
+                })
+                .transfer(outputStream);
         }
     },
     /**
@@ -91,20 +70,21 @@ public enum Warnings {
     HTML_SLIDE {
         @Override
         public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
-            Transfer.<Document>create(consumer)
-                .source(HtmlUtils::parse)
-                .transfer(document -> {
+            HtmlTransfer.create(consumer)
+                .handle(document ->
                     document.body()
                         .select("div > svg")
                         .forEach(it -> {
                             it.attr("width", "100%");
                             it.attr("height", "100%");
                             it.select("svg > g > text").forEach(Node::remove);
-                        });
-                    HtmlUtils.convert(document, outputStream);
-                });
+                        })
+                )
+                .transfer(outputStream);
         }
     };
+
+    private static final String WARN_MESSAGE = "Evaluation Warning: The document was created with Spire.Doc for JAVA.";
 
     /**
      * 移除警告信息
