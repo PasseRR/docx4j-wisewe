@@ -1,6 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.sheet;
 
-import cn.wisewe.docx4j.convert.sprie.Warnings;
+import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
 import com.spire.xls.Workbook;
 import com.spire.xls.core.spreadsheet.HTMLOptions;
 
@@ -20,11 +20,11 @@ class HtmlHandler extends SpreadSheetHandler {
 
     @Override
     protected void postHandle(Workbook workbook, OutputStream outputStream) {
+        HTMLOptions options = new HTMLOptions();
+        options.setImageEmbedded(true);
         // TODO 多sheet处理
-        Warnings.HTML_EXCEL.remove(os -> {
-            HTMLOptions options = new HTMLOptions();
-            options.setImageEmbedded(true);
-            workbook.getWorksheets().get(0).saveToHtml(os, options);
-        }, outputStream);
+        HtmlTransfer.create(os -> workbook.getWorksheets().get(0).saveToHtml(os, options))
+            .handle(document -> document.body().select("h2:lt(1)").remove())
+            .transfer(outputStream);
     }
 }

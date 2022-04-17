@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.portable;
 
-import cn.wisewe.docx4j.convert.base.ConvertHandler;
-import cn.wisewe.docx4j.convert.sprie.Warnings;
+import cn.wisewe.docx4j.convert.ConvertHandler;
+import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
 import com.spire.pdf.FileFormat;
 import com.spire.pdf.PdfDocument;
 
@@ -20,6 +20,14 @@ class HtmlHandler implements ConvertHandler {
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) {
         PdfDocument document = new PdfDocument(inputStream);
         document.getConvertOptions().setOutputToOneSvg(true);
-        Warnings.HTML_PDF.remove(os -> document.saveToStream(os, FileFormat.HTML), outputStream);
+
+        HtmlTransfer.create(os -> document.saveToStream(os, FileFormat.HTML))
+            .handle(d -> {
+                // 内容居中
+                d.body().attr("style", "text-align: center");
+                // 警告信息移除
+                d.body().select("svg > g > g:eq(1)").remove();
+            })
+            .transfer(outputStream);
     }
 }

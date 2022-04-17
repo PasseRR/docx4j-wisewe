@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.office;
 
 import cn.wisewe.docx4j.convert.ConvertException;
-import cn.wisewe.docx4j.convert.base.AbstractConverter;
+import cn.wisewe.docx4j.convert.AbstractConverter;
 
 import javax.annotation.Generated;
 import java.util.function.Function;

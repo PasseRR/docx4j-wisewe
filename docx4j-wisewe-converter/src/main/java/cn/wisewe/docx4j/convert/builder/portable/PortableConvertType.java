@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.portable;
 
-import cn.wisewe.docx4j.convert.base.ConvertHandler;
-import cn.wisewe.docx4j.convert.base.FileHandler;
+import cn.wisewe.docx4j.convert.ConvertHandler;
+import cn.wisewe.docx4j.convert.FileHandler;
 
 /**
  * pdf支持转换文件类型

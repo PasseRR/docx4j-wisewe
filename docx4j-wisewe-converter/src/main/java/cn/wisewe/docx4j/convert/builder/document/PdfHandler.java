@@ -1,6 +1,5 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
-import cn.wisewe.docx4j.convert.sprie.Warnings;
 import com.spire.doc.Document;
 import com.spire.doc.FileFormat;
 
@@ -20,6 +19,6 @@ class PdfHandler extends DocumentHandler {
 
     @Override
     protected void postHandle(Document document, OutputStream outputStream) {
-        Warnings.PDF.remove(os -> document.saveToStream(os, FileFormat.PDF), outputStream);
+        document.saveToStream(outputStream, FileFormat.PDF);
     }
 }

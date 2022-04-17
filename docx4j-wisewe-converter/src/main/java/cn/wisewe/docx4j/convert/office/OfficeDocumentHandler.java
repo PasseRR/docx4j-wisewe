@@ -1,6 +1,6 @@
 package cn.wisewe.docx4j.convert.office;
 
-import cn.wisewe.docx4j.convert.base.ConvertHandler;
+import cn.wisewe.docx4j.convert.ConvertHandler;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;

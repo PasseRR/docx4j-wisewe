@@ -1,6 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.portable;
 
-import cn.wisewe.docx4j.convert.base.AbstractConverter;
+import cn.wisewe.docx4j.convert.AbstractConverter;
 
 /**
  * pdf文档转换

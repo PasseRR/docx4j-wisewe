@@ -1,4 +1,4 @@
-package cn.wisewe.docx4j.convert.base;
+package cn.wisewe.docx4j.convert;
 
 /**
  * 文件类型转换处理器

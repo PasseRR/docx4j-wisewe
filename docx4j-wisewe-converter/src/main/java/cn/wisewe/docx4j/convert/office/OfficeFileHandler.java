@@ -1,6 +1,6 @@
 package cn.wisewe.docx4j.convert.office;
 
-import cn.wisewe.docx4j.convert.base.FileHandler;
+import cn.wisewe.docx4j.convert.FileHandler;
 
 /**
  * 支持转换的接口标识

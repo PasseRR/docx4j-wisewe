@@ -1,4 +1,4 @@
-package cn.wisewe.docx4j.convert.sprie;
+package cn.wisewe.docx4j.convert.builder;
 
 import cn.wisewe.docx4j.convert.ConvertException;
 import lombok.AccessLevel;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * @date 2022/04/14 20:17
  */
 @FieldDefaults(level = AccessLevel.PRIVATE)
-class HtmlTransfer {
+public class HtmlTransfer {
     final Consumer<OutputStream> consumer;
     Consumer<Document> handler;
 
@@ -37,7 +37,7 @@ class HtmlTransfer {
      * @param <T>      转换类型
      * @return {@link HtmlTransfer}
      */
-    static HtmlTransfer create(Consumer<OutputStream> consumer) {
+    public static HtmlTransfer create(Consumer<OutputStream> consumer) {
         return new HtmlTransfer(consumer);
     }
 
@@ -46,7 +46,7 @@ class HtmlTransfer {
      * @param handler {@link Consumer}
      * @return {@link HtmlTransfer}
      */
-    HtmlTransfer handle(Consumer<Document> handler) {
+    public HtmlTransfer handle(Consumer<Document> handler) {
         this.handler = handler;
         return this;
     }
@@ -54,7 +54,7 @@ class HtmlTransfer {
     /**
      * 将目标对象传输至输出流
      */
-    void transfer(OutputStream outputStream) {
+    public void transfer(OutputStream outputStream) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             this.consumer.accept(baos);
             try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {

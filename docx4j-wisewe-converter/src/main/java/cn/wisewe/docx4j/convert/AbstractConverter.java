@@ -1,6 +1,5 @@
-package cn.wisewe.docx4j.convert.base;
+package cn.wisewe.docx4j.convert;
 
-import cn.wisewe.docx4j.convert.ConvertException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
