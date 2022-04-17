@@ -35,6 +35,19 @@ public enum Warnings {
             }
         }
     },
+    HTML_PDF {
+        @Override
+        public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {
+            HtmlTransfer.create(consumer)
+                .handle(document -> {
+                    // 内容居中
+                    document.body().attr("style", "text-align: center");
+                    // 警告信息移除
+                    document.body().select("svg > g > g:eq(1)").remove();
+                })
+                .transfer(outputStream);
+        }
+    },
     HTML_EXCEL {
         @Override
         public void remove(Consumer<OutputStream> consumer, OutputStream outputStream) {

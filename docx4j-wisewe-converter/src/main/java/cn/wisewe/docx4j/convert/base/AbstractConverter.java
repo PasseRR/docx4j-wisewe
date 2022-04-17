@@ -66,6 +66,15 @@ public abstract class AbstractConverter<T extends AbstractConverter<?, U>, U ext
     }
 
     /**
+     * 按照文件绝对路径
+     * @param fullFilePath 待转换文件绝对路径
+     * @return {@link T}
+     */
+    public T input(String fullFilePath) {
+        return this.input(new File(fullFilePath));
+    }
+
+    /**
      * 转换后文件输出流
      * @param outputStream {@link OutputStream}
      * @return {@link T}
@@ -90,10 +99,20 @@ public abstract class AbstractConverter<T extends AbstractConverter<?, U>, U ext
     }
 
     /**
-     * 文档转换
-     * @param type 转换类型
+     * 转换后文件绝对路径
+     * @param fullFilePath 文件绝对路径
+     * @return {@link T}
      */
-    public void convert(U type) {
+    public T output(String fullFilePath) {
+        return this.output(new File(fullFilePath));
+    }
+
+    /**
+     * 指定转换类型
+     * @param type      转换类型
+     * @param closeable 是否关闭输出流
+     */
+    public void convert(U type, boolean closeable) {
         if (Objects.isNull(this.inputStream)) {
             throw this.messageConvertExceptionFunction.apply("input stream not set");
         }
@@ -119,7 +138,7 @@ public abstract class AbstractConverter<T extends AbstractConverter<?, U>, U ext
                 }
             }
 
-            if (Objects.nonNull(this.outputStream)) {
+            if (closeable && Objects.nonNull(this.outputStream)) {
                 try {
                     this.outputStream.close();
                 } catch (IOException e) {
@@ -127,5 +146,13 @@ public abstract class AbstractConverter<T extends AbstractConverter<?, U>, U ext
                 }
             }
         }
+    }
+
+    /**
+     * 文档转换 默认关闭输出流
+     * @param type 转换类型
+     */
+    public void convert(U type) {
+        this.convert(type, true);
     }
 }

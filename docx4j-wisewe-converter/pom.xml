@@ -57,6 +57,7 @@
                     <include>**/*.pptx</include>
                     <include>**/*.ppt</include>
                     <include>**/*.xml</include>
+                    <include>**/*.pdf</include>
                 </includes>
             </testResource>
         </testResources>
