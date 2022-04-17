@@ -1,8 +1,6 @@
 package cn.wisewe.docx4j.convert.office;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import cn.wisewe.docx4j.convert.base.ConvertHandler;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -17,7 +15,7 @@ import java.util.function.Supplier;
  * @date 2022/03/25 09:54
  */
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-public abstract class OfficeDocumentHandler<T> {
+public abstract class OfficeDocumentHandler<T> implements ConvertHandler {
     /**
      * 新建文档
      * @return 文档提供器
@@ -47,7 +45,8 @@ public abstract class OfficeDocumentHandler<T> {
      * @param inputStream  {@link BufferedInputStream}
      * @param outputStream {@link OutputStream}
      */
-    protected void handle(BufferedInputStream inputStream, OutputStream outputStream) {
+    @Override
+    public void handle(BufferedInputStream inputStream, OutputStream outputStream) {
         // 通过文件头的两个字节判断文件类型
         T t = this.newDocument().get();
         switch (OfficeFileType.type(inputStream)) {
@@ -74,32 +73,4 @@ public abstract class OfficeDocumentHandler<T> {
      * @param outputStream 输出流
      */
     protected abstract void postHandle(T t, OutputStream outputStream);
-
-    /**
-     * html {@link Document} 移动端支持
-     * @param document {@link Document}
-     */
-    protected static void mobileSupport(Document document) {
-        NodeList head = document.getElementsByTagName("head");
-        if (head.getLength() > 0) {
-
-            head.item(0).appendChild(mobileMeta(document));
-        }
-    }
-
-    /**
-     * 移动端meta节点
-     * @param document {@link Document}
-     * @return {@link Element}
-     */
-    protected static Element mobileMeta(Document document) {
-        Element meta = document.createElement("meta");
-        meta.setAttribute("name", "viewport");
-        meta.setAttribute(
-            "content",
-            "width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1," +
-                "maximum-scale=1,target-densitydpi=device-dpi"
-        );
-        return meta;
-    }
 }

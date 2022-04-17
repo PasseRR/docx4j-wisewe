@@ -1,6 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.sheet;
 
-import cn.wisewe.docx4j.convert.office.OfficeConvertHandler;
+import cn.wisewe.docx4j.convert.office.OfficeFileHandler;
 import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
 import com.spire.xls.Workbook;
 
@@ -9,7 +9,7 @@ import com.spire.xls.Workbook;
  * @author xiehai
  * @date 2022/03/25 12:44
  */
-public enum SpreadSheetOfficeConvertType implements OfficeConvertHandler<Workbook> {
+public enum SpreadSheetOfficeConvertType implements OfficeFileHandler<Workbook> {
     /**
      * excel转html
      */

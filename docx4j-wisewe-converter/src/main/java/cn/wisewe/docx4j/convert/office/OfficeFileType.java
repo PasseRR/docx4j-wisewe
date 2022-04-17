@@ -10,7 +10,6 @@ import java.util.Arrays;
  * 文件类型枚举
  * @author xiehai
  * @date 2022/03/23 18:28
- * @see org.docx4j.openpackaging.packages.OpcPackage#load(org.docx4j.events.PackageIdentifier, java.io.InputStream, java.lang.String)
  */
 enum OfficeFileType {
     /**
@@ -50,6 +49,11 @@ enum OfficeFileType {
      */
     protected abstract boolean match(byte[] bytes);
 
+    /**
+     * 根据office输入流字节确定文件类型
+     * @param bufferedInputStream {@link BufferedInputStream}
+     * @return {@link OfficeFileType}
+     */
     public static OfficeFileType type(BufferedInputStream bufferedInputStream) {
         bufferedInputStream.mark(0);
         byte[] firstTwoBytes = new byte[2];
