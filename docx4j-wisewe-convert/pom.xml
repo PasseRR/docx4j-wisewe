@@ -10,8 +10,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>docx4j-wisewe-converter</artifactId>
-    <name>docx4j-wisewe-converter</name>
+    <artifactId>docx4j-wisewe-convert</artifactId>
+    <name>docx4j-wisewe-convert</name>
     <description>文档转换器</description>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
 
@@ -32,7 +32,7 @@
             <artifactId>batik-codec</artifactId>
             <version>1.14</version>
         </dependency>
-        
+
         <dependency>
             <groupId>e-iceblue</groupId>
             <artifactId>spire.office</artifactId>

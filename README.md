@@ -7,6 +7,7 @@
 maven引入
 
 ```xml
+
 <dependency>
     <groupId>cn.wisewe</groupId>
     <artifactId>docx4j-wisewe-output</artifactId>
@@ -27,6 +28,7 @@ dependencies {
 maven引入
 
 ```xml
+
 <dependency>
     <groupId>cn.wisewe</groupId>
     <artifactId>docx4j-wisewe-input</artifactId>
@@ -39,5 +41,26 @@ gradle引入
 ```groovy
 dependencies {
     implementation "cn.wisewe:docx4j-wisewe-input:见上最新版本"
+}
+```
+
+## [文档转换](./docx4j-wisewe-convert/README.md)
+
+maven引入
+
+```xml
+
+<dependency>
+    <groupId>cn.wisewe</groupId>
+    <artifactId>docx4j-wisewe-convert</artifactId>
+    <version>见上最新版本</version>
+</dependency>
+```
+
+gradle引入
+
+```groovy
+dependencies {
+    implementation "cn.wisewe:docx4j-wisewe-convert:见上最新版本"
 }
 ```

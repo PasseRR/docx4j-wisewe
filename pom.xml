@@ -14,7 +14,7 @@
     <modules>
         <module>docx4j-wisewe-output</module>
         <module>docx4j-wisewe-input</module>
-        <module>docx4j-wisewe-converter</module>
+        <module>docx4j-wisewe-convert</module>
     </modules>
 
     <properties>
@@ -70,7 +70,7 @@
                 <artifactId>itextpdf</artifactId>
                 <version>5.5.13</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
