@@ -55,7 +55,7 @@ public class HtmlTransfer {
      * 将目标对象传输至输出流
      */
     public void transfer(OutputStream outputStream) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream(1024)) {
             this.consumer.accept(baos);
             try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
                 Document document = HtmlTransfer.parse(bais);
