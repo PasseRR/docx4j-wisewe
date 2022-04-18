@@ -39,7 +39,9 @@ public class SvgTransfer {
      * 移除警告信息过程
      */
     BiConsumer<Integer, Elements> consumer;
-
+    /**
+     * html大小写敏感解析器
+     */
     private static final Parser PARSER = Parser.htmlParser();
 
     static {
@@ -84,26 +86,33 @@ public class SvgTransfer {
             // svg转为pdf的一页
             int index = 0;
             for (byte[] it : this.supplier.get()) {
+                // 先要添加段落 否则会empty pages
                 document.add(new Chunk(""));
                 Elements svg = Jsoup.parse(new String(it, StandardCharsets.UTF_8), PARSER).select("svg");
                 this.consumer.accept(index++, svg);
-                TranscoderInput input = new TranscoderInput(new StringReader(svg.toString()));
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-                TranscoderOutput output = new TranscoderOutput(baos);
-                new PNGTranscoder().transcode(input, output);
-                Image image = Image.getInstance(baos.toByteArray());
-                image.scaleToFit(document.getPageSize());
-                image.setAbsolutePosition((width - image.getScaledWidth()) / 2, (height - image.getScaledHeight()) / 2);
-                writer.getDirectContent().addImage(image);
-                document.newPage();
-            }
-            if (!writer.isCloseStream()) {
-                writer.close();
+
+                try (StringReader reader = new StringReader(svg.toString());
+                     ByteArrayOutputStream baos = new ByteArrayOutputStream(1024)) {
+                    TranscoderInput input = new TranscoderInput(reader);
+                    TranscoderOutput output = new TranscoderOutput(baos);
+                    new PNGTranscoder().transcode(input, output);
+                    Image image = Image.getInstance(baos.toByteArray());
+                    image.scaleToFit(document.getPageSize());
+                    // 设置图片绝对位置
+                    image.setAbsolutePosition(
+                        (width - image.getScaledWidth()) / 2,
+                        (height - image.getScaledHeight()) / 2
+                    );
+                    writer.getDirectContent().addImage(image);
+                    document.newPage();
+                }
             }
         } catch (Exception e) {
             throw new ConvertException(e);
         } finally {
-            document.close();
+            if (document.isOpen()) {
+                document.close();
+            }
         }
     }
 }
