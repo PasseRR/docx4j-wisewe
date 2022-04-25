@@ -78,23 +78,31 @@ public class HtmlTransfer {
     protected static Document parse(InputStream inputStream) {
         try {
             Document document = Jsoup.parse(inputStream, StandardCharsets.UTF_8.name(), "");
-            // 移动端支持
-            Element mobile = new Element("meta");
-            mobile.attr("name", "viewport");
-            mobile.attr(
-                "content",
-                "width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1," +
-                    "maximum-scale=1,target-densitydpi=device-dpi"
-            );
-            // 编码
-            Element lang = new Element("meta");
-            lang.attr("http-equiv", "Content-Type");
-            lang.attr("content", "text/html; charset=utf-8");
-            document.head().appendChildren(Arrays.asList(mobile, lang));
+            HtmlTransfer.appendMeta(document);
             return document;
         } catch (Exception e) {
             throw new ConvertException(e);
         }
+    }
+
+    /**
+     * 添加html meta
+     * @param document {@link Document}
+     */
+    public static void appendMeta(Document document) {
+        // 移动端支持
+        Element mobile = new Element("meta");
+        mobile.attr("name", "viewport");
+        mobile.attr(
+            "content",
+            "width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1," +
+                "maximum-scale=1,target-densitydpi=device-dpi"
+        );
+        // 编码
+        Element lang = new Element("meta");
+        lang.attr("http-equiv", "Content-Type");
+        lang.attr("content", "text/html; charset=utf-8");
+        document.head().appendChildren(Arrays.asList(mobile, lang));
     }
 
     /**
