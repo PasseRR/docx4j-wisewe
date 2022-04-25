@@ -41,6 +41,7 @@ class HtmlHandler extends SpreadSheetHandler {
             Element div = document.createElement("div");
             StringBuilder sb = new StringBuilder();
             sb.append("var holder; \n");
+            // sheet菜单点击事件
             sb.append("function onNavClick(id) {\n")
                 .append("if(holder) { \n")
                 .append("if(holder === id){return;}\n")
@@ -54,7 +55,9 @@ class HtmlHandler extends SpreadSheetHandler {
                 .forEach(it -> {
                     int index = it.getIndex();
                     String id = "iframe" + index;
+                    // 添加导航
                     div.appendChild(this.navElement(document, it.getName(), id));
+                    // 添加iframe
                     this.appendIframe(document, id);
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                         HtmlTransfer.create(os -> it.saveToHtml(os, options))
@@ -100,13 +103,7 @@ class HtmlHandler extends SpreadSheetHandler {
                 )
             )
             .append(String.format("%s.open();\n", temp))
-            .append(
-                String.format(
-                    "%s.write(`%s`);\n",
-                    temp,
-                    body
-                )
-            )
+            .append(String.format("%s.write(`%s`);\n", temp, body))
             .append(String.format("%s.close();\n", temp));
     }
 
