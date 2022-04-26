@@ -124,7 +124,6 @@ public class DocumentExporter extends RichableDocument<DocumentExporter> impleme
     /**
      * 设置纸张大小及方向
      * @param paperSize   纸张大小
-     * @param orientation 方向
      * @return {@link DocumentExporter}
      */
     public DocumentExporter pageSize(DocumentPaperSize paperSize) {
