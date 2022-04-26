@@ -21,6 +21,8 @@ import java.util.stream.IntStream;
  */
 class HtmlHandler extends SpreadSheetHandler {
     static final HtmlHandler INSTANCE = new HtmlHandler();
+    private static final String IFRAME_PREFIX = "iframe";
+    private static final String NAV_SUFFIX = "nav";
 
     private HtmlHandler() {
 
@@ -31,7 +33,7 @@ class HtmlHandler extends SpreadSheetHandler {
         HTMLOptions options = new HTMLOptions();
         options.setImageEmbedded(true);
         WorksheetsCollection worksheets = workbook.getWorksheets();
-        Document document = Jsoup.parse("");
+        Document document = getDocument();
         // 添加移动端支持
         HtmlTransfer.appendMeta(document);
         int size = worksheets.size();
@@ -45,16 +47,19 @@ class HtmlHandler extends SpreadSheetHandler {
             sb.append("function onNavClick(id) {\n")
                 .append("if(holder) { \n")
                 .append("if(holder === id){return;}\n")
+                .append(
+                    String.format("document.getElementById(holder + '%s').classList.remove('active');\n", NAV_SUFFIX))
                 .append("document.getElementById(holder).style.display='none'; \n")
                 .append("}\n")
                 .append("holder = id; \n")
+                .append(String.format("document.getElementById(id + '%s').classList.add('active');\n", NAV_SUFFIX))
                 .append("document.getElementById(id).style.display='inline'; \n")
-                .append("}");
+                .append("}\n");
             IntStream.range(0, size)
                 .mapToObj(workbook.getWorksheets()::get)
                 .forEach(it -> {
                     int index = it.getIndex();
-                    String id = "iframe" + index;
+                    String id = IFRAME_PREFIX + index;
                     // 添加导航
                     div.appendChild(this.navElement(document, it.getName(), id));
                     // 添加iframe
@@ -68,15 +73,15 @@ class HtmlHandler extends SpreadSheetHandler {
                         throw new SpreadSheetConvertException(e.getMessage(), e);
                     }
                 });
-            sb.append("onNavClick('iframe0');");
-            script.append(sb.toString());
-            document.body().appendChild(script);
             // 菜单设置
             String style = "width: 100%;height: 30px;position: fixed;top: 0;left: 0;padding-left: 10px;" +
-                "background-color: rgba(53, 53, 53, 1);line-height: 30px;font-size: 14px; opacity: .8";
+                "background-color: rgba(53, 53, 53, 1);line-height: 30px;font-size: 14px; opacity: .6";
             div.attr("style", style);
             div.attr("id", "header-nav");
             document.body().appendChild(div);
+            sb.append(String.format("onNavClick('%s0');", IFRAME_PREFIX));
+            script.append(sb.toString());
+            document.body().appendChild(script);
         }
 
         // html转换
@@ -86,6 +91,22 @@ class HtmlHandler extends SpreadSheetHandler {
         } catch (IOException e) {
             throw new SpreadSheetConvertException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 初始化html文档
+     * @return {@link Document}
+     */
+    private static Document getDocument() {
+        Document parse = Jsoup.parse("");
+        Element style = parse.createElement("style");
+        style.attr("type", "text/css");
+        // 初始化导航点击样式
+        String css = "a { padding: 5px; color: #f9f9f9; text-decoration:none; cursor:hand;}\n" +
+            "a.active { color: #8df70c; }";
+        style.append(css);
+        parse.head().appendChild(style);
+        return parse;
     }
 
     /**
@@ -134,8 +155,8 @@ class HtmlHandler extends SpreadSheetHandler {
     private Element navElement(Document document, String title, String id) {
         Element a = document.createElement("a");
         a.attr("href", "javascript:void(0)");
+        a.attr("id", id + NAV_SUFFIX);
         a.attr("onclick", String.format("onNavClick('%s')", id));
-        a.attr("style", "padding: 5px; color: #f9f9f9; text-decoration:none; border-right: 1px solid white");
         a.text(title);
 
         return a;
