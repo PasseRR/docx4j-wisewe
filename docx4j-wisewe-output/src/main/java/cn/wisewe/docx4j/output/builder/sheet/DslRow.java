@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.output.builder.sheet;
 
+import cn.wisewe.docx4j.output.builder.BaseDslRow;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -12,8 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * {@link Row} dsl
@@ -22,7 +21,7 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DslRow {
+public class DslRow extends BaseDslRow<DslRow, DslCell> {
     @Getter(AccessLevel.PACKAGE)
     Row row;
     /**
@@ -55,6 +54,7 @@ public class DslRow {
      * @param consumer 单元格消费
      * @return {@link DslCell}
      */
+    @Override
     public DslRow cell(Consumer<DslCell> consumer) {
         DslCell cell = this.getOrCreateCell(this.cellNumber.getAndIncrement());
         consumer.accept(cell);
@@ -72,6 +72,7 @@ public class DslRow {
      * @param consumer 单元格消费
      * @return {@link DslRow}
      */
+    @Override
     public DslRow headCell(Consumer<DslCell> consumer) {
         return this.cell(cell -> consumer.accept(cell.headStyle()));
     }
@@ -81,17 +82,9 @@ public class DslRow {
      * @param o 单元格对象
      * @return {@link DslRow}
      */
+    @Override
     public DslRow headCell(Object o) {
         return this.headCell(cell -> cell.text(o));
-    }
-
-    /**
-     * 添加一个表头单元格
-     * @param supplier 单元格内容提供
-     * @return {@link DslRow}
-     */
-    public DslRow headCell(Supplier<Object> supplier) {
-        return this.headCell(supplier.get());
     }
 
     /**
@@ -112,49 +105,6 @@ public class DslRow {
         if (Objects.nonNull(objects) && objects.length > 0) {
             for (Object object : objects) {
                 this.headRedAsterCell(object);
-            }
-        }
-
-        return this;
-    }
-
-    /**
-     * 批量添加表头
-     * @param iterable 迭代器
-     * @param function 表头字段取值
-     * @param <T>      迭代器内容类型
-     * @return {@link DslRow}
-     */
-    public <T> DslRow headCells(Iterable<T> iterable, Function<T, ?> function) {
-        if (Objects.nonNull(iterable)) {
-            iterable.forEach(it -> this.headCell(function.apply(it)));
-        }
-
-        return this;
-    }
-
-    /**
-     * 批量添加表头单元格
-     * @param iterable 表头迭代器
-     * @return {@link DslRow}
-     */
-    public DslRow headCells(Iterable<?> iterable) {
-        if (Objects.nonNull(iterable)) {
-            iterable.forEach(this::headCell);
-        }
-
-        return this;
-    }
-
-    /**
-     * 批量添加表格单元格
-     * @param objects 对象数组
-     * @return {@link DslRow}
-     */
-    public DslRow headCells(Object... objects) {
-        if (Objects.nonNull(objects) && objects.length > 0) {
-            for (Object object : objects) {
-                this.headCell(object);
             }
         }
 
@@ -196,6 +146,7 @@ public class DslRow {
      * @param consumer 单元格消费
      * @return {@link DslRow}
      */
+    @Override
     public DslRow dataCell(Consumer<DslCell> consumer) {
         return this.cell(cell -> consumer.accept(cell.dataStyle()));
     }
@@ -205,58 +156,11 @@ public class DslRow {
      * @param o 单元格内容对象
      * @return {@link DslCell}
      */
+    @Override
     public DslRow dataCell(Object o) {
         return this.dataCell(c -> c.text(o));
     }
 
-    /**
-     * 添加一个数据单元格
-     * @param supplier 单元格内容提供
-     * @return {@link DslRow}
-     */
-    public DslRow dataCell(Supplier<?> supplier) {
-        return this.dataCell(supplier.get());
-    }
-
-    /**
-     * 添加多个数据单元格
-     * @param suppliers 数据提供数组
-     * @return {@link DslRow}
-     */
-    public DslRow dataCells(Supplier<?>... suppliers) {
-        if (Objects.nonNull(suppliers) && suppliers.length > 0) {
-            for (Supplier<?> supplier : suppliers) {
-                this.dataCell(supplier.get());
-            }
-        }
-
-        return this;
-    }
-
-    /**
-     * 添加多个数据单元格
-     * @param iterable 迭代器
-     * @param <T>      迭代器元素类型
-     * @return {@link DslRow}
-     */
-    public <T> DslRow dataCells(Iterable<T> iterable) {
-        return this.dataCells(iterable, it -> it);
-    }
-
-    /**
-     * 添加多个数据单元格
-     * @param iterable 迭代器
-     * @param function 单元格内容方法
-     * @param <T>      迭代器元素类型
-     * @return {@link DslRow}
-     */
-    public <T> DslRow dataCells(Iterable<T> iterable, Function<T, ?> function) {
-        if (Objects.nonNull(iterable)) {
-            iterable.forEach(it -> this.dataCell(function.apply(it)));
-        }
-
-        return this;
-    }
 
     /**
      * 表头单元格拆分 仅支持拆分为二 自行添加空格补齐
