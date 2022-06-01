@@ -13,6 +13,7 @@ import lombok.experimental.PackagePrivate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -34,7 +35,7 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
     }
 
     public DslRow cell(Phrase phrase, Consumer<DslCell> consumer) {
-        PdfPCell cell = new PdfPCell(phrase);
+        PdfPCell cell = Optional.ofNullable(phrase).map(PdfPCell::new).orElseGet(PdfPCell::new);
         // 默认单元格垂直居中
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         consumer.accept(new DslCell(cell));
