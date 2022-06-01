@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.output.builder.portable;
 
+import cn.wisewe.docx4j.output.builder.BaseDslRow;
 import cn.wisewe.docx4j.output.utils.StringConverterUtil;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Phrase;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
  * @Copyright(c) tellyes tech. inc. co.,ltd
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DslRow {
+public class DslRow extends BaseDslRow<DslRow, DslCell> {
     @Getter
     @PackagePrivate
     List<PdfPCell> cells;
@@ -42,8 +43,14 @@ public class DslRow {
         return this;
     }
 
+    @Override
     public DslRow cell(Consumer<DslCell> consumer) {
         return this.cell(null, consumer);
+    }
+
+    @Override
+    public DslRow headCell(Consumer<DslCell> consumer) {
+        return this.cell(consumer);
     }
 
     /**
@@ -79,33 +86,15 @@ public class DslRow {
      * @param o 任意对象
      * @return {@link DslRow}
      */
+    @Override
     public DslRow headCell(Object o) {
         // 表头加粗
         return this.headCell(o, null);
     }
 
-    /**
-     * 添加表头单元格
-     * @param supplier 表头单元格提供
-     * @return {@link DslRow}
-     */
-    public DslRow headCell(Supplier<?> supplier) {
-        return this.headCell(supplier.get());
-    }
-
-    /**
-     * 添加多个表头单元格
-     * @param objects 表头单元对象
-     * @return {@link DslRow}
-     */
-    public DslRow headCells(Object... objects) {
-        if (Objects.nonNull(objects) && objects.length > 0) {
-            for (Object object : objects) {
-                this.headCell(() -> object);
-            }
-        }
-
-        return this;
+    @Override
+    public DslRow dataCell(Consumer<DslCell> consumer) {
+        return this.cell(consumer);
     }
 
     /**
@@ -141,32 +130,9 @@ public class DslRow {
      * @param o 文本
      * @return {@link DslRow}
      */
+    @Override
     public DslRow dataCell(Object o) {
         return this.dataCell(o, null);
-    }
-
-    /**
-     * 添加数据单元格
-     * @param supplier 数据单元内容提供
-     * @return {@link DslRow}
-     */
-    public DslRow dataCell(Supplier<?> supplier) {
-        return this.dataCell(StringConverterUtil.convert(supplier.get()));
-    }
-
-    /**
-     * 添加多个数据单元格
-     * @param suppliers 多个数据内容提供
-     * @return {@link DslRow}
-     */
-    public DslRow dataCells(Supplier<?>... suppliers) {
-        if (Objects.nonNull(suppliers) && suppliers.length > 0) {
-            for (Supplier<?> supplier : suppliers) {
-                this.dataCell(supplier);
-            }
-        }
-
-        return this;
     }
 
     /**
