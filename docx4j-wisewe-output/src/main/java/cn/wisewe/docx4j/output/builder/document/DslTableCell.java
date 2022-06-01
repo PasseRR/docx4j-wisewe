@@ -57,7 +57,7 @@ public class DslTableCell extends ParagraphableDocument<DslTableCell> {
      * @param supplier 单元格内容提供器
      * @return {@link DslTableCell}
      */
-    public DslTableCell text(Supplier<Object> supplier) {
+    public DslTableCell text(Supplier<?> supplier) {
         return this.text(supplier.get());
     }
 
@@ -75,7 +75,7 @@ public class DslTableCell extends ParagraphableDocument<DslTableCell> {
      * @param supplier 单元格内容提供器
      * @return {@link DslTableCell}
      */
-    public DslTableCell boldText(Supplier<Object> supplier) {
+    public DslTableCell boldText(Supplier<?> supplier) {
         return this.boldText(supplier.get());
     }
 

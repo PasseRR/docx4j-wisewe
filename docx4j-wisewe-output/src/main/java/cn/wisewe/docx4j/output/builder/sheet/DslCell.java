@@ -124,7 +124,7 @@ public class DslCell {
      * @param supplier 单元格内容提供器
      * @return {@link DslCell}
      */
-    public DslCell text(Supplier<Object> supplier) {
+    public DslCell text(Supplier<?> supplier) {
         return this.text(supplier.get());
     }
 
