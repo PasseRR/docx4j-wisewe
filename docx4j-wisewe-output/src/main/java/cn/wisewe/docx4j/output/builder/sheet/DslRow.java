@@ -125,7 +125,7 @@ public class DslRow {
      * @param <T>      迭代器内容类型
      * @return {@link DslRow}
      */
-    public <T> DslRow headCells(Iterable<T> iterable, Function<T, Object> function) {
+    public <T> DslRow headCells(Iterable<T> iterable, Function<T, ?> function) {
         if (Objects.nonNull(iterable)) {
             iterable.forEach(it -> this.headCell(function.apply(it)));
         }
@@ -138,7 +138,7 @@ public class DslRow {
      * @param iterable 表头迭代器
      * @return {@link DslRow}
      */
-    public DslRow headCells(Iterable<Object> iterable) {
+    public DslRow headCells(Iterable<?> iterable) {
         if (Objects.nonNull(iterable)) {
             iterable.forEach(this::headCell);
         }
@@ -214,7 +214,7 @@ public class DslRow {
      * @param supplier 单元格内容提供
      * @return {@link DslRow}
      */
-    public DslRow dataCell(Supplier<Object> supplier) {
+    public DslRow dataCell(Supplier<?> supplier) {
         return this.dataCell(supplier.get());
     }
 
@@ -250,7 +250,7 @@ public class DslRow {
      * @param <T>      迭代器元素类型
      * @return {@link DslRow}
      */
-    public <T> DslRow dataCells(Iterable<T> iterable, Function<T, Object> function) {
+    public <T> DslRow dataCells(Iterable<T> iterable, Function<T, ?> function) {
         if (Objects.nonNull(iterable)) {
             iterable.forEach(it -> this.dataCell(function.apply(it)));
         }
