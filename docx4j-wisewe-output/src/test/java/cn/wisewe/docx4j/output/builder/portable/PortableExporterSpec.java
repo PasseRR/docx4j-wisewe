@@ -68,11 +68,14 @@ public class PortableExporterSpec {
                 p.chunk("教职工列表", Fonts.HEADING_1.font()).accept(pp -> pp.setAlignment(Element.ALIGN_CENTER))
             )
             // 需要指定表格列数
-            .table(3, t ->
+            .table(4, t ->
                 // 表头
-                t.row(r -> r.headCells("姓名", "年龄", "性别"))
+                t.row(r -> r.headCells("姓名", "年龄", "性别", "头像"))
                     // 数据单元格
-                    .rows(SpecDataFactory.tableData(), (u, r) -> r.dataCells(u::getName, u::getAge, u::getSex))
+                    .rows(SpecDataFactory.tableData(), (u, r) -> 
+                        r.dataCells(u::getName, u::getAge, u::getSex)
+                            .pictureCell(u.picture(), 30)
+                    )
             )
             .writeTo(new FileOutputStream(FileUtil.brotherPath(PortableExporterSpec.class, "table.pdf")));
     }

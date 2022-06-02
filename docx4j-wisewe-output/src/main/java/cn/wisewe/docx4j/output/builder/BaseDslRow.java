@@ -214,4 +214,15 @@ public abstract class BaseDslRow<T extends BaseDslRow<?, ?>, U> {
      * @return {@link T}
      */
     public abstract T pictureCell(File file, int width, int height);
+
+    /**
+     * 图片单元格
+     * @param fileName 文件名
+     * @param width    宽度
+     * @param height   高度
+     * @return {@link T}
+     */
+    public T pictureCell(String fileName, int width, int height) {
+        return this.pictureCell(new File(fileName), width, height);
+    }
 }

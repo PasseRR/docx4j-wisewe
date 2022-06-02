@@ -85,7 +85,22 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
 
     @Override
     public DslRow pictureCell(File file, int width, int height) {
-        return this.cell(null, c -> c.pictureParagraph(file, image -> image.scaleToFit(width, height)));
+        // 高度为0 按照固定宽度缩放图片
+        if (height <= 0) {
+            return this.cell(c -> c.pictureParagraph(file, width));
+        }
+
+        return this.cell(c -> c.pictureParagraph(file, image -> image.scaleToFit(width, height)));
+    }
+
+    /**
+     * 添加图片单元格 按照原图比例缩放
+     * @param file  图片文件
+     * @param width 图片宽度
+     * @return {@link DslRow}
+     */
+    public DslRow pictureCell(File file, int width) {
+        return this.pictureCell(file, width, 0);
     }
 
     /**

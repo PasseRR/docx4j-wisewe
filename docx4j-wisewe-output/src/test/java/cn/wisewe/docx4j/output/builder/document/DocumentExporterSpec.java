@@ -74,11 +74,14 @@ public class DocumentExporterSpec {
         DocumentExporter.create()
             .headingParagraph("教职工列表", ParagraphStyle.SUB_HEADING)
             // 需要指定表格行数及列数
-            .table(people.size() + 1, 3, t ->
+            .table(people.size() + 1, 4, t ->
                 // 表头行会自动加粗
-                t.row(r -> r.headCells("姓名", "年龄", "性别"))
+                t.row(r -> r.headCells("姓名", "年龄", "性别", "头像"))
                     // 数据行正常
-                    .rows(people, (p, r) -> r.dataCells(p::getName, p::getAge, p::getSex))
+                    .rows(people, (p, r) ->
+                        r.dataCells(p::getName, p::getAge, p::getSex)
+                            .pictureCell(p.picture(), 30, 30)
+                    )
             )
             .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "table.docx")));
     }

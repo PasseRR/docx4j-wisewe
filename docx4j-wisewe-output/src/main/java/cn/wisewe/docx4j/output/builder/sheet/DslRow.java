@@ -170,14 +170,14 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
 
     /**
      * 图片单元格
+     * @param file   文件
      * @param width  图片宽度
      * @param height 图片高度
-     * @param file   图片文件
      * @return {@link DslRow}
      */
     @Override
     public DslRow pictureCell(File file, int width, int height) {
-        return this.dataCell(c -> c.picture(file, width, height));
+        return this.cell(c -> c.picture(file, width, height));
     }
 
     /**
