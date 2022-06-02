@@ -97,6 +97,7 @@ public class DslTableRow extends BaseDslRow<DslTableRow, DslTableCell> {
      * @param height 高度
      * @return {@link DslTableRow}
      */
+    @Override
     public DslTableRow pictureCell(File file, int width, int height) {
         return this.cell(c -> c.paragraph(p -> p.run(r -> r.picture(file, width, height))));
     }

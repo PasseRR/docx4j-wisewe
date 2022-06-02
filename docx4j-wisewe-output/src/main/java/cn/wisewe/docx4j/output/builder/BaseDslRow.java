@@ -1,6 +1,7 @@
 package cn.wisewe.docx4j.output.builder;
 
 import javax.annotation.Generated;
+import java.io.File;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -204,4 +205,13 @@ public abstract class BaseDslRow<T extends BaseDslRow<?, ?>, U> {
     public <E> T dataCells(Iterable<E> iterable) {
         return this.dataCells(iterable, it -> it);
     }
+
+    /**
+     * 图片单元格
+     * @param file   图片文件
+     * @param width  宽度
+     * @param height 高度
+     * @return {@link T}
+     */
+    public abstract T pictureCell(File file, int width, int height);
 }

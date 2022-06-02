@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.PackagePrivate;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +81,11 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
                     }
                 }
             );
+    }
+
+    @Override
+    public DslRow pictureCell(File file, int width, int height) {
+        return this.cell(null, c -> c.pictureParagraph(file, image -> image.scaleToFit(width, height)));
     }
 
     /**

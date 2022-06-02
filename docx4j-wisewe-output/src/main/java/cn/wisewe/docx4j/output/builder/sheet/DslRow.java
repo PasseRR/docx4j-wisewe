@@ -175,6 +175,7 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
      * @param file   图片文件
      * @return {@link DslRow}
      */
+    @Override
     public DslRow pictureCell(File file, int width, int height) {
         return this.dataCell(c -> c.picture(file, width, height));
     }
