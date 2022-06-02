@@ -49,15 +49,12 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
         return this;
     }
 
-    /**
-     * 添加一个单元格主要方法
-     * @param consumer 单元格消费
-     * @return {@link DslCell}
-     */
     @Override
-    public DslRow cell(Consumer<DslCell> consumer) {
+    public DslRow cell(Object o, Consumer<DslCell> consumer) {
         DslCell cell = this.getOrCreateCell(this.cellNumber.getAndIncrement());
-        consumer.accept(cell);
+        Optional.ofNullable(o).ifPresent(cell::text);
+        Optional.ofNullable(consumer).ifPresent(it -> it.accept(cell));
+
         this.cellNumber.getAndAdd(cell.colspan - 1);
 
         if (cell.colspan > 1 || cell.rowspan > 1) {
@@ -67,24 +64,23 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
         return this;
     }
 
-    /**
-     * 添加一个表头单元格
-     * @param consumer 单元格消费
-     * @return {@link DslRow}
-     */
+
     @Override
-    public DslRow headCell(Consumer<DslCell> consumer) {
-        return this.cell(cell -> consumer.accept(cell.headStyle()));
+    public DslRow headCell(Object o, Consumer<DslCell> consumer) {
+        return
+            this.cell(o, c -> {
+                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
+                c.headStyle();
+            });
     }
 
-    /**
-     * 添加一个表头单元格
-     * @param o 单元格对象
-     * @return {@link DslRow}
-     */
     @Override
-    public DslRow headCell(Object o) {
-        return this.headCell(cell -> cell.text(o));
+    public DslRow dataCell(Object o, Consumer<DslCell> consumer) {
+        return
+            this.cell(o, c -> {
+                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
+                c.dataStyle();
+            });
     }
 
     /**
@@ -139,26 +135,6 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
      */
     public DslRow diagonalUpHeadCell(String first, String second) {
         return this.diagonalHeadCell(first, second, true);
-    }
-
-    /**
-     * 添加一个数据单元格
-     * @param consumer 单元格消费
-     * @return {@link DslRow}
-     */
-    @Override
-    public DslRow dataCell(Consumer<DslCell> consumer) {
-        return this.cell(cell -> consumer.accept(cell.dataStyle()));
-    }
-
-    /**
-     * 添加一个数据单元格
-     * @param o 单元格内容对象
-     * @return {@link DslCell}
-     */
-    @Override
-    public DslRow dataCell(Object o) {
-        return this.dataCell(c -> c.text(o));
     }
 
 

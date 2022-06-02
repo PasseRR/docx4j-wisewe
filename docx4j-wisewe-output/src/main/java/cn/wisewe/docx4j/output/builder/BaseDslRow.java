@@ -20,24 +20,56 @@ import java.util.function.Supplier;
 public abstract class BaseDslRow<T extends BaseDslRow<?, ?>, U> {
     /**
      * 行添加一个单元格
+     * @param o        单元格内容
+     * @param consumer 单元格设置
+     * @return {@link T}
+     */
+    public abstract T cell(Object o, Consumer<U> consumer);
+
+    /**
+     * 行添加一个单元格
      * @param consumer 单元格消费
      * @return {@link T}
      */
-    public abstract T cell(Consumer<U> consumer);
+    public T cell(Consumer<U> consumer) {
+        return this.cell(null, consumer);
+    }
+
+    /**
+     * 添加一个表头单元格
+     * @param o        表头单元格内容
+     * @param consumer 单元格设置
+     * @return {@link T}
+     */
+    public abstract T headCell(Object o, Consumer<U> consumer);
+
+    /**
+     * 添加一个表头单元格
+     * @param supplier 单元格提供
+     * @param consumer 单元格设置
+     * @return {@link T}
+     */
+    public T headCell(Supplier<?> supplier, Consumer<U> consumer) {
+        return this.headCell(supplier.get(), consumer);
+    }
 
     /**
      * 添加一个表头单元格
      * @param consumer 单元格消费
      * @return {@link T}
      */
-    public abstract T headCell(Consumer<U> consumer);
+    public T headCell(Consumer<U> consumer) {
+        return this.headCell(null, consumer);
+    }
 
     /**
      * 添加一个表头单元格
      * @param o 单元格对象
      * @return {@link T}
      */
-    public abstract T headCell(Object o);
+    public T headCell(Object o) {
+        return this.headCell(o, null);
+    }
 
     /**
      * 添加一个表头单元格
@@ -90,17 +122,39 @@ public abstract class BaseDslRow<T extends BaseDslRow<?, ?>, U> {
 
     /**
      * 添加一个数据单元格
+     * @param o        数据单元格
+     * @param consumer 单元格设置
+     * @return {@link T}
+     */
+    public abstract T dataCell(Object o, Consumer<U> consumer);
+
+    /**
+     * 添加一个数据单元格
+     * @param supplier 单元格提供
+     * @param consumer 单元格设置
+     * @return {@link T}
+     */
+    public T dataCell(Supplier<?> supplier, Consumer<U> consumer) {
+        return this.dataCell(supplier.get(), consumer);
+    }
+
+    /**
+     * 添加一个数据单元格
      * @param consumer 单元格消费
      * @return {@link T}
      */
-    public abstract T dataCell(Consumer<U> consumer);
+    public T dataCell(Consumer<U> consumer) {
+        return this.dataCell(null, consumer);
+    }
 
     /**
      * 添加一个数据单元格
      * @param o 单元格对象
      * @return {@link T}
      */
-    public abstract T dataCell(Object o);
+    public T dataCell(Object o) {
+        return this.dataCell(o, null);
+    }
 
     /**
      * 添加一个数据单元格

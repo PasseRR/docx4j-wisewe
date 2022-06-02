@@ -1,8 +1,6 @@
 package cn.wisewe.docx4j.output.builder.document;
 
 import cn.wisewe.docx4j.output.builder.BaseDslRow;
-import cn.wisewe.docx4j.output.builder.sheet.DslCell;
-import cn.wisewe.docx4j.output.builder.sheet.DslRow;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
@@ -10,6 +8,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -42,18 +41,14 @@ public class DslTableRow extends BaseDslRow<DslTableRow, DslTableCell> {
         return this;
     }
 
-    /**
-     * 添加一个单元格主要方法
-     * @param consumer 单元格消费
-     * @return {@link DslTableRow}
-     */
     @Override
-    public DslTableRow cell(Consumer<DslTableCell> consumer) {
+    public DslTableRow cell(Object o, Consumer<DslTableCell> consumer) {
         // 单元格索引
         int index = this.cellIndex.getAndIncrement();
         XWPFTableCell tableCell = this.row.getCell(index);
         DslTableCell dslCell = new DslTableCell(tableCell);
-        consumer.accept(dslCell);
+        Optional.ofNullable(o).ifPresent(dslCell::text);
+        Optional.ofNullable(consumer).ifPresent(it -> it.accept(dslCell));
         // 列合并
         if (dslCell.colspan > 1) {
             tableCell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.RESTART);
@@ -85,9 +80,14 @@ public class DslTableRow extends BaseDslRow<DslTableRow, DslTableCell> {
         return this;
     }
 
+
     @Override
-    public DslTableRow headCell(Consumer<DslTableCell> consumer) {
-        return this.cell(consumer);
+    public DslTableRow headCell(Object o, Consumer<DslTableCell> consumer) {
+        return
+            this.cell(null, c -> {
+                c.boldText(o);
+                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
+            });
     }
 
     /**
@@ -101,28 +101,8 @@ public class DslTableRow extends BaseDslRow<DslTableRow, DslTableCell> {
         return this.cell(c -> c.paragraph(p -> p.run(r -> r.picture(file, width, height))));
     }
 
-    /**
-     * 添加一个表头单元格
-     * @param o 单元格对象
-     * @return {@link DslRow}
-     */
     @Override
-    public DslTableRow headCell(Object o) {
-        return this.cell(t -> t.boldText(o));
-    }
-
-    @Override
-    public DslTableRow dataCell(Consumer<DslTableCell> consumer) {
-        return this.cell(consumer);
-    }
-    
-    /**
-     * 添加一个数据单元格
-     * @param o 单元格内容对象
-     * @return {@link DslCell}
-     */
-    @Override
-    public DslTableRow dataCell(Object o) {
-        return this.cell(c -> c.text(o));
+    public DslTableRow dataCell(Object o, Consumer<DslTableCell> consumer) {
+        return this.cell(o, consumer);
     }
 }

@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * {@link com.itextpdf.text.pdf.PdfPRow} dsl
@@ -45,13 +44,8 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
     }
 
     @Override
-    public DslRow cell(Consumer<DslCell> consumer) {
-        return this.cell(null, consumer);
-    }
-
-    @Override
-    public DslRow headCell(Consumer<DslCell> consumer) {
-        return this.cell(consumer);
+    public DslRow cell(Object o, Consumer<DslCell> consumer) {
+        return this.dataCell(o, consumer);
     }
 
     /**
@@ -60,42 +54,13 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
      * @param consumer 单元格追加消费
      * @return {@link DslRow}
      */
+    @Override
     public DslRow headCell(Object o, Consumer<DslCell> consumer) {
         return
             this.cell(
                 new Phrase(StringConverterUtil.convert(o), Fonts.BOLD_NORMAL.font()),
-                c -> {
-                    if (Objects.nonNull(consumer)) {
-                        consumer.accept(c);
-                    }
-                }
+                c -> Optional.ofNullable(consumer).ifPresent(it -> it.accept(c))
             );
-    }
-
-    /**
-     * 表头单元格
-     * @param supplier 表头单元格内容提供
-     * @param consumer 单元格追加消费
-     * @return {@link DslRow}
-     */
-    public DslRow headCell(Supplier<?> supplier, Consumer<DslCell> consumer) {
-        return this.headCell(supplier.get(), consumer);
-    }
-
-    /**
-     * 添加表头单元格
-     * @param o 任意对象
-     * @return {@link DslRow}
-     */
-    @Override
-    public DslRow headCell(Object o) {
-        // 表头加粗
-        return this.headCell(o, null);
-    }
-
-    @Override
-    public DslRow dataCell(Consumer<DslCell> consumer) {
-        return this.cell(consumer);
     }
 
     /**
@@ -104,6 +69,7 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
      * @param consumer 单元格追加消费
      * @return {@link DslRow}
      */
+    @Override
     public DslRow dataCell(Object o, Consumer<DslCell> consumer) {
         return
             this.cell(
@@ -117,32 +83,14 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
     }
 
     /**
-     * 数据单元格
-     * @param supplier 数据提供
-     * @param consumer 单元格追加消费
-     * @return {@link DslRow}
-     */
-    public DslRow dataCell(Supplier<?> supplier, Consumer<DslCell> consumer) {
-        return this.dataCell(supplier.get(), consumer);
-    }
-
-    /**
-     * 添加数据单元格
-     * @param o 文本
-     * @return {@link DslRow}
-     */
-    @Override
-    public DslRow dataCell(Object o) {
-        return this.dataCell(o, null);
-    }
-
-    /**
      * 添加多个数据单元格
      * @param iterable 迭代器
      * @param consumer 一个迭代产生多个单元格消费
      * @param <U>      迭代内容类型
      * @return {@link DslRow}
+     * @deprecated 后期会移除此方法
      */
+    @Deprecated
     public <U> DslRow dataCells(Iterable<U> iterable, BiConsumer<U, DslRow> consumer) {
         if (Objects.nonNull(iterable)) {
             iterable.forEach(u -> consumer.accept(u, this));
