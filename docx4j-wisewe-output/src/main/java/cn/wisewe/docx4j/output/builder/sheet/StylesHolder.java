@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.output.builder.sheet;
 
+import cn.wisewe.docx4j.output.builder.sheet.spi.DefaultStyleDefinitionSpi;
 import cn.wisewe.docx4j.output.builder.sheet.spi.OrderedStyleDefinition;
 import cn.wisewe.docx4j.output.builder.sheet.spi.StyleDefinition;
 import lombok.AccessLevel;
@@ -72,9 +73,7 @@ class StylesHolder implements StyleDefinition {
                                 // 取排序号最小的实现
                                 .min(Comparator.comparing(OrderedStyleDefinition::order))
                                 // 有提供的默认实现
-                                .orElseThrow(() ->
-                                    new SpreadSheetExportException("no OrderedStyleDefinition impl exists")
-                                )
+                                .orElseGet(DefaultStyleDefinitionSpi::new)
                         );
                 }
             }
