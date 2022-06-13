@@ -15,6 +15,10 @@
     <description>文档转换器</description>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
 
+    <properties>
+        <aspose.version>21.10</aspose.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.itextpdf</groupId>
@@ -40,6 +44,47 @@
         </dependency>
 
         <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>21.11</version>
+            <classifier>jdk17</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jogamp.jogl</groupId>
+                    <artifactId>jogl-all-main</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jogamp.gluegen</groupId>
+                    <artifactId>gluegen-rt-main</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.aspose</groupId>
+                    <artifactId>aspose-words</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.aspose</groupId>-->
+<!--            <artifactId>aspose-slides</artifactId>-->
+<!--            <version>${aspose.version}</version>-->
+<!--            <classifier>jdk16</classifier>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.aspose</groupId>-->
+<!--            <artifactId>aspose-cells</artifactId>-->
+<!--            <version>${aspose.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.aspose</groupId>-->
+<!--            <artifactId>aspose-pdf</artifactId>-->
+<!--            <version>${aspose.version}</version>-->
+<!--            <classifier>jdk17</classifier>-->
+<!--        </dependency>-->
+
+        <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.14.3</version>
@@ -49,9 +94,22 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.27.0-GA</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
         <testResources>
             <testResource>
                 <directory>src/test/java</directory>
@@ -67,9 +125,45 @@
                 </includes>
             </testResource>
         </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <!-- for words -->
+                                <filter>
+                                    <artifact>com.aspose:aspose-words</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/37E3C32D.RSA</exclude>
+                                        <exclude>META-INF/37E3C32D.SF</exclude>
+                                        <exclude>com/aspose/words/zzXDb.class</exclude>
+                                        <exclude>com/aspose/words/zzYKk.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <repositories>
+        <repository>
+            <id>AsposeJavaAPI</id>
+            <name>Aspose Java API</name>
+            <url>http://repository.aspose.com/repo/</url>
+        </repository>
         <repository>
             <id>com.e-iceblue</id>
             <name>e-iceblue</name>

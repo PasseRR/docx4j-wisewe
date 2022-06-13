@@ -48,7 +48,7 @@ public class DocumentConverterSpec {
     @Test
     public void docxToPdf() throws FileNotFoundException {
         DocumentConverter.create()
-            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2007.docx")))
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2007-1.docx")))
             .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "2007.pdf")))
             .convert(DocumentConvertType.PDF);
     }
@@ -56,7 +56,7 @@ public class DocumentConverterSpec {
     @Test
     public void docxToHtml() throws FileNotFoundException {
         DocumentConverter.create()
-            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2007.docx")))
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "2007-1.docx")))
             .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "2007.html")))
             .convert(DocumentConvertType.HTML);
     }
