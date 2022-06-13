@@ -15,6 +15,7 @@
         <module>docx4j-wisewe-output</module>
         <module>docx4j-wisewe-input</module>
         <module>docx4j-wisewe-convert</module>
+        <module>docx4j-wisewe-convert-test</module>
     </modules>
 
     <properties>

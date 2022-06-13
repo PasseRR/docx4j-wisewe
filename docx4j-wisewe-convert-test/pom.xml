@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>docx4j-wisewe</artifactId>
+        <groupId>cn.wisewe</groupId>
+        <version>1.5.1.RELEASE</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>docx4j-wisewe-convert-test</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.wisewe</groupId>
+            <artifactId>docx4j-wisewe-convert</artifactId>
+            <version>test</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/../docx4j-wisewe-convert/target/docx4j-wisewe-convert-1.5.1.RELEASE.jar</systemPath>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.27.0-GA</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.xls</include>
+                    <include>**/*.xlsx</include>
+                    <include>**/*.doc</include>
+                    <include>**/*.docx</include>
+                    <include>**/*.pptx</include>
+                    <include>**/*.ppt</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.pdf</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,37 +1,41 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
-import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
-import com.spire.doc.Document;
-import com.spire.doc.FileFormat;
+import cn.wisewe.docx4j.convert.ConvertHandler;
+import com.aspose.words.Document;
+import com.aspose.words.License;
 
-import java.io.InputStream;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.io.BufferedInputStream;
+import java.io.OutputStream;
 
 /**
- * word文档处理器
+ * 文档处理
  * @author xiehai
- * @date 2022/04/13 16:53
+ * @date 2022/06/13 18:47
  */
-@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-abstract class DocumentHandler extends OfficeDocumentHandler<Document> {
-    @Override
-    protected Supplier<Document> newDocument() {
-        return Document::new;
-    }
+abstract class DocumentHandler implements ConvertHandler {
+    /**
+     * 是否初始化
+     */
+    private static volatile boolean hasLicensed = false;
 
     @Override
-    protected BiConsumer<Document, InputStream> preHandleFlat() {
-        return (t, is) -> t.loadFromStream(is, FileFormat.Word_Xml);
+    public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
+        if (!hasLicensed) {
+            synchronized (DocumentHandler.class) {
+                if (!hasLicensed) {
+                    new License().setLicense("/license.xml");
+                    hasLicensed = true;
+                }
+            }
+        }
+        this.postHandle(new Document(inputStream), outputStream);
     }
 
-    @Override
-    protected BiConsumer<Document, InputStream> preHandleBinary() {
-        return (t, is) -> t.loadFromStream(is, FileFormat.Doc);
-    }
-
-    @Override
-    protected BiConsumer<Document, InputStream> preHandleZipped() {
-        return (t, is) -> t.loadFromStream(is, FileFormat.Docx);
-    }
+    /**
+     * 后置处理
+     * @param document     {@link Document}
+     * @param outputStream {@link OutputStream}
+     * @throws Exception 异常
+     */
+    protected abstract void postHandle(Document document, OutputStream outputStream) throws Exception;
 }

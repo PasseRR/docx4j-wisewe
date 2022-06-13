@@ -1,12 +1,9 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
-import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
-import com.spire.doc.Document;
-import com.spire.doc.FileFormat;
-import org.jsoup.nodes.Node;
+import com.aspose.words.Document;
+import com.aspose.words.HtmlSaveOptions;
 
 import java.io.OutputStream;
-import java.util.Optional;
 
 /**
  * word文档转html处理器
@@ -21,20 +18,10 @@ class HtmlHandler extends DocumentHandler {
     }
 
     @Override
-    protected void postHandle(Document document, OutputStream outputStream) {
-        document.getHtmlExportOptions().setImageEmbedded(true);
-        HtmlTransfer.create(os -> document.saveToStream(os, FileFormat.Html))
-            .handle(d -> {
-                Optional.of(d.body().getElementsByTag("p"))
-                    .filter(it -> it.size() > 0)
-                    .map(it -> it.get(0))
-                    .ifPresent(Node::remove);
-
-                Optional.of(d.body().getElementsByAttributeValue("style", "min-height:72pt"))
-                    .filter(it -> it.size() > 0)
-                    .map(it -> it.get(0))
-                    .ifPresent(it -> it.removeAttr("style"));
-            })
-            .transfer(outputStream);
+    protected void postHandle(Document document, OutputStream outputStream) throws Exception {
+        HtmlSaveOptions options = new HtmlSaveOptions();
+        options.setExportImagesAsBase64(true);
+        options.setExportPageMargins(true);
+        document.save(outputStream, options);
     }
 }

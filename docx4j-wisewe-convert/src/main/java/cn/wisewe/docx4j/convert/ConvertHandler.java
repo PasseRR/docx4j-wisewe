@@ -13,6 +13,7 @@ public interface ConvertHandler {
      * 文件转换
      * @param inputStream  文件输入流
      * @param outputStream 文件输出流
+     * @throws Exception 异常
      */
-    void handle(BufferedInputStream inputStream, OutputStream outputStream);
+    void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception;
 }

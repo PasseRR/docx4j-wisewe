@@ -1,21 +1,19 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
-import cn.wisewe.docx4j.convert.office.OfficeFileHandler;
-import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
-import com.spire.doc.Document;
+import cn.wisewe.docx4j.convert.FileHandler;
 
 /**
  * 支持转换类型
  * @author xiehai
  * @date 2022/03/23 16:03
  */
-public enum DocumentConvertType implements OfficeFileHandler<Document> {
+public enum DocumentConvertType implements FileHandler {
     /**
      * pdf转换
      */
     PDF {
         @Override
-        public OfficeDocumentHandler<Document> getHandler() {
+        public DocumentHandler getHandler() {
             return PdfHandler.INSTANCE;
         }
     },
@@ -24,7 +22,7 @@ public enum DocumentConvertType implements OfficeFileHandler<Document> {
      */
     HTML {
         @Override
-        public OfficeDocumentHandler<Document> getHandler() {
+        public DocumentHandler getHandler() {
             return HtmlHandler.INSTANCE;
         }
     }
