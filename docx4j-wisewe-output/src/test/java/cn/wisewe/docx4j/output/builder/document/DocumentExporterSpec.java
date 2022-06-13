@@ -214,8 +214,7 @@ public class DocumentExporterSpec {
         DocumentExporter exporter = DocumentExporter.create();
         File file = new File(FileUtil.rootPath(this.getClass(), "/e.png"));
         // 去除上下页边距后的高度和宽度像素
-        int maxHeight = (int) DocumentPaperPadding.NORMAL.heightPixel(DocumentPaperSize.A4),
-            maxWidth = (int) DocumentPaperPadding.NORMAL.widthPixel(DocumentPaperSize.A4);
+        int maxHeight = (int) DocumentPaperSize.A4.heightPixel(), maxWidth = (int) DocumentPaperSize.A4.widthPixel();
         IntStream.range(0, 5)
             .forEach(it -> {
                 try {
@@ -234,8 +233,7 @@ public class DocumentExporterSpec {
                     } else {
                         exporter.pictureParagraph(file, maxWidth, (int) ((maxWidth * 1.0D / width) * height));
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ignore) {
                 }
             });
 

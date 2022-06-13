@@ -65,7 +65,7 @@ public enum DocumentPaperPadding {
      * 左右边距像素值
      * @return 像素值
      */
-    public double widthPadding() {
+    public double widthPixel() {
         return DocumentPaperPadding.padding(this.left, this.right);
     }
 
@@ -73,26 +73,8 @@ public enum DocumentPaperPadding {
      * 上下边距像素值
      * @return 像素值
      */
-    public double heightPadding() {
+    public double heightPixel() {
         return DocumentPaperPadding.padding(this.top, this.bottom);
-    }
-
-    /**
-     * 计算指定纸张的实际宽度像素
-     * @param size 纸张
-     * @return 实际宽度像素值
-     */
-    public double widthPixel(DocumentPaperSize size) {
-        return size.width - this.widthPadding();
-    }
-
-    /**
-     * 计算指定纸张的实际高度
-     * @param size 纸张
-     * @return 实际高度像素值
-     */
-    public double heightPixel(DocumentPaperSize size) {
-        return size.height - this.heightPadding();
     }
 
     /**
