@@ -1,19 +1,19 @@
-package cn.wisewe.docx4j.convert.builder.document;
+package cn.wisewe.docx4j.convert.builder.portable;
 
 import cn.wisewe.docx4j.convert.ConvertHandler;
 import cn.wisewe.docx4j.convert.builder.Asposes;
-import com.aspose.words.Document;
-import com.aspose.words.License;
+import com.aspose.pdf.Document;
+import com.aspose.pdf.License;
 
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
 
 /**
- * 文档处理
+ * pdf处理器
  * @author xiehai
- * @date 2022/06/13 18:47
+ * @date 2022/06/13 19:40
  */
-abstract class DocumentHandler implements ConvertHandler {
+abstract class PortableHandler implements ConvertHandler {
     /**
      * 是否初始化
      */
@@ -22,7 +22,7 @@ abstract class DocumentHandler implements ConvertHandler {
     @Override
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
         if (!hasLicensed) {
-            synchronized (DocumentHandler.class) {
+            synchronized (PortableHandler.class) {
                 if (!hasLicensed) {
                     new License().setLicense(Asposes.license());
                     hasLicensed = true;

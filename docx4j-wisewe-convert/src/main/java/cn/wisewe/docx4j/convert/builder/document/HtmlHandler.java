@@ -1,5 +1,6 @@
 package cn.wisewe.docx4j.convert.builder.document;
 
+import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
 import com.aspose.words.Document;
 import com.aspose.words.HtmlSaveOptions;
 
@@ -22,6 +23,14 @@ class HtmlHandler extends DocumentHandler {
         HtmlSaveOptions options = new HtmlSaveOptions();
         options.setExportImagesAsBase64(true);
         options.setExportPageMargins(true);
-        document.save(outputStream, options);
+        // 添加移动端html支持
+        HtmlTransfer.create(os -> {
+                try {
+                    document.save(os, options);
+                } catch (Exception e) {
+                    throw new DocumentConvertException(e);
+                }
+            })
+            .transfer(outputStream);
     }
 }

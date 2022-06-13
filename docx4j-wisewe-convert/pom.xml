@@ -77,12 +77,12 @@
 <!--            <version>${aspose.version}</version>-->
 <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>com.aspose</groupId>-->
-<!--            <artifactId>aspose-pdf</artifactId>-->
-<!--            <version>${aspose.version}</version>-->
-<!--            <classifier>jdk17</classifier>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-pdf</artifactId>
+            <version>21.11</version>
+            <classifier>jdk17</classifier>
+        </dependency>
 
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -110,22 +110,6 @@
             </resource>
         </resources>
 
-        <testResources>
-            <testResource>
-                <directory>src/test/java</directory>
-                <includes>
-                    <include>**/*.xls</include>
-                    <include>**/*.xlsx</include>
-                    <include>**/*.doc</include>
-                    <include>**/*.docx</include>
-                    <include>**/*.pptx</include>
-                    <include>**/*.ppt</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.pdf</include>
-                </includes>
-            </testResource>
-        </testResources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -149,6 +133,16 @@
                                         <exclude>com/aspose/words/zzYKk.class</exclude>
                                     </excludes>
                                 </filter>
+                                <!-- for pdf -->
+                                <filter>
+                                    <artifact>com.aspose:aspose-pdf</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/37E3C32D.RSA</exclude>
+                                        <exclude>META-INF/37E3C32D.SF</exclude>
+                                        <exclude>com/aspose/pdf/l9f.class</exclude>
+                                    </excludes>
+                                </filter>
+
                             </filters>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>

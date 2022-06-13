@@ -1,11 +1,10 @@
 package cn.wisewe.docx4j.convert.builder.portable;
 
-import cn.wisewe.docx4j.convert.ConvertHandler;
 import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
-import com.spire.pdf.FileFormat;
-import com.spire.pdf.PdfDocument;
+import com.aspose.pdf.Document;
+import com.aspose.pdf.HtmlSaveOptions;
+import com.aspose.pdf.SaveOptions;
 
-import java.io.BufferedInputStream;
 import java.io.OutputStream;
 
 /**
@@ -13,21 +12,17 @@ import java.io.OutputStream;
  * @author xiehai
  * @date 2022/04/17 19:01
  */
-class HtmlHandler implements ConvertHandler {
+class HtmlHandler extends PortableHandler {
     static final HtmlHandler INSTANCE = new HtmlHandler();
 
     @Override
-    public void handle(BufferedInputStream inputStream, OutputStream outputStream) {
-        PdfDocument document = new PdfDocument(inputStream);
-        document.getConvertOptions().setOutputToOneSvg(true);
-
-        HtmlTransfer.create(os -> document.saveToStream(os, FileFormat.HTML))
-            .handle(d -> {
-                // 内容居中
-                d.body().attr("style", "text-align: center");
-                // 警告信息移除
-                d.body().select("svg > g > g:eq(1)").remove();
-            })
+    protected void postHandle(Document document, OutputStream outputStream) {
+        HtmlSaveOptions options = new HtmlSaveOptions();
+        options.setFixedLayout(true);
+        options.setPageBorderIfAny(new SaveOptions.BorderInfo());
+        options.setPartsEmbeddingMode(HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml);
+        options.setRasterImagesSavingMode(HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground);
+        HtmlTransfer.create(os -> document.save(os, options))
             .transfer(outputStream);
     }
 }
