@@ -8,6 +8,10 @@ import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * {@link DocumentExporter}单元测试
@@ -202,5 +207,38 @@ public class DocumentExporterSpec {
                     .pictureParagraph(new File(FileUtil.rootPath(this.getClass(), "/a.jpg")), 20, 20)
             )
             .writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "picture.docx")));
+    }
+
+    @Test
+    public void pictures() throws FileNotFoundException {
+        DocumentExporter exporter = DocumentExporter.create();
+        File file = new File(FileUtil.rootPath(this.getClass(), "/e.png"));
+        // 去除上下页边距后的高度和宽度像素
+        int maxHeight = (int) DocumentPaperPadding.NORMAL.heightPixel(DocumentPaperSize.A4),
+            maxWidth = (int) DocumentPaperPadding.NORMAL.widthPixel(DocumentPaperSize.A4);
+        IntStream.range(0, 5)
+            .forEach(it -> {
+                try {
+                    BufferedImage read = ImageIO.read(file);
+                    Graphics graphics = read.getGraphics();
+                    int width = read.getWidth(), height = read.getHeight();
+                    graphics.drawImage(read, 0, 0, width, height, null); // 绘制图
+
+                    graphics.setColor(Color.BLACK);
+
+                    graphics.drawRect(1, 1, width - 1, height - 1);
+                    graphics.dispose();
+                    // 按照对照比例 找相对比例较小的
+                    if ((width * 1.0D / maxWidth) <= (height * 1.0D / maxHeight)) {
+                        exporter.pictureParagraph(file, (int) ((maxHeight * 1.0D / height) * width), maxHeight);
+                    } else {
+                        exporter.pictureParagraph(file, maxWidth, (int) ((maxWidth * 1.0D / width) * height));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+        exporter.writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "pictures.docx")));
     }
 }
