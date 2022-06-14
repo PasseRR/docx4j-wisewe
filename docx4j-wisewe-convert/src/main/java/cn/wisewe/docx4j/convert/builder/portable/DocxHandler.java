@@ -12,7 +12,11 @@ import java.io.OutputStream;
  */
 class DocxHandler extends PortableHandler {
     static final PortableHandler INSTANCE = new DocxHandler();
-    
+
+    private DocxHandler() {
+        
+    }
+
     @Override
     protected void postHandle(Document document, OutputStream outputStream) throws Exception {
         document.save(outputStream, SaveFormat.DocX);

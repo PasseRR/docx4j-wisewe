@@ -15,6 +15,10 @@ import java.io.OutputStream;
 class HtmlHandler extends PortableHandler {
     static final PortableHandler INSTANCE = new HtmlHandler();
 
+    private HtmlHandler() {
+        
+    }
+
     @Override
     protected void postHandle(Document document, OutputStream outputStream) {
         HtmlSaveOptions options = new HtmlSaveOptions();

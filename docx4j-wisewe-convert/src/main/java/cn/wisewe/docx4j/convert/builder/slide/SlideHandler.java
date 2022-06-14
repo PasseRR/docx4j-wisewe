@@ -1,44 +1,37 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
-import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
-import com.spire.presentation.FileFormat;
-import com.spire.presentation.Presentation;
+import cn.wisewe.docx4j.convert.ConvertHandler;
+import cn.wisewe.docx4j.convert.builder.Asposes;
+import com.aspose.slides.License;
+import com.aspose.slides.Presentation;
 
-import java.io.InputStream;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.io.BufferedInputStream;
+import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * excel文档处理器
+ * ppt文档处理器
  * @author xiehai
  * @date 2022/04/13 16:53
  */
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-abstract class SlideHandler extends OfficeDocumentHandler<Presentation> {
-    @Override
-    protected Supplier<Presentation> newDocument() {
-        return Presentation::new;
-    }
+abstract class SlideHandler implements ConvertHandler {
+    /**
+     * 是否初始化
+     */
+    private static final AtomicBoolean HAS_LICENSED = new AtomicBoolean();
 
     @Override
-    protected BiConsumer<Presentation, InputStream> preHandleFlat() {
-        return
-            (t, is) -> {
-                try {
-                    t.loadFromStream(is, FileFormat.AUTO);
-                } catch (Exception e) {
-                    throw new SlideConvertException(e);
-                }
-            };
+    public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
+        Asposes.tryLoadLicense(HAS_LICENSED, () -> SlideHandler.class, new License()::setLicense);
+        this.postHandle(new Presentation(inputStream), outputStream);
     }
 
-    @Override
-    protected BiConsumer<Presentation, InputStream> preHandleBinary() {
-        return this.preHandleFlat();
-    }
-
-    @Override
-    protected BiConsumer<Presentation, InputStream> preHandleZipped() {
-        return this.preHandleFlat();
-    }
+    /**
+     * 后置处理
+     * @param presentation {@link Presentation}
+     * @param outputStream {@link OutputStream}
+     * @throws Exception 异常
+     */
+    protected abstract void postHandle(Presentation presentation, OutputStream outputStream) throws Exception;
 }

@@ -7,28 +7,23 @@ import com.aspose.words.License;
 
 import java.io.BufferedInputStream;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 文档处理
  * @author xiehai
  * @date 2022/06/13 18:47
  */
+@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 abstract class DocumentHandler implements ConvertHandler {
     /**
      * 是否初始化
      */
-    private static volatile boolean hasLicensed = false;
+    private static final AtomicBoolean HAS_LICENSED = new AtomicBoolean();
 
     @Override
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
-        if (!hasLicensed) {
-            synchronized (DocumentHandler.class) {
-                if (!hasLicensed) {
-                    new License().setLicense(Asposes.license());
-                    hasLicensed = true;
-                }
-            }
-        }
+        Asposes.tryLoadLicense(HAS_LICENSED, () -> DocumentHandler.class, new License()::setLicense);
         this.postHandle(new Document(inputStream), outputStream);
     }
 

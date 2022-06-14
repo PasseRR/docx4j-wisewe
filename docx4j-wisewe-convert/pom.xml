@@ -64,18 +64,18 @@
             </exclusions>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.aspose</groupId>-->
-<!--            <artifactId>aspose-slides</artifactId>-->
-<!--            <version>${aspose.version}</version>-->
-<!--            <classifier>jdk16</classifier>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-slides</artifactId>
+            <version>21.10</version>
+            <classifier>jdk16</classifier>
+        </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.aspose</groupId>-->
-<!--            <artifactId>aspose-cells</artifactId>-->
-<!--            <version>${aspose.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.aspose</groupId>-->
+        <!--            <artifactId>aspose-cells</artifactId>-->
+        <!--            <version>${aspose.version}</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.aspose</groupId>
@@ -122,6 +122,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                             <filters>
                                 <!-- for words -->
                                 <filter>
@@ -139,10 +140,21 @@
                                     <excludes>
                                         <exclude>META-INF/37E3C32D.RSA</exclude>
                                         <exclude>META-INF/37E3C32D.SF</exclude>
+                                        <exclude>META-INF/*.pdf</exclude>
                                         <exclude>com/aspose/pdf/l9f.class</exclude>
                                     </excludes>
                                 </filter>
-
+                                <!-- for slides -->
+                                <filter>
+                                    <artifact>com.aspose:aspose-slides</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/ASPOSE.RSA</exclude>
+                                        <exclude>META-INF/ASPOSE.SF</exclude>
+                                        <exclude>META-INF/*.pdf</exclude>
+                                        <exclude>META-INF/*.html</exclude>
+                                        <exclude>com.aspose.slides.internal.of.public.class</exclude>
+                                    </excludes>
+                                </filter>
                             </filters>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>

@@ -1,12 +1,8 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
-import cn.wisewe.docx4j.convert.builder.SvgTransfer;
-import com.spire.presentation.Presentation;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import com.aspose.slides.SaveFormat;
 
 import java.io.OutputStream;
-import java.util.Optional;
 
 /**
  * ppt转pdf处理器
@@ -20,14 +16,7 @@ class PdfHandler extends SlideHandler {
     }
 
     @Override
-    protected void postHandle(Presentation presentation, OutputStream outputStream) {
-        SvgTransfer.create(presentation::saveToSVG)
-            .handle((index, it) ->
-                Optional.of(it.select("svg > g > text"))
-                    .filter(t -> t.size() > 0)
-                    .map(Elements::last)
-                    .ifPresent(Element::remove)
-            )
-            .transfer(outputStream);
+    protected void postHandle(com.aspose.slides.Presentation presentation, OutputStream outputStream) throws Exception {
+        presentation.save(outputStream, SaveFormat.Pdf);
     }
 }

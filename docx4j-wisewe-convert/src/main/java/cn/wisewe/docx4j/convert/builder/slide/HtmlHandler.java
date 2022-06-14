@@ -1,9 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
 import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
-import com.spire.presentation.FileFormat;
-import com.spire.presentation.Presentation;
-import org.jsoup.nodes.Node;
+import com.aspose.slides.SaveFormat;
 
 import java.io.OutputStream;
 
@@ -20,18 +18,8 @@ class HtmlHandler extends SlideHandler {
     }
 
     @Override
-    protected void postHandle(Presentation presentation, OutputStream outputStream) {
-        presentation.getSaveToHtmlOption().setCenter(true);
-        HtmlTransfer.create(os -> presentation.saveToFile(os, FileFormat.HTML))
-            .handle(document ->
-                document.body()
-                    .select("div > svg")
-                    .forEach(it -> {
-                        it.attr("width", "100%");
-                        it.attr("height", "100%");
-                        it.select("svg > g > text").forEach(Node::remove);
-                    })
-            )
-            .transfer(outputStream);
+    protected void postHandle(com.aspose.slides.Presentation presentation, OutputStream outputStream) throws Exception {
+        // 添加移动端标签支持
+        HtmlTransfer.create(os -> presentation.save(outputStream, SaveFormat.Html)).transfer(outputStream);
     }
 }

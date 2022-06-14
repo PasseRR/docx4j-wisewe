@@ -1,21 +1,19 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
-import cn.wisewe.docx4j.convert.office.OfficeFileHandler;
-import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
-import com.spire.presentation.Presentation;
+import cn.wisewe.docx4j.convert.FileHandler;
 
 /**
  * ppt转换文件类型支持
  * @author xiehai
  * @date 2022/03/25 13:25
  */
-public enum SlideConvertType implements OfficeFileHandler<Presentation> {
+public enum SlideConvertType implements FileHandler {
     /**
      * ppt转pdf
      */
     PDF {
         @Override
-        public OfficeDocumentHandler<Presentation> getHandler() {
+        public SlideHandler getHandler() {
             return PdfHandler.INSTANCE;
         }
     },
@@ -24,7 +22,7 @@ public enum SlideConvertType implements OfficeFileHandler<Presentation> {
      */
     HTML {
         @Override
-        public OfficeDocumentHandler<Presentation> getHandler() {
+        public SlideHandler getHandler() {
             return HtmlHandler.INSTANCE;
         }
     }

@@ -13,6 +13,10 @@ import java.io.OutputStream;
 public class DocHandler extends PortableHandler {
     static final PortableHandler INSTANCE = new DocHandler();
 
+    private DocHandler() {
+
+    }
+
     @Override
     protected void postHandle(Document document, OutputStream outputStream) throws Exception {
         document.save(outputStream, SaveFormat.Doc);
