@@ -13,7 +13,7 @@ import java.io.OutputStream;
  * @date 2022/04/17 19:01
  */
 class HtmlHandler extends PortableHandler {
-    static final HtmlHandler INSTANCE = new HtmlHandler();
+    static final PortableHandler INSTANCE = new HtmlHandler();
 
     @Override
     protected void postHandle(Document document, OutputStream outputStream) {

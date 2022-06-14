@@ -12,7 +12,7 @@ import java.io.OutputStream;
  * @date 2022/03/25 10:00
  */
 class HtmlHandler extends DocumentHandler {
-    static final HtmlHandler INSTANCE = new HtmlHandler();
+    static final DocumentHandler INSTANCE = new HtmlHandler();
 
     private HtmlHandler() {
 

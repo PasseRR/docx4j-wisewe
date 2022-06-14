@@ -20,4 +20,20 @@ public class PortableConverterSpec {
             .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "pdf.html")))
             .convert(PortableConvertType.HTML);
     }
+
+    @Test
+    public void pdf2Docx() throws FileNotFoundException {
+        PortableConverter.create()
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "pdf.pdf")))
+            .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "pdf.docx")))
+            .convert(PortableConvertType.DOCX);
+    }
+
+    @Test
+    public void pdf2Doc() throws FileNotFoundException {
+        PortableConverter.create()
+            .input(new FileInputStream(FileUtil.brotherPath(this.getClass(), "pdf.pdf")))
+            .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "pdf.doc")))
+            .convert(PortableConvertType.DOC);
+    }
 }

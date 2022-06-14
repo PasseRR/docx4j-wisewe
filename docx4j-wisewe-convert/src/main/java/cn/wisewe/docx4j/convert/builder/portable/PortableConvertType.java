@@ -1,6 +1,5 @@
 package cn.wisewe.docx4j.convert.builder.portable;
 
-import cn.wisewe.docx4j.convert.ConvertHandler;
 import cn.wisewe.docx4j.convert.FileHandler;
 
 /**
@@ -14,8 +13,20 @@ public enum PortableConvertType implements FileHandler {
      */
     HTML {
         @Override
-        public ConvertHandler getHandler() {
+        public PortableHandler getHandler() {
             return HtmlHandler.INSTANCE;
+        }
+    },
+    DOCX {
+        @Override
+        public PortableHandler getHandler() {
+            return DocxHandler.INSTANCE;
+        }
+    },
+    DOC {
+        @Override
+        public PortableHandler getHandler() {
+            return DocHandler.INSTANCE;
         }
     }
 }

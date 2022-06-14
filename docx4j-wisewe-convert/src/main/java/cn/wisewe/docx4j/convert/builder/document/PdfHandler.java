@@ -11,7 +11,7 @@ import java.io.OutputStream;
  * @date 2022/03/25 10:10
  */
 class PdfHandler extends DocumentHandler {
-    static final PdfHandler INSTANCE = new PdfHandler();
+    static final DocumentHandler INSTANCE = new PdfHandler();
 
     private PdfHandler() {
 
