@@ -5,26 +5,35 @@
     <parent>
         <artifactId>docx4j-wisewe</artifactId>
         <groupId>cn.wisewe</groupId>
-        <version>1.5.1.RELEASE</version>
+        <version>1.6.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>docx4j-wisewe-convert-test</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <dependencies>
+        <!-- 执行测试用例前 需要先对docx4j-wisewe-convert进行package -->
         <dependency>
             <groupId>cn.wisewe</groupId>
             <artifactId>docx4j-wisewe-convert</artifactId>
             <version>test</version>
             <scope>system</scope>
-            <systemPath>${basedir}/../docx4j-wisewe-convert/target/docx4j-wisewe-convert-1.5.1.RELEASE.jar</systemPath>
+            <systemPath>
+                ${basedir}/../docx4j-wisewe-convert/target/docx4j-wisewe-convert-${project.version}.jar
+            </systemPath>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.14.3</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -57,10 +66,11 @@
 
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <extensions>true</extensions>
                 <configuration>
-                    <skip>true</skip>
+                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
                 </configuration>
             </plugin>
         </plugins>

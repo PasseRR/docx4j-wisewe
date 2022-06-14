@@ -5,7 +5,7 @@
     <parent>
         <artifactId>docx4j-wisewe</artifactId>
         <groupId>cn.wisewe</groupId>
-        <version>1.5.1.RELEASE</version>
+        <version>1.6.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -95,8 +95,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.jsoup:jsoup</exclude>
+                                </excludes>
+                            </artifactSet>
                             <filters>
                                 <!-- for words -->
                                 <filter>

@@ -5,17 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>docx4j-wisewe</artifactId>
     <groupId>cn.wisewe</groupId>
-    <version>1.5.1.RELEASE</version>
+    <version>1.6.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>docx4j-wisewe</name>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
     <description>常用文档的导入导出父pom</description>
     <modules>
-        <module>docx4j-wisewe-output</module>
-        <module>docx4j-wisewe-input</module>
         <module>docx4j-wisewe-convert</module>
         <module>docx4j-wisewe-convert-test</module>
+        <module>docx4j-wisewe-input</module>
+        <module>docx4j-wisewe-output</module>
     </modules>
 
     <properties>

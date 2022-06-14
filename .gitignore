@@ -11,3 +11,6 @@ target/
 *.iml
 
 *.pdb
+
+# convert reduced pom
+docx4j-wisewe-convert/dependency-reduced-pom.xml
