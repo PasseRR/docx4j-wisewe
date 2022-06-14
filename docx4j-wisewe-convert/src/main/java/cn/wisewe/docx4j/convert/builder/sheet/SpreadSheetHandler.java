@@ -1,11 +1,13 @@
 package cn.wisewe.docx4j.convert.builder.sheet;
 
-import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
-import com.spire.xls.Workbook;
+import cn.wisewe.docx4j.convert.ConvertHandler;
+import cn.wisewe.docx4j.convert.builder.Asposes;
+import com.aspose.cells.License;
+import com.aspose.cells.Workbook;
 
-import java.io.InputStream;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.io.BufferedInputStream;
+import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * excel文档处理器
@@ -13,24 +15,23 @@ import java.util.function.Supplier;
  * @date 2022/04/13 16:53
  */
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-abstract class SpreadSheetHandler extends OfficeDocumentHandler<Workbook> {
-    @Override
-    protected Supplier<Workbook> newDocument() {
-        return Workbook::new;
-    }
+abstract class SpreadSheetHandler implements ConvertHandler {
+    /**
+     * 是否初始化
+     */
+    private static final AtomicBoolean HAS_LICENSED = new AtomicBoolean();
 
     @Override
-    protected BiConsumer<Workbook, InputStream> preHandleFlat() {
-        return Workbook::loadFromXml;
+    public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
+        Asposes.tryLoadLicense(HAS_LICENSED, new License()::setLicense);
+        this.postHandle(new Workbook(inputStream), outputStream);
     }
 
-    @Override
-    protected BiConsumer<Workbook, InputStream> preHandleBinary() {
-        return Workbook::loadFromStream;
-    }
-
-    @Override
-    protected BiConsumer<Workbook, InputStream> preHandleZipped() {
-        return this.preHandleBinary();
-    }
+    /**
+     * 后置处理
+     * @param workbook     {@link Workbook}
+     * @param outputStream {@link OutputStream}
+     * @throws Exception 异常
+     */
+    protected abstract void postHandle(Workbook workbook, OutputStream outputStream) throws Exception;
 }

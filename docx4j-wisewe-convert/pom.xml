@@ -15,34 +15,7 @@
     <description>文档转换器</description>
     <url>https://gitee.com/PasseRR/docx4j-wisewe</url>
 
-    <properties>
-        <aspose.version>21.10</aspose.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>fop</artifactId>
-            <version>2.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-codec</artifactId>
-            <version>1.14</version>
-        </dependency>
-
-        <dependency>
-            <groupId>e-iceblue</groupId>
-            <artifactId>spire.office</artifactId>
-            <version>5.4.2</version>
-        </dependency>
-
         <dependency>
             <groupId>com.aspose</groupId>
             <artifactId>aspose-words</artifactId>
@@ -71,11 +44,11 @@
             <classifier>jdk16</classifier>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.aspose</groupId>-->
-        <!--            <artifactId>aspose-cells</artifactId>-->
-        <!--            <version>${aspose.version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cells</artifactId>
+            <version>21.11</version>
+        </dependency>
 
         <dependency>
             <groupId>com.aspose</groupId>
@@ -123,6 +96,7 @@
                         </goals>
                         <configuration>
                             <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
                                 <!-- for words -->
                                 <filter>
@@ -155,8 +129,16 @@
                                         <exclude>com.aspose.slides.internal.of.public.class</exclude>
                                     </excludes>
                                 </filter>
+                                <!-- for cells -->
+                                <filter>
+                                    <artifact>com.aspose:aspose-cells</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/37E3C32D.RSA</exclude>
+                                        <exclude>META-INF/37E3C32D.SF</exclude>
+                                        <exclude>com.aspose.cells.License.class</exclude>
+                                    </excludes>
+                                </filter>
                             </filters>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>
@@ -169,11 +151,6 @@
             <id>AsposeJavaAPI</id>
             <name>Aspose Java API</name>
             <url>http://repository.aspose.com/repo/</url>
-        </repository>
-        <repository>
-            <id>com.e-iceblue</id>
-            <name>e-iceblue</name>
-            <url>https://repo.e-iceblue.com/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 </project>

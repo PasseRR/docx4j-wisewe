@@ -1,9 +1,10 @@
 package cn.wisewe.docx4j.convert.builder.sheet;
 
 import cn.wisewe.docx4j.convert.builder.HtmlTransfer;
-import com.spire.xls.Workbook;
-import com.spire.xls.collections.WorksheetsCollection;
-import com.spire.xls.core.spreadsheet.HTMLOptions;
+import com.aspose.cells.HtmlSaveOptions;
+import com.aspose.cells.Workbook;
+import com.aspose.cells.Worksheet;
+import com.aspose.cells.WorksheetCollection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,6 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
@@ -21,8 +25,25 @@ import java.util.stream.IntStream;
  */
 class HtmlHandler extends SpreadSheetHandler {
     static final HtmlHandler INSTANCE = new HtmlHandler();
+    private static final HtmlSaveOptions HTML_SAVE_OPTIONS = new HtmlSaveOptions();
+
+    static {
+        // 图片base64编码
+        HTML_SAVE_OPTIONS.setExportImagesAsBase64(true);
+        // css文件不独立
+        HTML_SAVE_OPTIONS.setExportWorksheetCSSSeparately(false);
+        // 只导出当前活动的sheet
+        HTML_SAVE_OPTIONS.setExportActiveWorksheetOnly(true);
+    }
+
     private static final String IFRAME_PREFIX = "iframe";
     private static final String NAV_SUFFIX = "nav";
+    /**
+     * 需要移除的link rel属性值
+     */
+    private static final Set<String> LINKS = new HashSet<>(
+        Arrays.asList("File-List", "Edit-Time-Data", "OLE-Object-Data")
+    );
 
     private HtmlHandler() {
 
@@ -30,13 +51,11 @@ class HtmlHandler extends SpreadSheetHandler {
 
     @Override
     protected void postHandle(Workbook workbook, OutputStream outputStream) {
-        HTMLOptions options = new HTMLOptions();
-        options.setImageEmbedded(true);
-        WorksheetsCollection worksheets = workbook.getWorksheets();
+        WorksheetCollection worksheets = workbook.getWorksheets();
         Document document = getDocument();
         // 添加移动端支持
         HtmlTransfer.appendMeta(document);
-        int size = worksheets.size();
+        int size = worksheets.getCount();
         if (size > 0) {
             Element script = document.createElement("script");
             script.attr("type", "text/javascript");
@@ -57,16 +76,36 @@ class HtmlHandler extends SpreadSheetHandler {
                 .append("}\n");
             IntStream.range(0, size)
                 .mapToObj(workbook.getWorksheets()::get)
+                .map(Worksheet.class::cast)
                 .forEach(it -> {
                     int index = it.getIndex();
+                    // 激活sheet
+                    worksheets.setActiveSheetIndex(index);
                     String id = IFRAME_PREFIX + index;
                     // 添加导航
                     div.appendChild(this.navElement(document, it.getName(), id));
                     // 添加iframe
                     this.appendIframe(document, id);
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        HtmlTransfer.create(os -> it.saveToHtml(os, options))
-                            .handle(d -> d.body().select("h2:lt(1)").remove())
+                        HtmlTransfer.create(os -> {
+                                try {
+                                    workbook.save(os, HTML_SAVE_OPTIONS);
+                                } catch (Exception e) {
+                                    throw new SpreadSheetConvertException(e);
+                                }
+                            })
+                            .handle(d -> {
+                                // 移除无用的link标签
+                                d.head().getElementsByTag("link")
+                                    .stream()
+                                    .filter(e -> LINKS.contains(e.attr("rel")))
+                                    .forEach(Element::remove);
+                                // 移除script标签 反引号中不能有script标签
+                                d.body().getElementsByTag("script")
+                                    .stream()
+                                    .filter(e -> e.html().endsWith("ChangeIEBase64();"))
+                                    .forEach(Element::remove);
+                            })
                             .transfer(baos);
                         this.appendScript(sb, id, new String(baos.toByteArray(), StandardCharsets.UTF_8));
                     } catch (IOException e) {

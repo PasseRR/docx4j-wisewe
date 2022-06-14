@@ -1,21 +1,19 @@
 package cn.wisewe.docx4j.convert.builder.sheet;
 
-import cn.wisewe.docx4j.convert.office.OfficeFileHandler;
-import cn.wisewe.docx4j.convert.office.OfficeDocumentHandler;
-import com.spire.xls.Workbook;
+import cn.wisewe.docx4j.convert.FileHandler;
 
 /**
  * excel转换类型支持
  * @author xiehai
  * @date 2022/03/25 12:44
  */
-public enum SpreadSheetOfficeConvertType implements OfficeFileHandler<Workbook> {
+public enum SpreadSheetOfficeConvertType implements FileHandler {
     /**
      * excel转html
      */
     HTML {
         @Override
-        public OfficeDocumentHandler<Workbook> getHandler() {
+        public SpreadSheetHandler getHandler() {
             return HtmlHandler.INSTANCE;
         }
     }
