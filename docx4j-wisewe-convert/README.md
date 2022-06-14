@@ -1,10 +1,10 @@
 # 前言
 
-基于[spire.office](https://www.e-iceblue.com/)文档转换，目前有页数限制，**请谨慎使用**，支持文件转换如下
+> 若需要其他文件或者新增类型转换，请留言，会根据时间酌情处理。
 
 |源文件|源文件类型|目标文件类型|
 |:---|:---|:---|
-|PDF|pdf|html|
+|PDF|pdf|html、doc、docx|
 |Word文档|doc、docx、xml|html、pdf|
 |PowerPoint文档|ppt、pptx|html、pdf|
 |Excel文档|xls、xlsx、xml|html|
@@ -17,6 +17,8 @@
 PortableConverter.create()
     .input(new FileInputStream(FileUtil.brotherPath(this.getClass(),"pdf.pdf")))
     .output(new FileOutputStream(FileUtil.brotherPath(this.getClass(),"pdf.html")))
+    // PortableConvertType.DOC
+    // PortableConvertType.DOCX
     .convert(PortableConvertType.HTML);
 ```
 

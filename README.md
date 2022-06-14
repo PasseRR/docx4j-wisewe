@@ -45,6 +45,7 @@ dependencies {
 ```
 
 ## [文档转换](./docx4j-wisewe-convert/README.md)
+**文档转换依赖较大**（约120M），请酌情使用。
 
 maven引入
 
