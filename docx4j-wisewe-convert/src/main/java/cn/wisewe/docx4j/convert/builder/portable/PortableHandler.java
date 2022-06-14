@@ -23,7 +23,7 @@ abstract class PortableHandler implements ConvertHandler {
 
     @Override
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
-        Asposes.tryLoadLicense(HAS_LICENSED, () -> PortableHandler.class, new License()::setLicense);
+        Asposes.tryLoadLicense(HAS_LICENSED, new License()::setLicense);
         this.postHandle(new Document(inputStream), outputStream);
     }
 
