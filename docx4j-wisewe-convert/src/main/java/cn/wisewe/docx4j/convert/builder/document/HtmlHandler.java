@@ -13,6 +13,12 @@ import java.io.OutputStream;
  */
 class HtmlHandler extends DocumentHandler {
     static final DocumentHandler INSTANCE = new HtmlHandler();
+    private static final HtmlSaveOptions HTML_SAVE_OPTIONS = new HtmlSaveOptions();
+
+    static {
+        HTML_SAVE_OPTIONS.setExportImagesAsBase64(true);
+        HTML_SAVE_OPTIONS.setExportPageMargins(true);
+    }
 
     private HtmlHandler() {
 
@@ -20,13 +26,10 @@ class HtmlHandler extends DocumentHandler {
 
     @Override
     protected void postHandle(Document document, OutputStream outputStream) throws Exception {
-        HtmlSaveOptions options = new HtmlSaveOptions();
-        options.setExportImagesAsBase64(true);
-        options.setExportPageMargins(true);
         // 添加移动端html支持
         HtmlTransfer.create(os -> {
                 try {
-                    document.save(os, options);
+                    document.save(os, HTML_SAVE_OPTIONS);
                 } catch (Exception e) {
                     throw new DocumentConvertException(e);
                 }

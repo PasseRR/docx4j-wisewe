@@ -14,19 +14,23 @@ import java.io.OutputStream;
  */
 class HtmlHandler extends PortableHandler {
     static final PortableHandler INSTANCE = new HtmlHandler();
+    private static final HtmlSaveOptions HTML_SAVE_OPTIONS = new HtmlSaveOptions();
+
+    static {
+        HTML_SAVE_OPTIONS.setFixedLayout(true);
+        HTML_SAVE_OPTIONS.setPageBorderIfAny(new SaveOptions.BorderInfo());
+        HTML_SAVE_OPTIONS.setPartsEmbeddingMode(HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml);
+        HTML_SAVE_OPTIONS.setRasterImagesSavingMode(
+            HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground
+        );
+    }
 
     private HtmlHandler() {
-        
+
     }
 
     @Override
     protected void postHandle(Document document, OutputStream outputStream) {
-        HtmlSaveOptions options = new HtmlSaveOptions();
-        options.setFixedLayout(true);
-        options.setPageBorderIfAny(new SaveOptions.BorderInfo());
-        options.setPartsEmbeddingMode(HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml);
-        options.setRasterImagesSavingMode(HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground);
-        HtmlTransfer.create(os -> document.save(os, options))
-            .transfer(outputStream);
+        HtmlTransfer.create(os -> document.save(os, HTML_SAVE_OPTIONS)).transfer(outputStream);
     }
 }

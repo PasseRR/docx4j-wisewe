@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.slide;
 
 import cn.wisewe.docx4j.convert.ConvertHandler;
-import cn.wisewe.docx4j.convert.builder.Asposes;
+import cn.wisewe.docx4j.convert.builder.Licenses;
 import com.aspose.slides.License;
 import com.aspose.slides.Presentation;
 
@@ -23,7 +23,7 @@ abstract class SlideHandler implements ConvertHandler {
 
     @Override
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
-        Asposes.tryLoadLicense(HAS_LICENSED, new License()::setLicense);
+        Licenses.tryLoadLicense(HAS_LICENSED, new License()::setLicense);
         this.postHandle(new Presentation(inputStream), outputStream);
     }
 
