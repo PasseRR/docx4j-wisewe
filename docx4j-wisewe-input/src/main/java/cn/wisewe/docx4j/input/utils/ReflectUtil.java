@@ -70,7 +70,7 @@ public interface ReflectUtil {
     }
 
     /**
-     * 获得字段或字段get方法上的注解
+     * 获得字段get方法上或字段的注解
      * @param field      字段
      * @param annotation 注解
      * @param <T>        注解类型
@@ -78,13 +78,10 @@ public interface ReflectUtil {
      */
     static <T extends Annotation> T getAnnotation(Field field, Class<T> annotation) {
         return
-            // 优先获取字段上的注解
-            Optional.ofNullable(field.getAnnotation(annotation))
-                // 若字段上没有 获取get方法上的注解
-                .orElseGet(() ->
-                    Optional.ofNullable(ReflectUtil.getFieldGetter(field.getDeclaringClass(), field.getName()))
-                        .map(m -> m.getAnnotation(annotation))
-                        .orElse(null)
-                );
+            // 优先获取getter上的注解 考虑实体继承 属性可以通过getter方法修改注解
+            Optional.ofNullable(ReflectUtil.getFieldGetter(field.getDeclaringClass(), field.getName()))
+                .map(m -> m.getAnnotation(annotation))
+                // 否则获取字段上的注解
+                .orElseGet(() -> field.getAnnotation(annotation));
     }
 }
