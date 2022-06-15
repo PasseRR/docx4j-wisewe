@@ -145,7 +145,7 @@ public abstract class BaseDslRow<T extends BaseDslRow<?, ?>, U> {
      * @return {@link T}
      */
     public T dataCell(Consumer<U> consumer) {
-        return this.dataCell(null, consumer);
+        return this.dataCell((Object) null, consumer);
     }
 
     /**
