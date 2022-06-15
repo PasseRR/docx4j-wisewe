@@ -60,7 +60,7 @@ public abstract class BaseDslRow<T extends BaseDslRow<?, ?>, U> {
      * @return {@link T}
      */
     public T headCell(Consumer<U> consumer) {
-        return this.headCell(null, consumer);
+        return this.headCell((Object) null, consumer);
     }
 
     /**
