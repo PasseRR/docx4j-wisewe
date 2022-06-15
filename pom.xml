@@ -13,7 +13,6 @@
     <description>常用文档的导入导出父pom</description>
     <modules>
         <module>docx4j-wisewe-convert</module>
-        <module>docx4j-wisewe-convert-test</module>
         <module>docx4j-wisewe-input</module>
         <module>docx4j-wisewe-output</module>
     </modules>
