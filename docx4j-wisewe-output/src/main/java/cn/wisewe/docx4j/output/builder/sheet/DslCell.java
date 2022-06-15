@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -93,23 +94,6 @@ public class DslCell {
     }
 
     /**
-     * 以红星开头文本
-     * @param o 文本对象
-     * @return {@link DslCell}
-     */
-    public DslCell redAster(Object o) {
-        RichTextString rich =
-            this.getWorkBook()
-                .getCreationHelper()
-                .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
-        Font aster = LOADER.readHeadFont(this.getWorkBook());
-        rich.applyFont(0, 1, aster);
-        rich.applyFont(1, rich.length(), LOADER.headerFont(this.getWorkBook()));
-
-        return this.rich(rich);
-    }
-
-    /**
      * 富文本
      * @param text 富文本内容
      * @return {@link DslCell}
@@ -117,6 +101,34 @@ public class DslCell {
     public DslCell rich(RichTextString text) {
         this.accept(c -> c.setCellValue(text));
         return this.doUpdateLength(DslCell.width(text.getString()));
+    }
+
+    /**
+     * 自定义富文本
+     * @param function 生成富文本方法
+     * @return {@link DslCell}
+     */
+    public DslCell rich(Function<Workbook, RichTextString> function) {
+        return this.rich(function.apply(this.getWorkBook()));
+    }
+
+    /**
+     * 以红星开头文本
+     * @param o 文本对象
+     * @return {@link DslCell}
+     */
+    public DslCell redAster(Object o) {
+        return
+            this.rich(wb -> {
+                RichTextString rich =
+                    wb.getCreationHelper()
+                        .createRichTextString(OutputConstants.ASTER + StringConverterUtil.convert(o));
+                Font aster = LOADER.readHeadFont(wb);
+                rich.applyFont(0, 1, aster);
+                rich.applyFont(1, rich.length(), LOADER.headerFont(wb));
+
+                return rich;
+            });
     }
 
     /**
@@ -197,6 +209,15 @@ public class DslCell {
      */
     public DslCell style(CellStyle style) {
         return this.accept(c -> c.setCellStyle(style));
+    }
+
+    /**
+     * 单元格样式设置
+     * @param function 单元格样式生成方法
+     * @return {@link DslCell}
+     */
+    public DslCell style(Function<Workbook, CellStyle> function) {
+        return this.style(function.apply(this.getWorkBook()));
     }
 
     /**
