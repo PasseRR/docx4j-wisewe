@@ -221,6 +221,15 @@ public class DslCell {
     }
 
     /**
+     * 添加单元格样式
+     * @param supplier 样式提供器
+     * @return {@link DslCell}
+     */
+    public DslCell style(Supplier<CellStyle> supplier) {
+        return this.style(supplier.get());
+    }
+
+    /**
      * 设置单元格为表头样式
      * @return {@link DslCell}
      */
