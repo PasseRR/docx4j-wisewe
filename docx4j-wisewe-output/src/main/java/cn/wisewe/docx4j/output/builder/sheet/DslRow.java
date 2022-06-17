@@ -69,8 +69,8 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
     public DslRow headCell(Object o, Consumer<DslCell> consumer) {
         return
             this.cell(o, c -> {
-                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
                 c.headStyle();
+                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
             });
     }
 
@@ -78,8 +78,8 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
     public DslRow dataCell(Object o, Consumer<DslCell> consumer) {
         return
             this.cell(o, c -> {
-                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
                 c.dataStyle();
+                Optional.ofNullable(consumer).ifPresent(it -> it.accept(c));
             });
     }
 
