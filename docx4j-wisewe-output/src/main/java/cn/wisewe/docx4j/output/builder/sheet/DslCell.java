@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -221,12 +222,21 @@ public class DslCell {
     }
 
     /**
-     * 添加单元格样式
-     * @param supplier 样式提供器
+     * 扩展表头样式
+     * @param consumer 自定义样式
      * @return {@link DslCell}
      */
-    public DslCell style(Supplier<CellStyle> supplier) {
-        return this.style(supplier.get());
+    public DslCell headStyle(BiConsumer<Workbook, CellStyle> consumer) {
+        return this.style(LOADER::headCellStyle, consumer);
+    }
+
+    /**
+     * 扩展数据样式
+     * @param consumer 自定义样式设置
+     * @return {@link DslCell}
+     */
+    public DslCell dataStyle(BiConsumer<Workbook, CellStyle> consumer) {
+        return this.style(LOADER::cellStyle, consumer);
     }
 
     /**
@@ -275,6 +285,21 @@ public class DslCell {
         this.text(left + OutputConstants.BREAK_LINE + right);
         // 重新更新最大宽度
         return this.doUpdateLength(DslCell.width(left + right));
+    }
+
+    /**
+     * 样式扩展
+     * @param originCellStyle 源样式方法
+     * @param consumer        样式扩展方法
+     * @return {@link DslCell}
+     */
+    protected DslCell style(Function<Workbook, CellStyle> originCellStyle, BiConsumer<Workbook, CellStyle> consumer) {
+        Workbook workBook = this.getWorkBook();
+        CellStyle cellStyle = workBook.createCellStyle();
+        cellStyle.cloneStyleFrom(originCellStyle.apply(workBook));
+        consumer.accept(workBook, cellStyle);
+
+        return this.style(cellStyle);
     }
 
     /**

@@ -52,11 +52,31 @@ public class SpreadSheetExporterSpec {
             .workbook(wb ->
                 wb.sheet(s ->
                     // 表头行
-                    s.row(r -> r.headCells("姓名", "年龄", "性别"))
+                    s.row(r ->
+                            r.headCells("姓名", "年龄")
+                                .headCell(
+                                    "性别",
+                                    // 自定义样式
+                                    c -> c.headStyle((workbook, style) -> {
+                                        Font font = workbook.createFont();
+                                        font.setFontName("宋体");
+                                        font.setBold(true);
+                                        font.setFontHeightInPoints((short) 40);
+                                        style.setFont(font);
+                                    })
+                                )
+                        )
                         // 数据行
                         .rows(
                             SpecDataFactory.tableData(),
-                            (it, row) -> row.dataCells(it::getName, it::getAge, it::getSex)
+                            (it, row) ->
+                                row.dataCells(it::getName, it::getAge)
+                                    .dataCell(it::getSex, c -> c.dataStyle((workbook, style) -> {
+                                        Font font = workbook.createFont();
+                                        font.setFontName("宋体");
+                                        font.setFontHeightInPoints((short) 24);
+                                        style.setFont(font);
+                                    }))
                         )
                         // 行列冻结
                         .freeze(1, 1)

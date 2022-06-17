@@ -9,6 +9,7 @@ import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
@@ -253,7 +254,10 @@ public class DslSheet {
         return
             Optional.ofNullable(this.rows.get(rowNumber))
                 .orElseGet(() -> {
-                    DslRow row = new DslRow(this.sheet.createRow(rowNumber));
+                    Row r = this.sheet.createRow(rowNumber);
+                    // 自适应列高度
+                    r.setHeight((short) -1);
+                    DslRow row = new DslRow(r);
                     this.rows.put(rowNumber, row);
 
                     return row;
