@@ -13,6 +13,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -194,45 +195,64 @@ public class DslSheet {
                 return;
             }
 
-            // 最小5个字符 最大100个字符
-            final int base = 3, min = 5 * base, max = 100 * base;
-            // 计算列最大宽度
-            int maxWidth = DslCell.COLUMN_WIDTH.get().values().stream().mapToInt(Integer::intValue).max().orElse(min);
+            // 最小5个字符 最大120个字符
+            final int base = 1 << 8, min = 7 * base, max = 122 * base;
+            AtomicInteger maxWidth = new AtomicInteger();
+            IntStream.range(0, this.maxCells)
+                .peek(this.sheet::autoSizeColumn)
+                .forEach(it -> {
+                    // 从自适应宽度与最低宽度中找合适宽度
+                    // 若保持最大宽度 已最大宽度为准
+                    final int width =
+                        (int) (Integer.max(
+                            this.sheet.getColumnWidth(it),
+                            DslCell.AT_LEAST_MIN_WIDTH.get().getOrDefault(it, 0) * base >> 1
+                        ) * 1.7F);
+                    if (width < min) {
+                        this.sheet.setColumnWidth(it, min);
+                    } else {
+                        this.sheet.setColumnWidth(it, Math.min(width, max));
+                    }
+
+                    maxWidth.set(Integer.min(Integer.max(maxWidth.get(), width), max));
+                });
+
+            // 等宽列
+            if (this.keepMaxColumnWidth) {
+                IntStream.range(0, this.maxCells).forEach(it -> this.sheet.setColumnWidth(it, maxWidth.get()));
+            }
 
             IntStream.range(0, this.maxCells)
                 .forEach(it -> {
-                    // 列宽至少宽5个字符
-                    int width = this.keepMaxColumnWidth
-                        ? maxWidth :
-                        Optional.ofNullable(DslCell.COLUMN_WIDTH.get())
-                            // 若无数据设置 则赋值为默认宽度
-                            .map(m -> m.get(it))
-                            .filter(w -> w >= min)
-                            .orElse(min);
-                    // 使一列最大宽度为100个字符 并多出2个字符保持美观
-                    int fitWidth = Integer.min(width, max) + 2 * base;
-                    this.sheet.setColumnWidth(it, (fitWidth >> 1) * 256);
-
+                    // 单元格宽度
+                    int width = this.sheet.getColumnWidth(it);
                     // 设置斜线单元格 自动补全空格
                     Optional.ofNullable(DslCell.DIAGONAL_COLUMNS.get())
                         .map(m -> m.get(it))
                         .ifPresent(s ->
                             s.forEach(c ->
                                 c.accept(cl -> {
-                                    String text = cl.getStringCellValue();
-                                    int index = text.indexOf(OutputConstants.BREAK_LINE);
+                                    // 字符串分割位置
+                                    int index = c.diagonalIndex;
                                     if (index < 0) {
                                         return;
                                     }
+                                    // 字体宽度/高度
+                                    short fontHeight =
+                                        c.getWorkBook()
+                                            .getFontAt(cl.getCellStyle().getFontIndex())
+                                            .getFontHeight();
+                                    String text = cl.getStringCellValue(),
+                                        left = text.substring(0, index),
+                                        right = text.substring(index);
 
-                                    String left = text.substring(0, index), right = text.substring(index + 1);
                                     // 自动补齐空格
                                     if (c.diagonalUp) {
-                                        int len = fitWidth - DslCell.width(right);
+                                        int len = width / fontHeight - len(right);
                                         // 右上至左下斜线
                                         cl.setCellValue(left + OutputConstants.BREAK_LINE + padding(len) + right);
                                     } else {
-                                        int len = fitWidth - DslCell.width(left);
+                                        int len = width / fontHeight - len(left);
                                         // 左上至右下斜线
                                         cl.setCellValue(padding(len) + left + OutputConstants.BREAK_LINE + right);
                                     }
@@ -265,23 +285,24 @@ public class DslSheet {
     }
 
     /**
+     * 带有中文的转excel字符宽度计算
+     * @param s 字符串
+     * @return 字符宽度
+     */
+    protected static int len(String s) {
+        return (s.getBytes(StandardCharsets.UTF_8).length + s.length()) >> 1;
+    }
+
+    /**
      * 空格填充
      * @param len 填充字节数
      * @return 带斜线的单元格自动填充空格
      */
     protected static String padding(int len) {
-        len >>= 1;
-        // 多余2个字节使用双字节空格填充
-        String padding = String.join(
-            OutputConstants.EMPTY,
-            // 
-            Collections.nCopies((len >> 1) - (len & 1 ^ 1), OutputConstants.DOUBLE_BYTE_SPACE)
-        );
-        // 剩余字节使用单字节空格填充
-        if ((len & 1) == 0) {
-            padding += OutputConstants.SPACE;
-        }
-
-        return padding;
+        return
+            String.join(
+                OutputConstants.EMPTY,
+                Collections.nCopies((len << 1) - 1, OutputConstants.SPACE)
+            );
     }
 }

@@ -109,12 +109,27 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
 
     /**
      * 表头单元格拆分 仅支持拆分为二 自行添加空格补齐
+     * @param first    第一个字符串
+     * @param second   第二个字符串
+     * @param consumer 额外设置
+     * @return {@link DslRow}
+     */
+    public DslRow diagonalHeadCell(String first, String second, boolean isDiagonalUp, Consumer<DslCell> consumer) {
+        return
+            this.cell(cell -> {
+                cell.diagonalHeadStyle(isDiagonalUp).text(first, second);
+                Optional.ofNullable(consumer).ifPresent(it -> it.accept(cell));
+            });
+    }
+
+    /**
+     * 表头单元格拆分 仅支持拆分为二 自行添加空格补齐
      * @param first  第一个字符串
      * @param second 第二个字符串
      * @return {@link DslRow}
      */
     public DslRow diagonalHeadCell(String first, String second, boolean isDiagonalUp) {
-        return this.cell(cell -> cell.diagonalHeadStyle(isDiagonalUp).text(first, second));
+        return this.diagonalHeadCell(first, second, isDiagonalUp, null);
     }
 
     /**
@@ -137,6 +152,20 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
         return this.diagonalHeadCell(first, second, true);
     }
 
+    /**
+     * 表头单元格拆分 仅支持拆分为二 自行添加空格补齐
+     * @param first    第一个字符串
+     * @param second   第二个字符串
+     * @param consumer 额外设置
+     * @return {@link DslRow}
+     */
+    public DslRow diagonalDataCell(String first, String second, boolean isDiagonalUp, Consumer<DslCell> consumer) {
+        return
+            this.cell(cell -> {
+                cell.diagonalDataStyle(isDiagonalUp).text(first, second);
+                Optional.ofNullable(consumer).ifPresent(it -> consumer.accept(cell));
+            });
+    }
 
     /**
      * 表头单元格拆分 仅支持拆分为二 自行添加空格补齐
@@ -145,7 +174,7 @@ public class DslRow extends BaseDslRow<DslRow, DslCell> {
      * @return {@link DslRow}
      */
     public DslRow diagonalDataCell(String first, String second, boolean isDiagonalUp) {
-        return this.cell(cell -> cell.diagonalDataStyle(isDiagonalUp).text(first, second));
+        return this.diagonalDataCell(first, second, isDiagonalUp, null);
     }
 
     /**

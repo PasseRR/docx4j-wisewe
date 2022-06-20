@@ -75,6 +75,7 @@ public interface StyleDefinition {
         // 内容对齐方式
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setWrapText(true);
 
         return cellStyle;
     }

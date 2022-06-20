@@ -25,18 +25,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * {@link Cell} dsl
@@ -56,11 +53,18 @@ public class DslCell {
     @NonFinal
     @PackagePrivate
     boolean diagonalUp = false;
+    @NonFinal
+    @PackagePrivate
+    int diagonalIndex;
     /**
-     * 使用ThreadLocal缓存最大列宽 每个sheet渲染结束时回收
+     * 对角线
      */
-    protected static final ThreadLocal<Map<Integer, Integer>> COLUMN_WIDTH = ThreadLocal.withInitial(HashMap::new);
     protected static final ThreadLocal<Map<Integer, Set<DslCell>>> DIAGONAL_COLUMNS =
+        ThreadLocal.withInitial(HashMap::new);
+    /**
+     * 列宽最低
+     */
+    protected static final ThreadLocal<Map<Integer, Integer>> AT_LEAST_MIN_WIDTH =
         ThreadLocal.withInitial(HashMap::new);
     /**
      * 样式定义
@@ -91,7 +95,7 @@ public class DslCell {
             return this.accept(Cell::setBlank);
         }
 
-        return this.doSetText(StringConverterUtil.convert(o));
+        return this.accept(c -> c.setCellValue(StringConverterUtil.convert(o)));
     }
 
     /**
@@ -100,8 +104,7 @@ public class DslCell {
      * @return {@link DslCell}
      */
     public DslCell rich(RichTextString text) {
-        this.accept(c -> c.setCellValue(text));
-        return this.doUpdateLength(DslCell.width(text.getString()));
+        return this.accept(c -> c.setCellValue(text));
     }
 
     /**
@@ -169,13 +172,11 @@ public class DslCell {
             }
             // 插入图片，如果原图宽度大于最终要求的图片宽度，就按比例缩小，否则展示原图
             drawing.createPicture(anchor, index).resize(1);
-            // 设置列最大宽度
-            this.doUpdateLength(width);
         } catch (IOException e) {
             throw new SpreadSheetExportException(e);
         }
 
-        return this;
+        return this.atLeastWidth(width);
     }
 
     /**
@@ -204,6 +205,17 @@ public class DslCell {
     }
 
     /**
+     * 设置最低宽度
+     * @param width 最低宽度
+     * @return {@link DslCell}
+     */
+    public DslCell atLeastWidth(int width) {
+        AT_LEAST_MIN_WIDTH.get().merge(this.cell.getColumnIndex(), width, Integer::max);
+
+        return this;
+    }
+
+    /**
      * 设置单元格样式
      * @param style {@link CellStyle}
      * @return {@link DslCell}
@@ -222,21 +234,18 @@ public class DslCell {
     }
 
     /**
-     * 扩展表头样式
-     * @param consumer 自定义样式
+     * 样式扩展
+     * @param consumer 扩展方法
      * @return {@link DslCell}
      */
-    public DslCell headStyle(BiConsumer<Workbook, CellStyle> consumer) {
-        return this.style(LOADER::headCellStyle, consumer);
-    }
+    public DslCell expandStyle(BiConsumer<Workbook, CellStyle> consumer) {
+        Workbook workBook = this.getWorkBook();
+        CellStyle cellStyle = workBook.createCellStyle();
+        // 样式clone修改
+        cellStyle.cloneStyleFrom(this.cell.getCellStyle());
+        consumer.accept(workBook, cellStyle);
 
-    /**
-     * 扩展数据样式
-     * @param consumer 自定义样式设置
-     * @return {@link DslCell}
-     */
-    public DslCell dataStyle(BiConsumer<Workbook, CellStyle> consumer) {
-        return this.style(LOADER::cellStyle, consumer);
+        return this.style(cellStyle);
     }
 
     /**
@@ -282,24 +291,9 @@ public class DslCell {
      * @return {@link DslCell}
      */
     protected DslCell text(String left, String right) {
-        this.text(left + OutputConstants.BREAK_LINE + right);
-        // 重新更新最大宽度
-        return this.doUpdateLength(DslCell.width(left + right));
-    }
-
-    /**
-     * 样式扩展
-     * @param originCellStyle 源样式方法
-     * @param consumer        样式扩展方法
-     * @return {@link DslCell}
-     */
-    protected DslCell style(Function<Workbook, CellStyle> originCellStyle, BiConsumer<Workbook, CellStyle> consumer) {
-        Workbook workBook = this.getWorkBook();
-        CellStyle cellStyle = workBook.createCellStyle();
-        cellStyle.cloneStyleFrom(originCellStyle.apply(workBook));
-        consumer.accept(workBook, cellStyle);
-
-        return this.style(cellStyle);
+        // 设置分隔字符串索引
+        this.diagonalIndex = left.length();
+        return this.text(left + right);
     }
 
     /**
@@ -330,39 +324,6 @@ public class DslCell {
     }
 
     /**
-     * 设置单元格内容并缓存列最长字符串字节数
-     * @param text 内容
-     * @return {@link DslCell}
-     */
-    protected DslCell doSetText(String text) {
-        this.accept(c -> c.setCellValue(text));
-
-        Integer length = Optional.of(text)
-            .filter(it -> it.contains(OutputConstants.BREAK_LINE))
-            .map(it ->
-                // 若存在换行符
-                Stream.of(it.split(OutputConstants.BREAK_LINE))
-                    .mapToInt(DslCell::width)
-                    .boxed()
-                    .max(Comparator.comparingInt(t -> t))
-                    .orElse(0)
-            )
-            .orElseGet(() -> DslCell.width(text));
-
-        return this.doUpdateLength(length);
-    }
-
-    /**
-     * 更新最大宽度
-     * @param length 宽度
-     * @return {@link DslCell}
-     */
-    protected DslCell doUpdateLength(int length) {
-        COLUMN_WIDTH.get().merge(this.cell.getColumnIndex(), length, Math::max);
-        return this;
-    }
-
-    /**
      * 斜线设置
      * @param isDiagonalUp 斜线方向
      */
@@ -388,8 +349,8 @@ public class DslCell {
      * 移除线程变量
      */
     protected static void removeThreadLocal() {
-        COLUMN_WIDTH.remove();
         DIAGONAL_COLUMNS.remove();
+        AT_LEAST_MIN_WIDTH.remove();
     }
 
     protected static int width(String s) {

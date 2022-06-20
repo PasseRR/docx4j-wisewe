@@ -16,11 +16,11 @@ public interface OutputConstants {
      */
     String SPACE = " ";
     /**
-     * 星号
+     * 星号{@value}
      */
     String ASTER = "*";
     /**
-     * 全角空格
+     * 全角空格{@value}
      */
     String DOUBLE_BYTE_SPACE = "　";
     /**

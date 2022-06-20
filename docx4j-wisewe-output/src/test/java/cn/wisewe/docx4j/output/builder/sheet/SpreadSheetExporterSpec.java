@@ -55,9 +55,9 @@ public class SpreadSheetExporterSpec {
                     s.row(r ->
                             r.headCells("姓名", "年龄")
                                 .headCell(
-                                    "性别",
+                                    "性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别性别",
                                     // 自定义样式
-                                    c -> c.headStyle((workbook, style) -> {
+                                    c -> c.expandStyle((workbook, style) -> {
                                         Font font = workbook.createFont();
                                         font.setFontName("宋体");
                                         font.setBold(true);
@@ -71,12 +71,13 @@ public class SpreadSheetExporterSpec {
                             SpecDataFactory.tableData(),
                             (it, row) ->
                                 row.dataCells(it::getName, it::getAge)
-                                    .dataCell(it::getSex, c -> c.dataStyle((workbook, style) -> {
-                                        Font font = workbook.createFont();
-                                        font.setFontName("宋体");
-                                        font.setFontHeightInPoints((short) 24);
-                                        style.setFont(font);
-                                    }))
+                                    .dataCell(it::getSex, c -> c.expandStyle((workbook, style) -> {
+                                            Font font = workbook.createFont();
+                                            font.setFontName("宋体");
+                                            font.setFontHeightInPoints((short) 24);
+                                            style.setFont(font);
+                                        })
+                                    )
                         )
                         // 行列冻结
                         .freeze(1, 1)
@@ -89,7 +90,15 @@ public class SpreadSheetExporterSpec {
     public void diagonal() throws FileNotFoundException {
         SpreadSheetExporter.fastCreate(wb ->
             wb.sheet(s ->
-                s.row(r -> r.diagonalDownHeadCell("星期", "节次").diagonalUpHeadCell("左上", "右下"))
+                s.row(r ->
+                        r.diagonalDownHeadCell("星期", "节次")
+                            .diagonalHeadCell("左上", "右下", false, c -> c.expandStyle((b, style) -> {
+                                    Font font = b.createFont();
+                                    font.setFontHeightInPoints((short) 30);
+                                    style.setFont(font);
+                                })
+                            )
+                    )
                     .row(r -> r.diagonalUpDataCell("节次1", "星期一").diagonalDownDataCell("节次2", "星期二"))
             )
         ).writeTo(new FileOutputStream(FileUtil.brotherPath(this.getClass(), "diagonal.xlsx")));
@@ -238,7 +247,8 @@ public class SpreadSheetExporterSpec {
             .workbook(wb ->
                 wb.sheet(s ->
                     // 表头行
-                    s.row(r -> r.headCells("姓名", "年龄", "性别", "图片"))
+                    s.keepMaxColumnWidth()
+                        .row(r -> r.headCells("姓名", "年龄", "性别", "图片"))
                         // 数据行
                         .rows(
                             SpecDataFactory.tableData(),
