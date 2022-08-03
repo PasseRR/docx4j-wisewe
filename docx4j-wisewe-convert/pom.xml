@@ -18,8 +18,8 @@
     <dependencies>
         <dependency>
             <groupId>cn.wisewe</groupId>
-            <artifactId>aspose-shade</artifactId>
-            <version>1.0.0.RELEASE</version>
+            <artifactId>aspose-shade-office</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

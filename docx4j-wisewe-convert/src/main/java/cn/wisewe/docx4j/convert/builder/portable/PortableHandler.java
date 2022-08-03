@@ -1,7 +1,7 @@
 package cn.wisewe.docx4j.convert.builder.portable;
 
+import cn.wisewe.aspose.Asposes;
 import cn.wisewe.docx4j.convert.ConvertHandler;
-import cn.wisewe.docx4j.convert.builder.Licenses;
 import com.aspose.pdf.Document;
 import com.aspose.pdf.License;
 
@@ -23,7 +23,7 @@ abstract class PortableHandler implements ConvertHandler {
 
     @Override
     public void handle(BufferedInputStream inputStream, OutputStream outputStream) throws Exception {
-        Licenses.tryLoadLicense(HAS_LICENSED, new License()::setLicense);
+        Asposes.tryLoadLicense(HAS_LICENSED, new License()::setLicense);
         this.postHandle(new Document(inputStream), outputStream);
     }
 
